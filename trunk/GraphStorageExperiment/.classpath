@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.emf.ecore_2.3.1.v200709252135.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.emf.ecore.xmi_2.3.1.v200709252135.jar"/>
 	<classpathentry kind="lib" path="lib/sor_2.1.jar"/>
+	<classpathentry kind="lib" path="lib/je-3.3.69.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
