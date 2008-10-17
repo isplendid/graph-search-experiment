@@ -1,0 +1,8 @@
+Database = jdbc:db2://9.186.102.50:50000/INDEX
+User = db2admin
+Password = IBMintern
+Driver = com.ibm.db2.jcc.DB2Driver
+TempFolder = data/metaweb/raw
+DataFolder = data/metaweb
+PatternLength = 3
+PatternStrSize = 256
