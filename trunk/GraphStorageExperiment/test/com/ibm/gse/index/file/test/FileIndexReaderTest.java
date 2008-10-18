@@ -8,7 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ibm.gse.indexer.file.FileIndexReader;
+import com.ibm.gse.index.file.FileIndexReader;
 import com.ibm.gse.system.GraphStorage;
 
 public class FileIndexReaderTest {

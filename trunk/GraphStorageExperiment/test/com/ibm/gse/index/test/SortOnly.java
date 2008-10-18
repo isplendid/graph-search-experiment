@@ -1,7 +1,7 @@
 package com.ibm.gse.index.test;
 
+import com.ibm.gse.index.file.util.FileIndexSorter;
 import com.ibm.gse.indexer.file.FileIndexer;
-import com.ibm.gse.indexer.file.util.FileIndexSorter;
 import com.ibm.gse.system.GraphStorage;
 import com.ibm.gse.temp.file.util.TempRepositorySorter;
 

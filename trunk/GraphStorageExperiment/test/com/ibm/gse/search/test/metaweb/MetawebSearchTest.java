@@ -11,8 +11,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ibm.gse.indexer.file.FileIndexEntry;
-import com.ibm.gse.indexer.file.FileIndexReader;
+import com.ibm.gse.index.file.FileIndexEntry;
+import com.ibm.gse.index.file.FileIndexReader;
 import com.ibm.gse.query.MergeJoinPlan;
 import com.ibm.gse.query.PatternPlan;
 import com.ibm.gse.query.Plan;
