@@ -1,5 +1,6 @@
-package com.ibm.gse.index.file;
+package com.ibm.gse.indexer.file;
 
+import com.ibm.gse.index.file.FileIndexWriter;
 import com.ibm.gse.storage.file.FileRepositoryWriter;
 import com.ibm.gse.storage.file.RID;
 import com.ibm.gse.storage.file.RecordRange;
