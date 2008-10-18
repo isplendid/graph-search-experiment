@@ -73,5 +73,9 @@ public class DatabaseIDManager implements IDManager {
         }
         return idCounter - 1;
     }
+    
+    public void close() {
+    	
+    }
 
 }

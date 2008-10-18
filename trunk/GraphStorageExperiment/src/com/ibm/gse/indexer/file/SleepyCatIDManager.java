@@ -112,4 +112,15 @@ public class SleepyCatIDManager implements IDManager {
 
 	}
 
+	@Override
+	public void close() {
+		try {
+			uri2id.close();
+			id2uri.close();
+			env.close();
+		} catch (DatabaseException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

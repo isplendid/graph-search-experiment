@@ -39,5 +39,10 @@ public interface IDManager {
      * @return The id of the new uri
      */
     public int addURI(String uri);
+    
+    /**
+     * Release all resources occupied by this manager
+     */
+    public void close();
 
 }
