@@ -1,13 +1,13 @@
-package com.ibm.gse.indexer.file.util;
+package com.ibm.gse.index.file.util;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.ibm.gse.indexer.file.FileIndexEntry;
-import com.ibm.gse.indexer.file.FileIndexReader;
-import com.ibm.gse.indexer.file.FileIndexWriter;
+import com.ibm.gse.index.file.FileIndexEntry;
+import com.ibm.gse.index.file.FileIndexReader;
+import com.ibm.gse.index.file.FileIndexWriter;
 import com.ibm.gse.util.Heap;
 
 /**
