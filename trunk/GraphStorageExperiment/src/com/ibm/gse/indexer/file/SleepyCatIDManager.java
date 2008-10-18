@@ -28,7 +28,7 @@ public class SleepyCatIDManager implements IDManager {
 	Environment env;
 	
 	public SleepyCatIDManager() {
-		String idDir = GraphStorage.config.getStringSetting("", null);
+		String idDir = GraphStorage.config.getStringSetting("IDMappingFolder", null);
 		EnvironmentConfig ec = new EnvironmentConfig();
 		ec.setAllowCreate(true);
 		ec.setTransactional(false);
