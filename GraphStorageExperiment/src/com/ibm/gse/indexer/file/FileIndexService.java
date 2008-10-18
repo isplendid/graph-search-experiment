@@ -37,16 +37,15 @@ import com.ibm.gse.util.Heap;
 public class FileIndexService {
 
 	final static int coe = 10;
-
-	IDManager idman;
+	
 	PatternCodec codec;
 
 	public FileIndexService() {
-		idman = new SleepyCatIDManager();
 		codec = new PreorderPatternCodec();
 	}
 
 	public void indexNode(String filename) {
+		IDManager idman = new SleepyCatIDManager(); 
 		TempRepositoryFileWriter wr = new TempRepositoryFileWriter(GraphStorage.config.getStringSetting("TempFolder", null) + "/raw" + 0, 1);
 		InstanceKeywordRepository rs = new InstanceKeywordRepository(filename);
 		int entryCounter = 0;
@@ -73,6 +72,8 @@ public class FileIndexService {
 		}
 		rs.close();
 		wr.close();
+		
+		idman.close();
 
 		System.out.println("ENTRY COUNT = " + entryCounter);
 		TempRepositorySorter.sort(GraphStorage.config.getStringSetting("TempFolder", null) + "/raw" + 0, GraphStorage.config.getStringSetting("TempFolder", null) + "/sort" + 0, 1, GraphStorage.config.getStringSetting("TempFolder", null) + "/SortTmp");
