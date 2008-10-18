@@ -5,9 +5,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.ibm.gse.indexer.IDManager;
 import com.ibm.gse.system.ConnectionFactory;
 
-public class IDManager {
+public class DatabaseIDManager implements IDManager {
 
 	final static String COLUMN_PATTERN = "URI";
 	final static String TABLE_URI2ID = "URI2ID";
@@ -16,7 +17,7 @@ public class IDManager {
 	
 	private Connection conn = null;
     
-    public IDManager() {
+    public DatabaseIDManager() {
     	conn = ConnectionFactory.createConnection();
     }
     
