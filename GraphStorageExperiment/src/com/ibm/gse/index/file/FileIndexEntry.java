@@ -1,4 +1,4 @@
-package com.ibm.gse.indexer.file;
+package com.ibm.gse.index.file;
 
 import com.ibm.gse.storage.file.RecordRange;
 

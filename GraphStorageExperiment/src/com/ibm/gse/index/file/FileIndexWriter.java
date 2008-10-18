@@ -1,4 +1,4 @@
-package com.ibm.gse.indexer.file;
+package com.ibm.gse.index.file;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
