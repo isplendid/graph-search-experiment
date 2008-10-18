@@ -6,18 +6,18 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ibm.gse.indexer.db.IDManager;
+import com.ibm.gse.indexer.db.DatabaseIDManager;
 import com.ibm.gse.storage.file.FileRepository;
 
 public class IndexSearchTest {
 	
-	IDManager idman;
+	DatabaseIDManager idman;
 	List<String> patterns;
 	List<Integer> size;
 
 	@Before
 	public void setUp() throws Exception {
-		idman = new IDManager();
+		idman = new DatabaseIDManager();
 		patterns = new ArrayList<String>();
 		size = new ArrayList<Integer>();
 		
