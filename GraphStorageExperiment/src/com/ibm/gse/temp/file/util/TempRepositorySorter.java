@@ -17,7 +17,7 @@ import com.ibm.gse.util.Heap;
  */
 public class TempRepositorySorter {
 
-	final static int segmentLength = 500000;
+	final static int segmentLength = 2000000;
 
 	static public void sort(String src, String dest, int size, String tmpDir) {
 		sort(src, dest, tmpDir, size, true);
