@@ -1,23 +1,16 @@
-package com.ibm.gse.indexer.file;
+package com.ibm.gse.indexer;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 
-/**
- * 
- * @author Tian Yuan
- * 
- */
-public class InstanceKeywordRepository {
+public class RelationRepository {
 
 	BufferedReader rd;
-	String[] words;
-	String uri;
+	String sub, pred, obj;
 
-	public InstanceKeywordRepository(String filename) {
+	public RelationRepository(String filename) {
 		try {
 			rd = new BufferedReader(new FileReader(filename));
 		} catch (FileNotFoundException e) {
@@ -29,28 +22,36 @@ public class InstanceKeywordRepository {
 	public boolean next() {
 		String temp;
 
-		if (rd == null)
-			return false;
+		if (rd == null) return false;
 
 		do {
 			try {
-				temp = rd.readLine();
+				if ((temp = rd.readLine()) == null) return false;
 			} catch (IOException e) {
 				e.printStackTrace();
 				return false;
 			}
 
-			if (temp == null) return false;
-
-			String[] split = temp.split("\t");
+			String[] split = temp.split("> ");
 			
-			if (split.length < 2) continue;
-
-			uri = split[0];
-			words = split[1].split(" ");
-
+			if (split[2].startsWith("\"")) continue;
+			sub = split[0] + ">";
+			pred = split[1] + ">";
+			obj = split[2] + ">";
 			return true;
 		} while (true);
+	}
+
+	public String getSubject() {
+		return sub;
+	}
+
+	public String getPredicate() {
+		return pred;
+	}
+
+	public String getObject() {
+		return obj;
 	}
 
 	public void close() {
@@ -60,13 +61,4 @@ public class InstanceKeywordRepository {
 			e.printStackTrace();
 		}
 	}
-
-	public String getInstance() {
-		return uri;
-	}
-
-	public String[] getWords() {
-		return words;
-	}
-
 }

@@ -75,7 +75,10 @@ public class FileIndexReader {
 	}
 	
 	public FileIndexEntry readEntry() {
-		return new FileIndexEntry(getPatternString(), getRange());
+		if (next())
+			return new FileIndexEntry(getPatternString(), getRange());
+		else
+			return null;
 	}
 	
 	public int getInstanceCount() {
