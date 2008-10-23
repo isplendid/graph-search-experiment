@@ -16,7 +16,14 @@ import com.ibm.gse.util.Heap;
  */
 public class FileIndexMerger {
 	
-	static void merge(String src, String dest, int size, int threadCnt) {
+	/**
+	 * This method merges two or more indices into one
+	 * @param src The directory containing the indices to be merged
+	 * @param dest The directory where the merged index is to be put 
+	 * @param size The node count of the indices
+	 * @param threadCnt The number of indices to be merged
+	 */
+	public static void merge(String src, String dest, int size, int threadCnt) {
 		FileIndexWriter fiw = new FileIndexWriter(dest + "/index" + (size - 1), size);
 		FileRepositoryWriter frw = new FileRepositoryWriter(dest + "/storage" + (size - 1), size);
 		Heap h = new Heap();
@@ -42,6 +49,7 @@ public class FileIndexMerger {
 			if (!hc.fie.pattern.equals(currentPattern) && end != null) {
 				fiw.writeEntry(currentPattern, new RecordRange(start, end));
 				currentPattern = hc.fie.pattern;
+				start = frw.getRID();
 			}
 			
 			FileRepositoryReader frr = new FileRepositoryReader(hc.repFilename, size, hc.fie.range);
@@ -50,10 +58,16 @@ public class FileIndexMerger {
 				end = frw.getRID();
 				frw.writeEntry(tmp);
 			}
+			frr.close();
 						
 			hc.fie = hc.reader.readEntry();
-			if (hc.fie != null) h.insert(hc);
+			if (hc.fie != null)
+				h.insert(hc);
+			else
+				hc.reader.close();
 		}
+		fiw.close();
+		frw.close();
 	}
 	
 	static class HeapContainer implements Comparable {
@@ -71,7 +85,7 @@ public class FileIndexMerger {
 		@Override
 		public int compareTo(Object arg0) {
 			if (arg0 instanceof HeapContainer)
-				return fie.compareTo(((HeapContainer) arg0).fie);
+				return -fie.compareTo(((HeapContainer) arg0).fie);
 			else
 				return 0;
 		}
