@@ -47,7 +47,7 @@ public class TempRepositoryFileReader {
 		}
 		
 		int res[] = new int[size];
-		int len = ((int)(buf[offset]) << 8) + buf[offset + 1];
+		int len = ((int)(buf[offset]) << 8) + (255 & buf[offset + 1]);
 //		System.out.println("OFFSET = " + offset + " LEN = " + len);
 		
 		String pattern = new String(buf, offset + 2, len);

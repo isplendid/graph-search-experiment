@@ -95,7 +95,7 @@ public class SleepyCatIDManager implements IDManager {
 		
 		IntegerBinding.intToEntry(id, idde);
 		try {
-			OperationStatus os = uri2id.get(null, idde, uride, LockMode.DEFAULT);
+			OperationStatus os = id2uri.get(null, idde, uride, LockMode.DEFAULT);
 			if (os == OperationStatus.SUCCESS)
 				return StringBinding.entryToString(uride);
 			else

@@ -87,14 +87,23 @@ public class FileIndexService {
 		f.renameTo(new File(dest));
 	}
 
-	public void indexEdge(String filename, int maxEntryCnt, int maxThreadCnt) {
+	public void indexEdge(String filename, int maxEntryCnt, int maxThreadCnt, String[] startTriple) {
 		String tempFolder = GraphStorage.config.getStringSetting("TempFolder", null);
 		String dataFolder = GraphStorage.config.getStringSetting("DataFolder", null);
-		int count = 0, all = 0, threadCnt = 0, entryCnt = 0;
+		int count = 0, all = 0, entryCnt = 0, threadCnt;
+		boolean skip = false;
 
 		IDManager idman = new SleepyCatIDManager();
 		LabelManager labman = new SleepyCatLabelManager();
 		RelationRepository rd = new RelationRepository(filename);
+		
+		if (startTriple == null)
+			threadCnt = 0;
+		else {
+			skip = true;
+			threadCnt = 1;
+		}
+		
 
 		TempRepositoryFileWriter wr = new TempRepositoryFileWriter(tempFolder + "/raw" + 1, 2);
 
@@ -118,6 +127,13 @@ public class FileIndexService {
 			if (ss == -1 || os == -1) continue;
 
 			if ((++count) % 1000 == 0) System.out.println(count);
+			
+			if (skip) {
+				if (sub.equals(startTriple[0]) && pred.equals(startTriple[1]) && obj.equals(startTriple[2]))
+					skip = false;
+				else
+					continue;
+			}
 
 			for (String a : left)
 				for (String b : right) {
@@ -350,7 +366,12 @@ public class FileIndexService {
 		FileIndexService is = new FileIndexService();
 
 		//		is.indexNode(args[0]);
-		is.indexEdge(args[0], 5000000, 2);
+		String[] s = new String[3];
+		s[0] = "<http://dbpedia.org/resource/2008_Ole_Miss_Rebels_football_team>";
+		s[1] = "siteCityst";
+		s[2] = "<http://dbpedia.org/resource/Baton_Rouge%2C_Louisiana>";
+		
+		is.indexEdge(args[0], 5000000, 2, s);
 //		is.indexEdge(args[0], 500, 2);
 		//		is.indexTree();
 		//		is.close();
