@@ -135,13 +135,15 @@ public class FileIndexService {
 
 //			String[] left = labman.getLabel(sub);
 //			String[] right = labman.getLabel(obj);
-//
-//
+
+
 //			if (left == null || right == null) {
-//				//   						System.out.println(sub + "\t" + obj);
+//   						System.out.println(sub + "\t" + obj);
 //				if ((++ notFountCnt) % 1000 == 0) System.out.println("NOT FOUND = " + notFountCnt);
 //				continue;
 //			}
+			
+			if (pred.length() > 50) continue;
 
 			int ss = idman.getID(sub);
 			int os = idman.getID(obj);
@@ -382,14 +384,14 @@ public class FileIndexService {
 	public static void main(String[] args) {		
 		FileIndexService is = new FileIndexService();
 
-		//		is.indexNode(args[0]);
+		is.indexNode(args[0]);
 //		String[] s = new String[3];
 //		s[0] = "<http://dbpedia.org/resource/2008_Ole_Miss_Rebels_football_team>";
 //		s[1] = "siteCityst";
 //		s[2] = "<http://dbpedia.org/resource/Baton_Rouge%2C_Louisiana>";
 		
 //		is.indexEdge(args[0], 5000000, 2, s);
-		is.indexEdge(args[0], 500, 2);
+//		is.indexEdge(args[0], 500, 2);
 		//		is.indexTree();
 		//		is.close();
 	}
