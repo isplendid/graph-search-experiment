@@ -1,0 +1,10 @@
+Database = jdbc:db2://9.186.102.50:50000/INDEX
+User = db2admin
+Password = IBMintern
+Driver = com.ibm.db2.jcc.DB2Driver
+TempFolder = h:/barn/data/dbpedia/raw
+DataFolder = h:/barn/data/dbpedia
+IDMappingFolder = h:/barn/data/dbpedia/id
+LabelRepository = h:/barn/data/dbpedia/label
+PatternLength = 3
+PatternStrSize = 256
