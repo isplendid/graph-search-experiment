@@ -52,13 +52,19 @@ public class PreorderPatternCodec implements PatternCodec {
 	 */
 	@Override
 	public String encodePattern(QueryGraph graph) {
+		int cmpRes;
+		
 		if (graph.nodeCount() == 0)
 			return "";
 		QueryGraphNode minNode = graph.getNode(0);
 
 		for (int i = 1; i < graph.nodeCount(); i++) {
 			QueryGraphNode currentNode = graph.getNode(i);
-			if (currentNode.getLabel().compareTo(minNode.getLabel()) < 0)
+			if ((cmpRes = currentNode.getLabel().compareTo(minNode.getLabel())) < 0)
+				minNode = currentNode;
+			else if (cmpRes == 0 && (cmpRes = (currentNode.getOutDegree() - minNode.getOutDegree())) > 0)
+				minNode = currentNode;
+			else if (cmpRes == 0 && (cmpRes = (currentNode.getInDegree() - minNode.getInDegree())) > 0)
 				minNode = currentNode;
 		}
 
@@ -140,9 +146,17 @@ public class PreorderPatternCodec implements PatternCodec {
 
 		@Override
 		public int compare(Connectivity o1, Connectivity o2) {
+			int cmpRes;
+			
 			Connectivity a = (Connectivity) o1;
 			Connectivity b = (Connectivity) o2;
-			return a.getNode().getLabel().compareTo(b.getNode().getLabel());
+			
+			if ((cmpRes = a.getNode().getLabel().compareTo(b.getNode().getLabel())) != 0)
+				return cmpRes;
+			else if ((cmpRes = a.getEdge().getLabel().compareTo(b.getEdge().getLabel())) != 0)
+				return cmpRes;
+			else
+				return 0;	
 		}
 
 	}
