@@ -26,6 +26,10 @@ public class FileIndexService {
 		codec = new PreorderPatternCodec();
 	}
 
+	/**
+	 * Index elementary patterns containing only one node
+	 * @param filename The pattern file
+	 */
 	public void indexNode(String filename) {
 		IDManager idman = new SleepyCatIDManager(); 
 		TempRepositoryFileWriter wr = new TempRepositoryFileWriter(GraphStorage.config.getStringSetting("TempFolder", null) + "/raw" + 0, 1);
@@ -86,11 +90,28 @@ public class FileIndexService {
 		File f = new File(src);
 		f.renameTo(new File(dest));
 	}
+	
+	/**
+	 * Index elementary patterns containing one edge
+	 * @param filename
+	 * @param maxEntryCnt
+	 * @param maxThreadCnt
+	 */
+	public void indexEdge(String filename, int maxEntryCnt, int maxThreadCnt) {
+		indexEdge(filename, maxEntryCnt, maxThreadCnt, null);
+	}
 
+	/**
+	 * Index elementary pattern containing one edge from the given triple
+	 * @param filename
+	 * @param maxEntryCnt
+	 * @param maxThreadCnt
+	 * @param startTriple
+	 */
 	public void indexEdge(String filename, int maxEntryCnt, int maxThreadCnt, String[] startTriple) {
 		String tempFolder = GraphStorage.config.getStringSetting("TempFolder", null);
 		String dataFolder = GraphStorage.config.getStringSetting("DataFolder", null);
-		int count = 0, all = 0, entryCnt = 0, threadCnt;
+		int count = 0, notFountCnt = 0, entryCnt = 0, threadCnt;
 		boolean skip = false;
 
 		IDManager idman = new SleepyCatIDManager();
@@ -112,18 +133,19 @@ public class FileIndexService {
 			String pred = getAbbr(rd.getPredicate());
 			String obj = rd.getObject();
 
-			String[] left = labman.getLabel(sub);
-			String[] right = labman.getLabel(obj);
-
-
-			if (left == null || right == null) {
-				//   						System.out.println(sub + "\t" + obj);
-				if ((++ all) % 1000 == 0) System.out.println("NOT FOUND = " + all);
-				continue;
-			}
+//			String[] left = labman.getLabel(sub);
+//			String[] right = labman.getLabel(obj);
+//
+//
+//			if (left == null || right == null) {
+//				//   						System.out.println(sub + "\t" + obj);
+//				if ((++ notFountCnt) % 1000 == 0) System.out.println("NOT FOUND = " + notFountCnt);
+//				continue;
+//			}
 
 			int ss = idman.getID(sub);
 			int os = idman.getID(obj);
+			
 			if (ss == -1 || os == -1) continue;
 
 			if ((++count) % 1000 == 0) System.out.println(count);
@@ -135,19 +157,14 @@ public class FileIndexService {
 					continue;
 			}
 
-			for (String a : left)
-				for (String b : right) {
-					entryCnt ++;
-					QueryGraph g = new QueryGraph();
-					QueryGraphNode ln = g.addNode(a);
-					QueryGraphNode rn = g.addNode(b);
+			entryCnt ++;
+			QueryGraph g = new QueryGraph();
+			QueryGraphNode ln = g.addNode("*");
+			QueryGraphNode rn = g.addNode("*");
 
-					g.addEdge(ln, rn, pred);
-					if (a.compareTo(b) < 0)
-						addEdge(wr, codec.encodePattern(g), ss, os);
-					else
-						addEdge(wr, codec.encodePattern(g), os, ss);
-				}
+			g.addEdge(ln, rn, pred);
+
+			addEdge(wr, codec.encodePattern(g), ss, os);
 			
 			if (entryCnt > maxEntryCnt) {
 				wr.close();
@@ -366,13 +383,13 @@ public class FileIndexService {
 		FileIndexService is = new FileIndexService();
 
 		//		is.indexNode(args[0]);
-		String[] s = new String[3];
-		s[0] = "<http://dbpedia.org/resource/2008_Ole_Miss_Rebels_football_team>";
-		s[1] = "siteCityst";
-		s[2] = "<http://dbpedia.org/resource/Baton_Rouge%2C_Louisiana>";
+//		String[] s = new String[3];
+//		s[0] = "<http://dbpedia.org/resource/2008_Ole_Miss_Rebels_football_team>";
+//		s[1] = "siteCityst";
+//		s[2] = "<http://dbpedia.org/resource/Baton_Rouge%2C_Louisiana>";
 		
-		is.indexEdge(args[0], 5000000, 2, s);
-//		is.indexEdge(args[0], 500, 2);
+//		is.indexEdge(args[0], 5000000, 2, s);
+		is.indexEdge(args[0], 500, 2);
 		//		is.indexTree();
 		//		is.close();
 	}
