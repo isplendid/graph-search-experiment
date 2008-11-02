@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.ibm.gse.struct.QueryGraph;
 import com.ibm.gse.struct.QueryGraphEdge;
+import com.ibm.gse.struct.QueryGraphNode;
 
 /**
  * An optimal array that stores the optimal value of each states, used in DP
@@ -19,7 +20,8 @@ class OptimalArray {
 	int p2[], numEdge = 1;
 	OptimalArrayElem encode[];
 	OptimalArrayEvaluator eval = new OptimalArrayEvaluator();
-	Map<QueryGraphEdge, Integer> map = new HashMap<QueryGraphEdge, Integer>();
+	Map<QueryGraphEdge, Integer> eMap = new HashMap<QueryGraphEdge, Integer>();
+	Map<QueryGraphNode, Integer> nMap = new HashMap<QueryGraphNode, Integer>();
 	Set<OptimalArrayElem>[] pending;
 	
 	private void initP2(int size) {
@@ -34,22 +36,31 @@ class OptimalArray {
 		int total = 0;
 		
 		for (QueryGraphEdge e : value.getCoveredEdges())
-			total += p2[map.get(e)];
+			total += p2[eMap.get(e)];
+		
+		for (QueryGraphNode n : value.getConstrainedNodes())
+			total += p2[nMap.get(n)];
 		
 		return total;
 	}
 	
 	OptimalArray(QueryGraph g) {
-		 initP2(g.edgeCount() + 1);
+		 initP2(g.edgeCount() + g.nodeCount() + 1);
+		 
+		 int serial = 0;
 		 
 		 for (int i = 0; i < g.edgeCount(); i++)
-			 map.put(g.getEdge(i), i);
+			 eMap.put(g.getEdge(i), serial ++);
 		 
-		 pending = new Set[g.edgeCount() + 1];
+		 for (int i = 0; i < g.nodeCount(); i++)
+			 nMap.put(g.getNode(i), serial ++);
+		 
+		 pending = new Set[g.edgeCount() + g.nodeCount() + 1];
+		 
 		 for (int i = 0; i < pending.length; i++)
 			 pending[i] = new HashSet<OptimalArrayElem>();
 		 
-		 encode = new OptimalArrayElem[p2[g.edgeCount()]];
+		 encode = new OptimalArrayElem[p2[g.edgeCount() + g.nodeCount()]];
 	}
 
 	/**

@@ -24,10 +24,54 @@ public class QueryGraph {
 	}
 	
 	/**
-	 * Create a induced subgraph according to node
+	 * Create an induced subgraph according to node constraints set and edge constraints set
+	 * @param ns 
+	 * @param es
+	 * @return
+	 */
+	public QueryGraph getInducedSubgraph(Set<QueryGraphNode> ns, Set<QueryGraphEdge> es) {
+		QueryGraph result = new QueryGraph();
+		Map<QueryGraphNode, QueryGraphNode> map = new HashMap<QueryGraphNode, QueryGraphNode>();
+		
+		if (es != null)
+		for (QueryGraphEdge e : es) {
+			QueryGraphNode from, to;
+			
+			if ((from = map.get(e.from)) == null) {
+				if (ns.contains(e.from))
+					from = e.from.clone();
+				else
+					from = e.from.getGeneralClone();
+				map.put(e.from, from);
+				result.addNode(from);
+			}
+			
+			if ((to = map.get(e.to)) == null) {
+				if (ns.contains(e.to))
+					from = e.to.clone();
+				else
+					from = e.to.getGeneralClone();
+				map.put(e.to, to);
+				result.addNode(to);
+			}
+			
+			result.addEdge(e.clone(map));
+		}
+		
+		if (ns != null) {
+			Set<QueryGraphNode> added = map.keySet();
+			for (QueryGraphNode n : ns)
+				if (!added.contains(n)) result.addNode(n.clone());
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Create an induced subgraph according to node
 	 * @param ns The nodes contained in the subgraph
 	 */
-	public QueryGraph getNodeInducedSubgraph(Set<QueryGraphNode> ns) {
+/*	public QueryGraph getNodeInducedSubgraph(Set<QueryGraphNode> ns) {
 		QueryGraph result = new QueryGraph();
 		Map<QueryGraphNode, QueryGraphNode> map = new HashMap<QueryGraphNode, QueryGraphNode>();
 		
@@ -45,13 +89,13 @@ public class QueryGraph {
 				result.addEdge(ne);
 		
 		return result;
-	}
+	}*/
 	
 	/**
 	 * Create a induced subgraph according to edge
 	 * @param es The edges contained in the subgraph
 	 */
-	public QueryGraph getEdgeInducedSubgraph(Set<QueryGraphEdge> es) {
+/*	public QueryGraph getEdgeInducedSubgraph(Set<QueryGraphEdge> es) {
 		QueryGraph result = new QueryGraph();
 		Map<QueryGraphNode, QueryGraphNode> map = new HashMap<QueryGraphNode, QueryGraphNode>();
 		
@@ -74,6 +118,16 @@ public class QueryGraph {
 		}
 		
 		return result;
+	}*/
+	
+	/**
+	 * Generate a general node without any keyword constraints
+	 */
+	public QueryGraphNode addNode() {
+		QueryGraphNode node = new GeneralQueryGraphNode();
+		
+		nodes.add(node);
+		return node;
 	}
 	
 	/**
@@ -82,7 +136,7 @@ public class QueryGraph {
 	 * @return The node generated
 	 */
 	public QueryGraphNode addNode(String label) {
-		QueryGraphNode node = new QueryGraphNode(label);
+		QueryGraphNode node = new ConcreteQueryGraphNode(label);
 		
 		nodes.add(node);
 		return node;
@@ -191,10 +245,22 @@ public class QueryGraph {
 	}
 	
 	/**
+	 * Get the node set of this graph that are not empty
+	 */
+	public Set<QueryGraphNode> getConstrainedNodeSet() {
+		Set<QueryGraphNode> result = new HashSet<QueryGraphNode>();
+		for (QueryGraphNode n : nodes)
+			if (!n.isGeneral())
+				result.add(n);
+		
+		return result;
+	}
+	
+	/**
 	 * Get a clone of this graph
 	 */
 	public QueryGraph clone() {
-		return getNodeInducedSubgraph(null);
+		return getInducedSubgraph(getConstrainedNodeSet(), getEdgeSet());
 		
 	}
 }

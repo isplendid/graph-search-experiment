@@ -26,43 +26,54 @@ public class DynamicProgrammingPlanner implements Planner {
 
 	@Override
 	public Plan plan(QuerySchema g) {
-		//		int prune = Integer.MAX_VALUE;
 		QueryGraph graph = g.getQueryGraph();
 		OptimalArray optArr = new OptimalArray(graph);
 		List<PatternInfo> sbp = GraphStorage.patternMan.getSubPatterns(graph); 
 
-		for (PatternInfo pi : sbp) 
-			if (pi.getCoveredNodes().size() > 1){
-				Set<String> pis = new HashSet<String>();
+		for (PatternInfo pi : sbp) {
+			Set<String> pis = new HashSet<String>();
+			
+			Plan p = new PatternPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()));
 
-				Plan p = new PatternPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()));
-
-				pis.add(pi.getPatternString());
-				optArr.setInitValue(new OptimalArrayElem(p, pis));
-			}
+			pis.add(pi.getPatternString());
+			optArr.setInitValue(new OptimalArrayElem(p, pis));
+		}
 
 		Set<OptimalArrayElem> ext;
 		while ((ext = optArr.nextStage()) != null) {
-			for (OptimalArrayElem elem : ext)
-				for (PatternInfo p : sbp) 
-					if (!elem.getContainedPatterns().contains(p.getPatternString()) && isExtendAndConnected(p.getPattern(), elem)){
+			for (OptimalArrayElem elem : ext) {
+				Set<String> containedPattern = elem.getContainedPatterns();
+				
+				for (PatternInfo p : sbp)
+					if (!containedPattern.contains(p.getPatternString()) && isExtendAndConnected(p, elem)){
 						Set<String> con = getContainedPattern(elem.getContainedPatterns(), p.getPatternString());
-						Plan pln = getJoinSelectPlan(elem.getPlan(), p, g);
+						Plan pln = getJoinSelectPlan(elem, p, g);
 						OptimalArrayElem oae = new OptimalArrayElem(pln, con);
 
 						optArr.update(oae);
 					}
+			}
 		}
 
 		return optArr.getOptimalElem().getPlan();
 	}
 
-	private Plan getJoinSelectPlan(Plan plan, PatternInfo p, QuerySchema g) {
+	/**
+	 * 
+	 * @param plan
+	 * @param p
+	 * @param g
+	 * @return
+	 */
+	private Plan getJoinSelectPlan(OptimalArrayElem elem, PatternInfo p, QuerySchema g) {
 //		Set<QueryGraphNode> nsn = g.getSelectedNodeSet();
+		Plan plan = elem.getPlan();
 		Set<QueryGraphNode> osn = plan.getSchema().getSelectedNodeSet();
 		Set<QueryGraphEdge> nes = p.getCoveredEdges();
-		Set<QueryGraphEdge> oes = plan.getSchema().getQueryGraph().getEdgeSet();
-		Set<QueryGraphNode> notSat = getPlanSelectedNode(g, p.getCoveredNodes(), nes);
+		Set<QueryGraphNode> nns = p.getConstrainedNodes();
+		Set<QueryGraphEdge> oes = new HashSet<QueryGraphEdge>(elem.getCoveredEdges());
+		Set<QueryGraphNode> ons = new HashSet<QueryGraphNode>(elem.getConstrainedNodes());
+		Set<QueryGraphNode> notSat = getPlanSelectedNode(g, p.getCoveredNodes(), oes);
 
 		Plan pp = new PatternPlan(new QuerySchema(p.getPattern(), notSat), p.getPatternString());
 
@@ -74,9 +85,9 @@ public class DynamicProgrammingPlanner implements Planner {
 		}
 
 		oes.addAll(nes);
-		QueryGraph ng = g.getQueryGraph().getEdgeInducedSubgraph(oes);
+		ons.addAll(nns);
+		QueryGraph ng = g.getQueryGraph().getInducedSubgraph(ons, oes);
 		notSat = getPlanSelectedNode(g, ng.getNodeSet(), oes);
-//		notSat.addAll(nsn);
 
 		pp = new MergeJoinPlan(pp, plan, joinNode, new QuerySchema(ng, notSat));
 
@@ -89,20 +100,28 @@ public class DynamicProgrammingPlanner implements Planner {
 	 * @param subpattern The target sub-pattern
 	 * @param coverage Edges contained within the coverage
 	 */
-	private boolean isExtendAndConnected(QueryGraph subpattern, OptimalArrayElem coverage) {
+	private boolean isExtendAndConnected(PatternInfo subpattern, OptimalArrayElem coverage) {
 		Set<QueryGraphEdge> containedEdge = coverage.getCoveredEdges();
 		Set<QueryGraphNode> containedNode = coverage.getCoveredNodes();
+		Set<QueryGraphNode> constrainedNode = coverage.getConstrainedNodes();
 		boolean extended = false, connected = false; 
 
-		for (int i = 0; i < subpattern.edgeCount(); i++) {
-			QueryGraphEdge edge = subpattern.getEdge(i);
-
-			if (!extended && !containedEdge.contains(edge)) extended = true;
-			if (!connected && (containedNode.contains(edge.getNodeTo()) 
-					|| containedNode.contains(edge.getNodeFrom()))) connected = true;
-			if (connected && extended) return true;
+		for (QueryGraphEdge e : subpattern.getCoveredEdges()) {
+			
+			if (!extended && !containedEdge.contains(e)) extended = true;
+			
+			if (extended) break;
 		}
-		return false;
+		
+		for (QueryGraphNode n : subpattern.getCoveredNodes()) {
+			
+			if (!extended && !n.isGeneral() && !constrainedNode.contains(n)) extended = true;
+			
+			if (containedNode.contains(n)) connected = true;
+			
+		}
+		
+		return (extended & connected);
 	}
 
 	/**
@@ -123,27 +142,29 @@ public class DynamicProgrammingPlanner implements Planner {
 	 * as result and the other of which are the ones to be joined with other nodes
 	 * 
 	 * @param qs The global (user given) query schema
-	 * @param ns The set of nodes in the pattern
-	 * @param ce The set of edges already covered by existing plan
+	 * @param patternNodeSet The set of nodes in the pattern
+	 * @param patternEdgeSet The set of edges in the pattern
 	 * @return
 	 */
-	private Set<QueryGraphNode> getPlanSelectedNode(QuerySchema qs, Set<QueryGraphNode> ns, Set<QueryGraphEdge> ce) {
+	private Set<QueryGraphNode> getPlanSelectedNode(QuerySchema qs, Set<QueryGraphNode> patternNodeSet, Set<QueryGraphEdge> patternEdgeSet) {
 		QueryGraph graph = qs.getQueryGraph();
 		Set<QueryGraphNode> result = new HashSet<QueryGraphNode>();
 
-		for (int i = 0; i < graph.nodeCount(); i++)
-			if (ns.contains(graph.getNode(i))){
-				QueryGraphNode n = graph.getNode(i);
+		
+		for (QueryGraphNode n : patternNodeSet) {
 				
 				if (qs.hasNode(n)) {
 					result.add(n);
 					continue;
 				}
 				
+				if (n.isGeneral() && !n.getAncestor().isGeneral())
+					result.add(n);
+				
 				List<Connectivity> conns = n.getConnectivities();
 
 				for (Connectivity c : conns)
-					if (!ce.contains(c.getEdge())) {
+					if (!patternEdgeSet.contains(c.getEdge())) {
 						result.add(n);
 						break;
 					}

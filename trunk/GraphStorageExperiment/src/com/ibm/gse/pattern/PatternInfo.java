@@ -15,14 +15,16 @@ public class PatternInfo {
 	private QueryGraph graph;
 	private String patternStr;
 	private Set<QueryGraphEdge> usedEdge;
-	private Set<QueryGraphNode> availNode;
+	private Set<QueryGraphNode> usedNode;
+	private Set<QueryGraphNode> constrainedNode;
 	private int insCnt;
 	
-	public PatternInfo(QueryGraph graph, String patternStr, Set<QueryGraphEdge> usedEdge, int insCnt) {
+	public PatternInfo(QueryGraph graph, String patternStr, int insCnt) {
 		this.graph = graph;
 		this.patternStr = patternStr;
-		this.usedEdge = usedEdge;
-		this.availNode = graph.getNodeSet();
+		this.usedEdge = graph.getEdgeSet();
+		this.usedNode = graph.getNodeSet();
+		this.constrainedNode = graph.getConstrainedNodeSet();
 	}
 	
 	/**
@@ -50,7 +52,14 @@ public class PatternInfo {
 	 * Get the nodes covered by this pattern
 	 */
 	public Set<QueryGraphNode> getCoveredNodes() {
-		return availNode;
+		return usedNode;
+	}
+	
+	/**
+	 * Get the nodes that have constraints
+	 */
+	public Set<QueryGraphNode> getConstrainedNodes() {
+		return constrainedNode;
 	}
 	
 	/**

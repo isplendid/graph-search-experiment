@@ -21,7 +21,7 @@ import com.ibm.gse.pattern.PatternCodec;
 import com.ibm.gse.pattern.PreorderPatternCodec;
 import com.ibm.gse.struct.Pattern;
 import com.ibm.gse.struct.QueryGraph;
-import com.ibm.gse.struct.QueryGraphNode;
+import com.ibm.gse.struct.ConcreteQueryGraphNode;
 import com.ibm.gse.system.GraphStorage;
 import com.ibm.iodt.sor.query.SPARQLResultSet;
 import com.ibm.iodt.sor.utils.SORException;
@@ -101,8 +101,8 @@ public class IndexService {
                         for(int i = 0; i < terms1.length; i++) {
                             for(int j = 0; j < terms2.length; j++) {
                                 QueryGraph pattern = new QueryGraph();
-                                QueryGraphNode n1 = new QueryGraphNode(terms1[i]);
-                                QueryGraphNode n2 = new QueryGraphNode(terms2[j]);
+                                ConcreteQueryGraphNode n1 = new ConcreteQueryGraphNode(terms1[i]);
+                                ConcreteQueryGraphNode n2 = new ConcreteQueryGraphNode(terms2[j]);
                                 pattern.addNode(n1);
                                 pattern.addNode(n2);
                                 pattern.addEdge(n1, n2, pre);

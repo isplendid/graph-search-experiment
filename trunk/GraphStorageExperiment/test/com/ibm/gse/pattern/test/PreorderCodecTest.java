@@ -36,8 +36,8 @@ public class PreorderCodecTest {
 		
 		QueryGraph q;
 		q = new QueryGraph();
-		QueryGraphNode na = q.addNode("*");
-		QueryGraphNode nb = q.addNode("*");
+		QueryGraphNode na = q.addNode();
+		QueryGraphNode nb = q.addNode();
 		q.addEdge(na, nb, "test");
 		qg.add(q);
 	}
