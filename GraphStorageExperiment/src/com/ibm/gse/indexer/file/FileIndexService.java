@@ -161,8 +161,8 @@ public class FileIndexService {
 
 			entryCnt ++;
 			QueryGraph g = new QueryGraph();
-			QueryGraphNode ln = g.addNode("*");
-			QueryGraphNode rn = g.addNode("*");
+			QueryGraphNode ln = g.addNode();
+			QueryGraphNode rn = g.addNode();
 
 			g.addEdge(ln, rn, pred);
 

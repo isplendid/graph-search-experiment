@@ -5,45 +5,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * A node in query graph
- * @author Tian Yuan
- *
- */
-public class QueryGraphNode {
+public abstract class QueryGraphNode {
+	
 	static int serialCounter = 1;
 	
-	String label;
 	Set<QueryGraphEdge> inEdge = new HashSet<QueryGraphEdge>();
 	Set<QueryGraphEdge> outEdge = new HashSet<QueryGraphEdge>();
+	
 	int serialNo;
+	QueryGraphNode ancestor;
 	
-	/**
-	 * Create a node with the specified label
-	 * @param label
-	 */
-	public QueryGraphNode(String label) {
-		this(label, serialCounter ++);
-	}
-	
-	/**
-	 * Create a node with the specified serial number and label
-	 * @param label The label of the node
-	 * @param serialNo The serial number of this node. Serial numbers
-	 *   distinguish one node from another. Two instances with the same
-	 *   serial number are viewed as the same node.  
-	 */
-	QueryGraphNode(String label, int serialNo) {
-		this.label = label;
+	QueryGraphNode(int serialNo, QueryGraphNode ancestor) {
 		this.serialNo = serialNo;
+		this.ancestor = ancestor;
 	}
-	
+
 	/**
 	 * Get the label of this node 
 	 */
-	public String getLabel() {
-		return label;
-	}
+	abstract public String getLabel();
 	
 	/**
 	 * Get the in-degree of this node 
@@ -84,11 +64,30 @@ public class QueryGraphNode {
 	}
 	
 	/**
+	 * Get the node from which this node is cloned
+	 */
+	public QueryGraphNode getAncestor() {
+		if (ancestor == null)
+			return this;
+		else
+			return ancestor;
+	}
+	
+	/**
 	 * Get the clone of a node with no edge
 	 */
-	public QueryGraphNode clone() {
-		return new QueryGraphNode(label, serialNo);
-	}
+	protected abstract QueryGraphNode clone();
+	
+	/**
+	 * Get the clone of a node with no edge and set the constraint empty
+	 * @param isEmpty The emptiness property
+	 */
+	abstract QueryGraphNode getGeneralClone();
+	
+	/**
+	 * Tell whether this node is without constraint
+	 */
+	public abstract boolean isGeneral();
 	
 	/**
 	 * Hash according to the node's serial number
@@ -101,9 +100,8 @@ public class QueryGraphNode {
 	 * Judge if two instances represent the same node
 	 */
 	public boolean equals(Object n) {
-//		System.out.println(n + " THIS " + this);
-		if (n instanceof QueryGraphNode)
-			return ((QueryGraphNode)n).serialNo == serialNo;
+		if (n instanceof ConcreteQueryGraphNode)
+			return ((ConcreteQueryGraphNode)n).serialNo == serialNo;
 		else
 			return false;
 	}

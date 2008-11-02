@@ -14,6 +14,7 @@ import com.ibm.gse.struct.QueryGraphNode;
 public class OptimalArrayElem {
 	private Set<QueryGraphEdge> edges;
 	private Set<QueryGraphNode> nodes;
+	private Set<QueryGraphNode> constrained;
 	private Set<String> patterns;
 	private Plan plan;
 	
@@ -21,6 +22,7 @@ public class OptimalArrayElem {
 		this.patterns = contained;
 		this.edges = plan.getSchema().getQueryGraph().getEdgeSet();
 		this.nodes = plan.getSchema().getQueryGraph().getNodeSet();
+		this.constrained = plan.getSchema().getQueryGraph().getConstrainedNodeSet();
 		this.plan = plan;
 	}
 	
@@ -34,6 +36,10 @@ public class OptimalArrayElem {
 	
 	public Set<String> getContainedPatterns() {
 		return patterns;
+	}
+	
+	public Set<QueryGraphNode> getConstrainedNodes() {
+		return constrained;
 	}
 	
 	public Plan getPlan() {

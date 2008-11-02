@@ -81,7 +81,7 @@ public class MetawebSearchTest {
 
 				nl.add(na);
 				nl.add(nb);
-				QueryGraph gc = g.getNodeInducedSubgraph(new HashSet<QueryGraphNode>(nl));
+				QueryGraph gc = g.getInducedSubgraph(new HashSet<QueryGraphNode>(nl), null);
 				QuerySchema qst = new QuerySchema(gc, nl);
 
 				Plan pp = new PatternPlan(qst);
@@ -93,7 +93,7 @@ public class MetawebSearchTest {
 
 				nl.add(na);
 				nl.add(nc);
-				QueryGraph gc = g.getNodeInducedSubgraph(new HashSet<QueryGraphNode>(nl));
+				QueryGraph gc = g.getInducedSubgraph(new HashSet<QueryGraphNode>(nl), null);
 				QuerySchema qst = new QuerySchema(gc, nl);
 
 				Plan pp = new PatternPlan(qst);
