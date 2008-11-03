@@ -199,12 +199,14 @@ public class FileIndexService {
 		deleteFile(tempFolder + "/raw" + 1);
 		FileIndexer.index(tempFolder + "/sort" + 1, dataFolder + "/storage" + 1 + ".t" + threadCnt, dataFolder + "/index" + 1 + ".t" + threadCnt, 2);
 		deleteFile(tempFolder + "/sort" + 1);
-		
+
+		threadCnt ++;
 		FileIndexMerger.merge(dataFolder, dataFolder, 2, threadCnt);
 		for (int i = 0; i < threadCnt; i++) {
 			deleteFile(dataFolder + "/index1.t" + i);
 			deleteFile(dataFolder + "/storage1.t" + i);
 		}
+			
 	}
 
 	//	/**
@@ -384,14 +386,14 @@ public class FileIndexService {
 	public static void main(String[] args) {		
 		FileIndexService is = new FileIndexService();
 
-		is.indexNode(args[0]);
+//		is.indexNode(args[0]);
 //		String[] s = new String[3];
 //		s[0] = "<http://dbpedia.org/resource/2008_Ole_Miss_Rebels_football_team>";
 //		s[1] = "siteCityst";
 //		s[2] = "<http://dbpedia.org/resource/Baton_Rouge%2C_Louisiana>";
 		
 //		is.indexEdge(args[0], 5000000, 2, s);
-//		is.indexEdge(args[0], 500, 2);
+		is.indexEdge(args[0], 5000000, 2);
 		//		is.indexTree();
 		//		is.close();
 	}
