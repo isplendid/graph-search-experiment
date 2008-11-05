@@ -31,7 +31,7 @@ public class FileRepositoryReader {
 		this.size = size;
 		recLen = 4 * size;
 		try {
-			file = new RandomAccessFile(GraphStorage.config.getStringSetting("DataFolder", null) + "/Storage" + (size - 1), "r");
+			file = new RandomAccessFile(filename, "r");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

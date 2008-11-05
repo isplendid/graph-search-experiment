@@ -1,7 +1,9 @@
 package com.ibm.gse.indexer.file;
 
 import java.io.File;
+import java.util.Map;
 
+import com.ibm.gse.index.file.FileIndexReader;
 import com.ibm.gse.index.file.util.FileIndexMerger;
 import com.ibm.gse.indexer.IDManager;
 import com.ibm.gse.indexer.InstanceKeywordRepository;
@@ -9,12 +11,16 @@ import com.ibm.gse.indexer.LabelManager;
 import com.ibm.gse.indexer.RelationRepository;
 import com.ibm.gse.pattern.PatternCodec;
 import com.ibm.gse.pattern.PreorderPatternCodec;
+import com.ibm.gse.storage.file.FileRepositoryReader;
+import com.ibm.gse.storage.file.RecordRange;
 import com.ibm.gse.struct.QueryGraph;
+import com.ibm.gse.struct.QueryGraphEdge;
 import com.ibm.gse.struct.QueryGraphNode;
 import com.ibm.gse.system.GraphStorage;
 import com.ibm.gse.temp.file.TempFileEntry;
 import com.ibm.gse.temp.file.TempRepositoryFileWriter;
 import com.ibm.gse.temp.file.util.TempRepositorySorter;
+import com.ibm.gse.util.Heap;
 
 public class FileIndexService {
 
@@ -208,6 +214,142 @@ public class FileIndexService {
 		}
 			
 	}
+	
+	public void indexComplex(int mergeThreshold, int maxThreadCnt, int totalThreshold) {
+		String dataFolder = GraphStorage.config.getStringSetting("DataFolder", null);
+		String tempFolder = GraphStorage.config.getStringSetting("TempFolder", null);
+		String idx2 = dataFolder + "/index" + 1;
+		Heap h = new Heap();
+		IDManager idman = new SleepyCatIDManager();
+		LabelManager labman = new SleepyCatLabelManager();
+		
+		FileIndexReader fir = new FileIndexReader(idx2, 2);
+		TempRepositoryFileWriter tw = new TempRepositoryFileWriter(tempFolder + "/raw" + 1, 2);
+		int entryCnt = 0, totalCnt = 0, threadCnt = 0;
+		
+		while (fir.next()) {
+			int insCnt = fir.getInstanceCount();
+			
+			if (insCnt > 1000) {
+				String ps = fir.getPatternString();
+			
+				h.insert(new HeapContainer(ps, codec.decodePattern(ps), insCnt, fir.getRange()));
+			}
+		}
+		
+		fir.close();
+		
+		HeapContainer hc;
+		
+		while ((hc = (HeapContainer)h.remove()) != null && totalCnt < totalThreshold) {
+			QueryGraph g = hc.graph;
+			String ps = hc.patternStr;
+			
+			if (g.edgeCount() == 1) {
+				QueryGraphEdge edge = g.getEdge(0);
+				System.out.println(edge.getLabel());
+//				FileRepository fr = new FileRepository(ps, 2);
+				FileRepositoryReader fr = new FileRepositoryReader(ps, 2, hc.recRange);
+				Map<QueryGraphNode, Integer> map = GraphStorage.columnNodeMap.getMap(g);
+				int ent[];
+				int rdCnt = 0;
+				
+				while ((ent = fr.readEntry()) != null) {
+					if ((++rdCnt) % 5000 == 0) System.out.println(rdCnt + "," + totalCnt);
+					
+					int ss = ent[map.get(edge.getNodeTo())];
+					int os = ent[map.get(edge.getNodeTo())];
+					String sub = idman.getURI(ss);
+					String pred = edge.getLabel();
+					String obj = idman.getURI(os);
+					
+					String[] left = labman.getLabel(sub);
+					String[] right = labman.getLabel(obj);
+
+
+					if (left == null || right == null) {
+						continue;
+					}
+					
+					for (String l : left)
+						for (String r : right) {
+							entryCnt ++;
+							totalCnt ++;
+							QueryGraph ng = new QueryGraph();
+							
+							QueryGraphNode na = ng.addNode(l);
+							QueryGraphNode nb = ng.addNode(r);
+							ng.addEdge(na, nb, pred);
+						
+							if (l.compareTo(r) < 0)
+								addEdge(tw, codec.encodePattern(ng), ss, os);
+							else
+								addEdge(tw, codec.encodePattern(ng), os, ss);
+						}
+					
+					if (entryCnt > mergeThreshold) {
+	                    tw.close();
+	                    TempRepositorySorter.sort(tempFolder + "/raw" + 1, tempFolder + "/sort" + 1, 2, tempFolder + "/SortTmp");
+	                    deleteFile(tempFolder + "/raw" + 1);
+	                    FileIndexer.index(tempFolder + "/sort" + 1, dataFolder + "/storage" + 1 + ".t" + threadCnt, dataFolder + "/index" + 1 + ".t" + threadCnt, 2);
+	                    deleteFile(tempFolder + "/sort" + 1);
+	                    threadCnt ++;
+	                    
+	                    if (threadCnt >= maxThreadCnt) {
+	                            System.out.println("Merging files ... ");
+	                            FileIndexMerger.merge(dataFolder, dataFolder, "index1.t", "storage1.t", 2, threadCnt);
+	                            for (int i = 0; i < threadCnt; i++) {
+	                                    deleteFile(dataFolder + "/index1.t" + i);
+	                                    deleteFile(dataFolder + "/storage1.t" + i);
+	                            }
+	                            renameFile(dataFolder + "/index1.t", dataFolder + "/index1.t0");
+	                            renameFile(dataFolder + "/storage1.t", dataFolder + "/storage1.t0");
+	                            threadCnt = 1;
+	                    }
+	                    
+	                    
+	                    tw = new TempRepositoryFileWriter(tempFolder + "/raw" + 1, 2);
+	                    entryCnt = 0;
+					}
+					
+				}
+				
+				fr.close();
+
+				
+			} else {
+				System.err.println("ERROR ON PATTERN " + ps);
+			}
+		}
+		
+		tw.close();
+		
+		TempRepositorySorter.sort(tempFolder + "/raw" + 1, tempFolder + "/sort" + 1, 2, tempFolder + "/SortTmp");
+        deleteFile(tempFolder + "/raw" + 1);
+        FileIndexer.index(tempFolder + "/sort" + 1, dataFolder + "/storage" + 1 + ".t" + threadCnt, dataFolder + "/index" + 1 + ".t" + threadCnt, 2);
+        deleteFile(tempFolder + "/sort" + 1);
+        
+        threadCnt++;
+        
+        FileIndexMerger.merge(dataFolder, dataFolder, "index1.t", "storage1.t", 2, threadCnt);
+        for (int i = 0; i < threadCnt; i++) {
+                deleteFile(dataFolder + "/index1.t" + i);
+                deleteFile(dataFolder + "/storage1.t" + i);
+        }
+        renameFile(dataFolder + "/index1.t", dataFolder + "/index1.t0");
+        renameFile(dataFolder + "/storage1.t", dataFolder + "/storage1.t0");
+        renameFile(dataFolder + "/index1", dataFolder + "/index1.t1");
+        renameFile(dataFolder + "/storage1", dataFolder + "/storage1.t1");
+        
+//        FileIndexMerger.merge(dataFolder, dataFolder, 2, 2);
+        FileIndexMerger.merge(dataFolder, dataFolder, "index1.t", "storage1.t", 2, 2);
+        
+        for (int i = 0; i < 2; i++) {
+            deleteFile(dataFolder + "/index1.t" + i);
+            deleteFile(dataFolder + "/storage1.t" + i);
+        }
+        
+	}
 
 	//	/**
 	//	 * 
@@ -393,27 +535,32 @@ public class FileIndexService {
 //		s[2] = "<http://dbpedia.org/resource/Baton_Rouge%2C_Louisiana>";
 		
 //		is.indexEdge(args[0], 5000000, 2, s);
-		is.indexEdge(args[0], 5000000, 2);
+//		is.indexEdge(args[0], 5000000, 2);
+		is.indexComplex(5000000, 3, 300000000);
 		//		is.indexTree();
 		//		is.close();
 	}
 
-	//	class HeapContainer implements Comparable {
-	//		QueryGraph graph;
-	//		int insCnt;
-	//
-	//		HeapContainer(QueryGraph g, int c) {
-	//			this.graph = g;
-	//			this.insCnt = c;
-	//		}
-	//
-	//		@Override
-	//		public int compareTo(Object arg0) {
-	//			if (arg0 instanceof HeapContainer)
-	//				return insCnt - ((HeapContainer) arg0).insCnt;
-	//			else
-	//				return 0;
-	//		}
-	//
-	//	}
+	class HeapContainer implements Comparable {
+		String patternStr;
+		QueryGraph graph;
+		int insCnt;
+		RecordRange recRange;
+
+		HeapContainer(String patternStr, QueryGraph g, int c, RecordRange recRange) {
+			this.patternStr = patternStr;
+			this.graph = g;
+			this.insCnt = c;
+			this.recRange = recRange;
+		}
+
+		@Override
+		public int compareTo(Object arg0) {
+			if (arg0 instanceof HeapContainer)
+				return insCnt - ((HeapContainer) arg0).insCnt;
+			else
+				return 0;
+		}
+
+	}
 }

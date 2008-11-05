@@ -45,7 +45,8 @@ public class FileIndexer {
 			dwr.writeEntry(tfe.ins);
 		}
 		
-		iwr.writeEntry(currentPat, new RecordRange(start, last));
+		if (currentPat != null) iwr.writeEntry(currentPat, new RecordRange(start, last));
+		
 		srd.close();
 		dwr.close();
 		iwr.close();

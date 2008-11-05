@@ -33,7 +33,15 @@ public class LexicoColumnNodeMap implements ColumnNodeMap {
 
 		@Override
 		public int compare(QueryGraphNode arg0, QueryGraphNode arg1) {
-			return arg0.getLabel().compareTo(arg1.getLabel());
+			int cmp;
+			if ((cmp = arg0.getLabel().compareTo(arg1.getLabel())) != 0)
+				return cmp;
+			else if ((cmp = arg1.getOutDegree() - arg0.getOutDegree()) != 0)
+				return cmp;
+			else if ((cmp = arg1.getInDegree() - arg0.getInDegree()) != 0)
+				return cmp;
+			else
+				return 0;
 		}
 		
 	}
