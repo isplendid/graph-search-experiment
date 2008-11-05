@@ -4,9 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import com.ibm.gse.struct.ConcreteQueryGraphNode;
-import com.ibm.gse.system.GraphStorage;
-
 /**
  * The reader that reads entries from a given range
  * @author Tian Yuan
