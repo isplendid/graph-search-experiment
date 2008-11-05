@@ -117,11 +117,10 @@ public class FileIndexService {
 	public void indexEdge(String filename, int maxEntryCnt, int maxThreadCnt, String[] startTriple) {
 		String tempFolder = GraphStorage.config.getStringSetting("TempFolder", null);
 		String dataFolder = GraphStorage.config.getStringSetting("DataFolder", null);
-		int count = 0, notFountCnt = 0, entryCnt = 0, threadCnt;
+		int count = 0, entryCnt = 0, threadCnt;
 		boolean skip = false;
 
 		IDManager idman = new SleepyCatIDManager();
-		LabelManager labman = new SleepyCatLabelManager();
 		RelationRepository rd = new RelationRepository(filename);
 		
 		if (startTriple == null)
@@ -138,16 +137,6 @@ public class FileIndexService {
 			String sub = rd.getSubject();
 			String pred = getAbbr(rd.getPredicate());
 			String obj = rd.getObject();
-
-//			String[] left = labman.getLabel(sub);
-//			String[] right = labman.getLabel(obj);
-
-
-//			if (left == null || right == null) {
-//   						System.out.println(sub + "\t" + obj);
-//				if ((++ notFountCnt) % 1000 == 0) System.out.println("NOT FOUND = " + notFountCnt);
-//				continue;
-//			}
 			
 			if (pred.length() > 50) continue;
 
