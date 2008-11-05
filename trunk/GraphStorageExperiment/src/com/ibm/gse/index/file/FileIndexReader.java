@@ -15,12 +15,14 @@ public class FileIndexReader {
 	
 	RandomAccessFile file;
 	int recLen;
+	int entLen;
 	long pointer;
 
 	public FileIndexReader(String filename, int size) {
 		try {
 			file = new RandomAccessFile(filename, "r");
 			recLen = strSize + lenSize + intSize * 4;
+			entLen = intSize * size;
 			pointer = -recLen;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -87,7 +89,7 @@ public class FileIndexReader {
 		long startpos = (long)(rr.getStartRID().getPageID()) * 4096 + (long)(rr.getStartRID().getOffset());
 		long endpos = (long)(rr.getEndRID().getPageID()) * 4096 + (long)(rr.getEndRID().getOffset());
 		
-		return (int) ((endpos - startpos) / recLen + 1);
+		return (int) ((endpos - startpos) / entLen + 1);
 	}
 	
 	public void close() {

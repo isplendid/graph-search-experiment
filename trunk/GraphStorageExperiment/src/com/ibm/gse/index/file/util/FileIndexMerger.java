@@ -16,6 +16,7 @@ import com.ibm.gse.util.Heap;
  */
 public class FileIndexMerger {
 	
+
 	/**
 	 * This method merges two or more indices into one
 	 * @param src The directory containing the indices to be merged
@@ -24,8 +25,21 @@ public class FileIndexMerger {
 	 * @param threadCnt The number of indices to be merged
 	 */
 	public static void merge(String src, String dest, int size, int threadCnt) {
-		FileIndexWriter fiw = new FileIndexWriter(dest + "/index" + (size - 1), size);
-		FileRepositoryWriter frw = new FileRepositoryWriter(dest + "/storage" + (size - 1), size);
+		merge(src, dest, "index" + (size - 1), "storage" + (size - 1), size, threadCnt);
+	}
+	
+	/**
+	 * This method merges two or more indices into one
+	 * @param src The directory containing the indices to be merged
+	 * @param dest The directory where the merged index is to be put
+	 * @param destIdxFn The name of destination index file
+	 * @param destStrFn The name of destination storage file 
+	 * @param size The node count of the indices
+	 * @param threadCnt The number of indices to be merged
+	 */
+	public static void merge(String src, String dest, String destIdxFn, String destStrFn, int size, int threadCnt) {
+		FileIndexWriter fiw = new FileIndexWriter(dest + "/" + destIdxFn, size);
+		FileRepositoryWriter frw = new FileRepositoryWriter(dest + "/" + destStrFn, size);
 		Heap h = new Heap();
 		FileIndexReader[] fir = new FileIndexReader[threadCnt];
 //		FileRepositoryReader[] frr = new FileRepositoryReader[threadCnt];
@@ -37,6 +51,8 @@ public class FileIndexMerger {
 			
 			if ((fie = fir[i].readEntry()) != null)
 				h.insert(new HeapContainer(fie, fir[i], src + "/storage" + (size - 1) + ".t" + i));
+			else
+				fir[i].close();
 		}
 			
 		String currentPattern = null;
