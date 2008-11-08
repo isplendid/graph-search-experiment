@@ -238,7 +238,7 @@ public class FileIndexService {
 				QueryGraphEdge edge = g.getEdge(0);
 				System.out.println(edge.getLabel());
 //				FileRepository fr = new FileRepository(ps, 2);
-				FileRepositoryReader fr = new FileRepositoryReader(ps, 2, hc.recRange);
+				FileRepositoryReader fr = new FileRepositoryReader(dataFolder + "/storage1", 2, hc.recRange);
 				Map<QueryGraphNode, Integer> map = GraphStorage.columnNodeMap.getMap(g);
 				int ent[];
 				int rdCnt = 0;
@@ -246,7 +246,7 @@ public class FileIndexService {
 				while ((ent = fr.readEntry()) != null) {
 					if ((++rdCnt) % 5000 == 0) System.out.println(rdCnt + "," + totalCnt);
 					
-					int ss = ent[map.get(edge.getNodeTo())];
+					int ss = ent[map.get(edge.getNodeFrom())];
 					int os = ent[map.get(edge.getNodeTo())];
 					String sub = idman.getURI(ss);
 					String pred = edge.getLabel();
@@ -525,7 +525,7 @@ public class FileIndexService {
 		
 //		is.indexEdge(args[0], 5000000, 2, s);
 //		is.indexEdge(args[0], 5000000, 2);
-		is.indexComplex(5000000, 3, 300000000);
+		is.indexComplex(10000000, 3, 300000000);
 		//		is.indexTree();
 		//		is.close();
 	}
