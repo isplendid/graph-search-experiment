@@ -25,6 +25,7 @@ public class PatternInfo {
 		this.usedEdge = graph.getEdgeSet();
 		this.usedNode = graph.getNodeSet();
 		this.constrainedNode = graph.getConstrainedNodeSet();
+		this.insCnt = insCnt;
 	}
 	
 	/**

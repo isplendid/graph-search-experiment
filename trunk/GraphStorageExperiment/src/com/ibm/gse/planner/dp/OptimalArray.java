@@ -70,7 +70,7 @@ class OptimalArray {
 	void setInitValue(OptimalArrayElem value) {
 		if (numEdge == 1 && value.getContainedPatterns().size() == 1) {
 			encode[encodeElem(value)] = value;
-			pending[value.getCoveredEdges().size()].add(value);
+			pending[value.getCoveredEdges().size() + value.getConstrainedNodes().size()].add(value);
 		}
 	}
 	
@@ -94,8 +94,8 @@ class OptimalArray {
 		int enc = encodeElem(value);
 		
 		if (encode[enc] == null || eval.evaluate(value) < eval.evaluate(encode[enc])) {
-			pending[value.getCoveredEdges().size()].remove(encode[enc]);
-			pending[value.getCoveredEdges().size()].add(value);
+			pending[value.getCoveredEdges().size() + value.getConstrainedNodes().size()].remove(encode[enc]);
+			pending[value.getCoveredEdges().size() + value.getConstrainedNodes().size()].add(value);
 			encode[enc] = value;
 		}
 	}

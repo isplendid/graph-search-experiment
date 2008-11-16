@@ -260,21 +260,39 @@ public class FileIndexService {
 						continue;
 					}
 					
-					for (String l : left)
-						for (String r : right) {
-							entryCnt ++;
-							totalCnt ++;
-							QueryGraph ng = new QueryGraph();
-							
-							QueryGraphNode na = ng.addNode(l);
-							QueryGraphNode nb = ng.addNode(r);
-							ng.addEdge(na, nb, pred);
+					for (String l : left) {
+						String r = "*";
 						
-							if (l.compareTo(r) < 0)
-								addEdge(tw, codec.encodePattern(ng), ss, os);
-							else
-								addEdge(tw, codec.encodePattern(ng), os, ss);
-						}
+						entryCnt ++;
+						totalCnt ++;
+						QueryGraph ng = new QueryGraph();
+							
+						QueryGraphNode na = ng.addNode(l);
+						QueryGraphNode nb = ng.addNode();
+						ng.addEdge(na, nb, pred);
+						
+						if (l.compareTo(r) < 0)
+							addEdge(tw, codec.encodePattern(ng), ss, os);
+						else
+							addEdge(tw, codec.encodePattern(ng), os, ss);
+					}
+					
+					for (String r : right) {
+						String l = "*";
+						
+						entryCnt ++;
+						totalCnt ++;
+						QueryGraph ng = new QueryGraph();
+						
+						QueryGraphNode na = ng.addNode();
+						QueryGraphNode nb = ng.addNode(r);
+						ng.addEdge(na, nb, pred);
+					
+						if (l.compareTo(r) < 0)
+							addEdge(tw, codec.encodePattern(ng), ss, os);
+						else
+							addEdge(tw, codec.encodePattern(ng), os, ss);
+					}
 					
 					if (entryCnt > mergeThreshold) {
 	                    tw.close();
@@ -525,7 +543,7 @@ public class FileIndexService {
 		
 //		is.indexEdge(args[0], 5000000, 2, s);
 //		is.indexEdge(args[0], 5000000, 2);
-		is.indexComplex(10000000, 3, 300000000);
+		is.indexComplex(10000000, 3, 15000000);
 		//		is.indexTree();
 		//		is.close();
 	}

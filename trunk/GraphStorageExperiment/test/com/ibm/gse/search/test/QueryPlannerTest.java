@@ -25,19 +25,34 @@ public class QueryPlannerTest {
 		qsList = new ArrayList<QuerySchema>();
 		
 		/* TEST CASE 1 */
-		QueryGraph g = new QueryGraph();
-		QueryGraphNode na, nb, nc;
-		List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
-		na = g.addNode("metamodel");
-		nb = g.addNode("polici");
-		nc = g.addNode("xmln");
-		g.addEdge(na, nb, "hasMember");
-		g.addEdge(na, nc, "hasMember");
-		seln.add(na);
-		seln.add(nb);
-		seln.add(nc);
-		QuerySchema qs = new QuerySchema(g, seln); 
-		qsList.add(qs);
+//		{
+//			QueryGraph g = new QueryGraph();
+//			QueryGraphNode na, nb, nc;
+//			List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
+//			na = g.addNode("metamodel");
+//			nb = g.addNode("polici");
+//			nc = g.addNode("xmln");
+//			g.addEdge(na, nb, "hasMember");
+//			g.addEdge(na, nc, "hasMember");
+//			seln.add(na);
+//			seln.add(nb);
+//			seln.add(nc);
+//			QuerySchema qs = new QuerySchema(g, seln); 
+//			qsList.add(qs);
+//		}
+		/* TEST 2 */
+		{
+			QueryGraph g = new QueryGraph();
+			QueryGraphNode na, nb;
+			List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
+			na = g.addNode("track");
+			nb = g.addNode("progress");
+			g.addEdge(na, nb, "genre");
+			seln.add(na);
+			seln.add(nb);
+			QuerySchema qs = new QuerySchema(g, seln); 
+			qsList.add(qs);
+		}
 	}
 
 	@Test

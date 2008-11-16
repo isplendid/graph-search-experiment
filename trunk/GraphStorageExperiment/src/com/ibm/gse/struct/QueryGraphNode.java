@@ -100,8 +100,8 @@ public abstract class QueryGraphNode {
 	 * Judge if two instances represent the same node
 	 */
 	public boolean equals(Object n) {
-		if (n instanceof ConcreteQueryGraphNode)
-			return ((ConcreteQueryGraphNode)n).serialNo == serialNo;
+		if (n instanceof QueryGraphNode)
+			return ((QueryGraphNode)n).serialNo == serialNo;
 		else
 			return false;
 	}

@@ -39,7 +39,7 @@ public class IndexManager {
 		
 		try {
 			head = 0;
-			tail = currentFile.length() / recLen;
+			tail = currentFile.length() / recLen - 1;
 			
 			while (head <= tail) {
 				mid = (head + tail) / 2;
@@ -76,8 +76,11 @@ public class IndexManager {
 	
 	public int getPatternCount(String pattern, int size) {
 		RecordRange rr = seek(pattern, size);
+		if (rr == null)
+			return -1;
 		long startpos = ((long)rr.getStartRID().getPageID() * 4096) + rr.getStartRID().getOffset();
 		long endpos = ((long)rr.getEndRID().getPageID() * 4096) + rr.getEndRID().getOffset();
-		return (int)((endpos - startpos)/(4 * size));
+		
+		return (int)((endpos - startpos)/(4 * size)) + 1;
 	}
 }

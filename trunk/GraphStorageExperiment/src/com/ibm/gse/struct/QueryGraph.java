@@ -38,8 +38,8 @@ public class QueryGraph {
 			QueryGraphNode from, to;
 			
 			if ((from = map.get(e.from)) == null) {
-				if (ns.contains(e.from))
-					from = e.from.clone();
+				if (ns != null && ns.contains(e.from))
+					from = e.from.getAncestor().clone();
 				else
 					from = e.from.getGeneralClone();
 				map.put(e.from, from);
@@ -47,10 +47,10 @@ public class QueryGraph {
 			}
 			
 			if ((to = map.get(e.to)) == null) {
-				if (ns.contains(e.to))
-					from = e.to.clone();
+				if (ns != null && ns.contains(e.to))
+					to = e.to.getAncestor().clone();
 				else
-					from = e.to.getGeneralClone();
+					to = e.to.getGeneralClone();
 				map.put(e.to, to);
 				result.addNode(to);
 			}
