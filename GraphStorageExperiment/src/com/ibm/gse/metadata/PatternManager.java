@@ -45,7 +45,11 @@ public class PatternManager {
 	 * @return The number of instances
 	 */
 	public Integer getPatternInstanceCount(String ps, int size) {
-		return GraphStorage.indexMan.getPatternCount(ps, size);
+		int res = GraphStorage.indexMan.getPatternCount(ps, size);
+		if (res == -1)
+			return null;
+		else
+			return res;
 		//		try {
 		//			Statement stm = conn.createStatement();
 		//			ResultSet rs = stm.executeQuery("SELECT CNT FROM PATTERN WHERE P = '" + ps + "'");
@@ -57,9 +61,7 @@ public class PatternManager {
 	}
 
 	/**
-	 * Get all legal sub-patterns of the given pattern
-	 * BFS search algorithm is applied here
-	 * TODO This method should be revised
+	 * Get all legal sub-patterns of the given pattern BFS search algorithm is applied here
 	 * @param graph The given pattern
 	 * @return A set of legal sub-patterns
 	 */
@@ -86,8 +88,9 @@ public class PatternManager {
 			
 			es.add(e);
 			QueryGraph g = graph.getInducedSubgraph(null, es);
-			String ps = codec.encodePattern(graph);
+			String ps = codec.encodePattern(g);
 			elems.add(new PatternInfo(g, ps, getPatternInstanceCount(ps, g.nodeCount())));
+			generated.add(ps);
 		}
 
 		while (pointer < elems.size()) {
@@ -96,7 +99,7 @@ public class PatternManager {
 			Set<QueryGraphEdge> edgeContained = toExt.getCoveredEdges();
 			
 			for (QueryGraphNode n : nodeContained) {
-				for (Connectivity c : n.getConnectivities()) 
+				for (Connectivity c : n.getAncestor().getConnectivities()) 
 					if (!edgeContained.contains(c.getEdge())){
 						edgeContained.add(c.getEdge());
 						
@@ -104,23 +107,28 @@ public class PatternManager {
 						String ps = codec.encodePattern(ng);
 						Integer insCnt;
 						
-						if (!generated.contains(ps) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null)
+						if (!generated.contains(ps) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
 							elems.add(new PatternInfo(ng, ps, insCnt));
+							generated.add(ps);
+						}
 						
 						edgeContained.remove(c.getEdge());
 					}
 				
 				if (n.isGeneral()) {
-					nodeContained.add(n);
+					Set<QueryGraphNode> nodeConstrained = toExt.getConstrainedNodes();
+					nodeConstrained.add(n);
 					
-					QueryGraph ng = graph.getInducedSubgraph(nodeContained, edgeContained);
+					QueryGraph ng = graph.getInducedSubgraph(nodeConstrained, edgeContained);
 					String ps = codec.encodePattern(ng);
 					Integer insCnt;
 					
-					if (!generated.contains(ps) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null)
+					if (!generated.contains(ps) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
 						elems.add(new PatternInfo(ng, ps, insCnt));
+						generated.add(ps);
+					}
 					
-					nodeContained.remove(n);
+					nodeConstrained.remove(n);
 				}
 			}
 
