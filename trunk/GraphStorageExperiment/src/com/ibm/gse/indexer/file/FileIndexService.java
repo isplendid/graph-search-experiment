@@ -31,6 +31,13 @@ public class FileIndexService {
 	public FileIndexService() {
 		codec = new PreorderPatternCodec();
 	}
+	
+	public void loadKeyword(String filename) {
+		LabelManager lm = new SleepyCatLabelManager();
+		InstanceKeywordRepository ikr = new InstanceKeywordRepository(filename);
+		lm.load(ikr);
+		ikr.close();
+	}
 
 	/**
 	 * Index elementary patterns containing only one node
@@ -70,6 +77,8 @@ public class FileIndexService {
 		System.out.println("ENTRY COUNT = " + entryCounter);
 		TempRepositorySorter.sort(GraphStorage.config.getStringSetting("TempFolder", null) + "/raw" + 0, GraphStorage.config.getStringSetting("TempFolder", null) + "/sort" + 0, 1, GraphStorage.config.getStringSetting("TempFolder", null) + "/SortTmp");
 		FileIndexer.index(GraphStorage.config.getStringSetting("TempFolder", null) + "/sort" + 0, GraphStorage.config.getStringSetting("DataFolder", null) + "/storage" + 0, GraphStorage.config.getStringSetting("DataFolder", null) + "/index" + 0, 1);
+		deleteFile(GraphStorage.config.getStringSetting("TempFolder", null) + "/raw" + 0);
+		deleteFile(GraphStorage.config.getStringSetting("TempFolder", null) + "/sort" + 0);
 		//		TempRepositorySorter.deleteDirectory(new File())
 	}
 
@@ -138,7 +147,7 @@ public class FileIndexService {
 			String pred = getAbbr(rd.getPredicate());
 			String obj = rd.getObject();
 			
-			if (pred.length() > 50) continue;
+//			if (pred.length() > 50) continue;
 
 			int ss = idman.getID(sub);
 			int os = idman.getID(obj);
@@ -204,7 +213,7 @@ public class FileIndexService {
 			
 	}
 	
-	public void indexComplex(int mergeThreshold, int maxThreadCnt, int totalThreshold) {
+	public void indexComplex(int minJoinInsCnt, int mergeThreshold, int maxThreadCnt, int totalThreshold) {
 		String dataFolder = GraphStorage.config.getStringSetting("DataFolder", null);
 		String tempFolder = GraphStorage.config.getStringSetting("TempFolder", null);
 		String idx2 = dataFolder + "/index" + 1;
@@ -219,7 +228,7 @@ public class FileIndexService {
 		while (fir.next()) {
 			int insCnt = fir.getInstanceCount();
 			
-			if (insCnt > 1000) {
+			if (insCnt > minJoinInsCnt) {
 				String ps = fir.getPatternString();
 			
 				h.insert(new HeapContainer(ps, codec.decodePattern(ps), insCnt, fir.getRange()));
@@ -349,7 +358,7 @@ public class FileIndexService {
         renameFile(dataFolder + "/storage1", dataFolder + "/storage1.t1");
         
 //        FileIndexMerger.merge(dataFolder, dataFolder, 2, 2);
-        FileIndexMerger.merge(dataFolder, dataFolder, "index1.t", "storage1.t", 2, 2);
+        FileIndexMerger.merge(dataFolder, dataFolder, "index1", "storage1", 2, 2);
         
         for (int i = 0; i < 2; i++) {
             deleteFile(dataFolder + "/index1.t" + i);
@@ -534,18 +543,12 @@ public class FileIndexService {
 	 */
 	public static void main(String[] args) {		
 		FileIndexService is = new FileIndexService();
+//
+		is.indexNode(args[0]);
+//		is.indexEdge(args[1], 5000000, 3);
+//		is.loadKeyword(args[0]);
+//		is.indexComplex(1, 10000000, 3, 15000000);
 
-//		is.indexNode(args[0]);
-//		String[] s = new String[3];
-//		s[0] = "<http://dbpedia.org/resource/2008_Ole_Miss_Rebels_football_team>";
-//		s[1] = "siteCityst";
-//		s[2] = "<http://dbpedia.org/resource/Baton_Rouge%2C_Louisiana>";
-		
-//		is.indexEdge(args[0], 5000000, 2, s);
-//		is.indexEdge(args[0], 5000000, 2);
-		is.indexComplex(10000000, 3, 15000000);
-		//		is.indexTree();
-		//		is.close();
 	}
 
 	class HeapContainer implements Comparable {

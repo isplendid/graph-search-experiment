@@ -71,16 +71,17 @@ public class PatternManager {
 		int pointer = 0;
 		PatternInfo toExt;
 
-		for (int i = 0; i < graph.nodeCount(); i++) {
-			QueryGraphNode n = graph.getNode(i);
-			Set<QueryGraphNode> ns = new HashSet<QueryGraphNode>();
+		for (int i = 0; i < graph.nodeCount(); i++) 
+			if (!graph.getNode(i).isGeneral()) {
+				QueryGraphNode n = graph.getNode(i);
+				Set<QueryGraphNode> ns = new HashSet<QueryGraphNode>();
 
-			ns.add(n);
-			QueryGraph g = graph.getInducedSubgraph(ns, null);
-			String ps = codec.encodePattern(g);
-			elems.add(new PatternInfo(g, ps, getPatternInstanceCount(ps, g.nodeCount())));
-			generated.add(ps);
-		}
+				ns.add(n);
+				QueryGraph g = graph.getInducedSubgraph(ns, null);
+				String ps = codec.encodePattern(g);
+				elems.add(new PatternInfo(g, ps, getPatternInstanceCount(ps, g.nodeCount())));
+				generated.add(ps);
+			}
 		
 		for (int i = 0; i < graph.edgeCount(); i++) {
 			QueryGraphEdge e = graph.getEdge(i);

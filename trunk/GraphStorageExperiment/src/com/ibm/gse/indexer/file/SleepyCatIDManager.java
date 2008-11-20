@@ -22,7 +22,7 @@ import com.sleepycat.je.OperationStatus;
  */
 public class SleepyCatIDManager implements IDManager {
 	
-	long counter = 0;
+	long counter = 1;
 	Database uri2id;
 	Database id2uri;
 	Environment env;

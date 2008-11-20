@@ -41,18 +41,36 @@ public class QueryPlannerTest {
 //			qsList.add(qs);
 //		}
 		/* TEST 2 */
+//		{
+//			QueryGraph g = new QueryGraph();
+//			QueryGraphNode na, nb;
+//			List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
+//			na = g.addNode("track");
+//			nb = g.addNode("progress");
+//			g.addEdge(na, nb, "genre");
+//			seln.add(na);
+//			seln.add(nb);
+//			QuerySchema qs = new QuerySchema(g, seln); 
+//			qsList.add(qs);
+//		}
+		
+		/* TEST 3 */
 		{
 			QueryGraph g = new QueryGraph();
-			QueryGraphNode na, nb;
+			QueryGraphNode na, nb, nc;
 			List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
-			na = g.addNode("track");
-			nb = g.addNode("progress");
-			g.addEdge(na, nb, "genre");
+			na = g.addNode("GraduateStudent");
+			nb = g.addNode();
+			nc = g.addNode("GraduateCourse0");
+			g.addEdge(nb, na, "22-rdf-syntax-ns#type");
+			g.addEdge(nb, nc, "univ-bench.owl#takesCourse");
 			seln.add(na);
 			seln.add(nb);
+			seln.add(nc);
 			QuerySchema qs = new QuerySchema(g, seln); 
 			qsList.add(qs);
 		}
+
 	}
 
 	@Test
