@@ -545,7 +545,7 @@ public class FileIndexService {
 		FileIndexService is = new FileIndexService();
 //
 		is.indexNode(args[0]);
-//		is.indexEdge(args[1], 5000000, 3);
+		is.indexEdge(args[1], 5000000, 3);
 //		is.loadKeyword(args[0]);
 //		is.indexComplex(1, 10000000, 3, 15000000);
 

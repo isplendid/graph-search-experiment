@@ -46,7 +46,7 @@ public class PatternScan implements Scan{
 	}
 	
 	public int getID(int nodeID) {
-		return src.getID(nodeID);
+		return src.getID(cmap.get(sch.getSelectedNode(nodeID)));
 	}
 
 	public boolean next() {

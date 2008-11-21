@@ -19,8 +19,11 @@ public class MergeSorter {
 	
 	private static boolean moveTo(Scan src, UpdateScan dest, QuerySchema sch) {
 		dest.insert();
-		for (int i = 0; i < sch.getSelectedNodeCount(); i++)
-			dest.setID(i, src.getID(i));
+		for (int i = 0; i < sch.getSelectedNodeCount(); i++) {
+			int c = src.getID(i);
+//			System.out.println("#" + c);
+			dest.setID(i, c);
+		}
 		return src.next();
 	}
 	

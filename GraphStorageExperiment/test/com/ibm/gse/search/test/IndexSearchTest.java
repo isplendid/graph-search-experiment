@@ -6,18 +6,19 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ibm.gse.indexer.db.DatabaseIDManager;
+import com.ibm.gse.indexer.IDManager;
+import com.ibm.gse.indexer.file.SleepyCatIDManager;
 import com.ibm.gse.storage.file.FileRepository;
 
 public class IndexSearchTest {
 	
-	DatabaseIDManager idman;
+	IDManager idman;
 	List<String> patterns;
 	List<Integer> size;
 
 	@Before
 	public void setUp() throws Exception {
-		idman = new DatabaseIDManager();
+		idman = new SleepyCatIDManager();
 		patterns = new ArrayList<String>();
 		size = new ArrayList<Integer>();
 		
@@ -46,8 +47,11 @@ public class IndexSearchTest {
 //		size.add(2);
 		
 		/* TESTCASE 7 */
-		patterns.add("metamodel[+hasMember::polici,+hasMember::xmln]");
-		size.add(3);
+//		patterns.add("*[+22-rdf-syntax-ns#type::*]");
+//		size.add(2);
+		
+		patterns.add("GraduateStudent0");
+		size.add(1);
 	}
 	
 //	@Test
@@ -70,14 +74,19 @@ public class IndexSearchTest {
 			fr = new FileRepository(patterns.get(i), size.get(i));
 			
 			System.out.println(patterns.get(i));
+			
+			int count = 0;
 			while (fr.next()) {
-				for (int j = 0; j < size.get(i); j++)
+				count ++;
+				if (count < 10 || fr.getID(1) == 4159) {
+					for (int j = 0; j < size.get(i); j++)
 //					System.out.print(idman.getURI(fr.getID(j)) + " ");
-					System.out.print(fr.getID(j) + " ");
-				System.out.println();
+						System.out.print(fr.getID(j) + " ");
+					System.out.println();
+				}
 			}
+			System.out.println("Count = " + count);
 		}
-		
 		System.out.println(System.currentTimeMillis() - time);
 	}
 
