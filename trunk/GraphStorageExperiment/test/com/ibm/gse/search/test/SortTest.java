@@ -28,9 +28,9 @@ public class SortTest {
 		/* TESTCASE 1 */
 		{
 			QueryGraph g = new QueryGraph();
-			QueryGraphNode na = g.addNode("risk");
-			QueryGraphNode nb = g.addNode("high");
-			g.addEdge(na, nb, "related");
+			QueryGraphNode na = g.addNode();
+			QueryGraphNode nb = g.addNode();
+			g.addEdge(na, nb, "22-rdf-syntax-ns#type");
 			List<QueryGraphNode> nl = new ArrayList<QueryGraphNode>();
 
 			nl.add(na);
@@ -40,18 +40,18 @@ public class SortTest {
 		}
 
 		/* TESTCASE 2 */
-		{
-			QueryGraph g = new QueryGraph();
-			QueryGraphNode na = g.addNode("risk");
-			QueryGraphNode nb = g.addNode("http");
-			g.addEdge(na, nb, "related");
-			List<QueryGraphNode> nl = new ArrayList<QueryGraphNode>();
-
-			nl.add(na);
-			nl.add(nb);
-			seln.add(nl);
-			qs.add(new QuerySchema(g, nl));
-		}
+//		{
+//			QueryGraph g = new QueryGraph();
+//			QueryGraphNode na = g.addNode("risk");
+//			QueryGraphNode nb = g.addNode("http");
+//			g.addEdge(na, nb, "related");
+//			List<QueryGraphNode> nl = new ArrayList<QueryGraphNode>();
+//
+//			nl.add(na);
+//			nl.add(nb);
+//			seln.add(nl);
+//			qs.add(new QuerySchema(g, nl));
+//		}
 	}
 
 	@Test
@@ -65,10 +65,14 @@ public class SortTest {
 			
 			System.out.println("RESULT " + (i + 1));
 			
+			int count = 0;
 			while (s.next()) {
-				for (QueryGraphNode n : seln.get(i))
-					System.out.print(s.getID(n) + " ");
-				System.out.println();
+				count ++;
+				if (s.getID(0) == 4159) {
+					for (QueryGraphNode n : seln.get(i))
+						System.out.print(s.getID(n) + " ");
+					System.out.println("count = " + count);
+				}
 			}
 			
 			System.out.println();

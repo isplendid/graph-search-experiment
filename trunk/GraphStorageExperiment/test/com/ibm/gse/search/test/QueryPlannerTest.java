@@ -57,19 +57,52 @@ public class QueryPlannerTest {
 		/* TEST 3 */
 		{
 			QueryGraph g = new QueryGraph();
-			QueryGraphNode na, nb, nc;
+			QueryGraphNode na, nb;
 			List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
 			na = g.addNode("GraduateStudent");
-			nb = g.addNode();
-			nc = g.addNode("GraduateCourse0");
+			nb = g.addNode("GraduateStudent0");
 			g.addEdge(nb, na, "22-rdf-syntax-ns#type");
-			g.addEdge(nb, nc, "univ-bench.owl#takesCourse");
 			seln.add(na);
 			seln.add(nb);
-			seln.add(nc);
 			QuerySchema qs = new QuerySchema(g, seln); 
 			qsList.add(qs);
 		}
+		
+		/* TEST 4 */
+//		{
+//			QueryGraph g = new QueryGraph();
+//            QueryGraphNode na, nb, nc;
+//            List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
+//            na = g.addNode("GraduateStudent");
+//            nb = g.addNode("GraduateCourse0");
+//            nc = g.addNode();
+//            g.addEdge(nc, na, "22-rdf-syntax-ns#type");
+//            g.addEdge(nc, nb, "takeCourse");
+//            seln.add(na);
+//            seln.add(nb);
+//            seln.add(nc);
+//            QuerySchema qs = new QuerySchema(g, seln); 
+//            qsList.add(qs);
+//
+//		}
+
+		
+		/* TEST 5 */
+//		{
+//			QueryGraph g = new QueryGraph();
+//			QueryGraphNode na, nb, nc;
+//			List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
+//			na = g.addNode("GraduateStudent");
+//			nb = g.addNode();
+//			nc = g.addNode("GraduateCourse0");
+//			g.addEdge(nb, na, "22-rdf-syntax-ns#type");
+//			g.addEdge(nb, nc, "univ-bench.owl#takesCourse");
+//			seln.add(na);
+//			seln.add(nb);
+//			seln.add(nc);
+//			QuerySchema qs = new QuerySchema(g, seln); 
+//			qsList.add(qs);
+//		}
 
 	}
 
