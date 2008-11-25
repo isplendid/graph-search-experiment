@@ -75,6 +75,7 @@ public class IndexManager {
 	}
 	
 	public int getPatternCount(String pattern, int size) {
+		if (size > file.length) return -1;
 		RecordRange rr = seek(pattern, size);
 		if (rr == null)
 			return -1;
