@@ -69,4 +69,8 @@ public class PatternInfo {
 	public int getInstanceCount() {
 		return insCnt;
 	}
+	
+	public String toString() {
+		return patternStr;
+	}
 }
