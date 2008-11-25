@@ -45,22 +45,24 @@ class OptimalArray {
 	}
 	
 	OptimalArray(QueryGraph g) {
-		 initP2(g.edgeCount() + g.nodeCount() + 1);
+		Set<QueryGraphNode> nodes = g.getConstrainedNodeSet();
+		
+		 initP2(g.edgeCount() + nodes.size() + 1);
 		 
 		 int serial = 0;
 		 
 		 for (int i = 0; i < g.edgeCount(); i++)
 			 eMap.put(g.getEdge(i), serial ++);
 		 
-		 for (int i = 0; i < g.nodeCount(); i++)
-			 nMap.put(g.getNode(i), serial ++);
+		 for (QueryGraphNode n : nodes)
+			 nMap.put(n, serial ++);
 		 
-		 pending = new Set[g.edgeCount() + g.nodeCount() + 1];
+		 pending = new Set[g.edgeCount() + nodes.size() + 1];
 		 
 		 for (int i = 0; i < pending.length; i++)
 			 pending[i] = new HashSet<OptimalArrayElem>();
 		 
-		 encode = new OptimalArrayElem[p2[g.edgeCount() + g.nodeCount()]];
+		 encode = new OptimalArrayElem[p2[g.edgeCount() + nodes.size()]];
 	}
 
 	/**
