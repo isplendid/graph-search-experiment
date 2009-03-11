@@ -9,8 +9,9 @@ import com.ibm.gse.indexer.IDManager;
 import com.ibm.gse.indexer.InstanceKeywordRepository;
 import com.ibm.gse.indexer.LabelManager;
 import com.ibm.gse.indexer.RelationRepository;
+import com.ibm.gse.pattern.HashingPatternCodec;
+import com.ibm.gse.pattern.ModHash;
 import com.ibm.gse.pattern.PatternCodec;
-import com.ibm.gse.pattern.PreorderPatternCodec;
 import com.ibm.gse.storage.file.FileRepositoryReader;
 import com.ibm.gse.storage.file.RecordRange;
 import com.ibm.gse.struct.QueryGraph;
@@ -29,7 +30,7 @@ public class FileIndexService {
 	PatternCodec codec;
 
 	public FileIndexService() {
-		codec = new PreorderPatternCodec();
+		codec = new HashingPatternCodec(new ModHash());
 	}
 	
 	public void loadKeyword(String filename) {

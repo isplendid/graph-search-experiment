@@ -16,7 +16,13 @@ import com.ibm.gse.struct.QueryGraphNode;
  * @author Tian Yuan
  * 
  */
-public class PreorderPatternCodec implements PatternCodec {
+public class HashingPatternCodec implements PatternCodec {
+	
+	HashFunction hf;
+	
+	public HashingPatternCodec(HashFunction hf) {
+		this.hf = hf;
+	}
 
 	private String iterativeEncode(QueryGraph graph, QueryGraphNode root,
 			HashSet<QueryGraphNode> visited) {
@@ -24,7 +30,7 @@ public class PreorderPatternCodec implements PatternCodec {
 		boolean first = true;
 
 		visited.add(root);
-		sb.append(root.getLabel());
+		sb.append(hf.hash(root.getLabel()));
 
 		List<Connectivity> linked = root.getConnectivities();
 		java.util.Collections.sort(linked, new ConnectivityComparator());
@@ -60,7 +66,7 @@ public class PreorderPatternCodec implements PatternCodec {
 
 		for (int i = 1; i < graph.nodeCount(); i++) {
 			QueryGraphNode currentNode = graph.getNode(i);
-			if ((cmpRes = currentNode.getLabel().compareTo(minNode.getLabel())) < 0)
+			if ((cmpRes = hf.hash(currentNode.getLabel()).compareTo(hf.hash(minNode.getLabel()))) < 0)
 				minNode = currentNode;
 			else if (cmpRes == 0 && (cmpRes = (currentNode.getOutDegree() - minNode.getOutDegree())) > 0)
 				minNode = currentNode;
@@ -151,7 +157,7 @@ public class PreorderPatternCodec implements PatternCodec {
 			Connectivity a = (Connectivity) o1;
 			Connectivity b = (Connectivity) o2;
 			
-			if ((cmpRes = a.getNode().getLabel().compareTo(b.getNode().getLabel())) != 0)
+			if ((cmpRes = hf.hash(a.getNode().getLabel()).compareTo(hf.hash(b.getNode().getLabel()))) != 0)
 				return cmpRes;
 			else if ((cmpRes = a.getEdge().getLabel().compareTo(b.getEdge().getLabel())) != 0)
 				return cmpRes;

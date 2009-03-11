@@ -13,15 +13,14 @@ package com.ibm.gse.indexer.db;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.PriorityQueue;
 
+import com.ibm.gse.pattern.HashingPatternCodec;
+import com.ibm.gse.pattern.ModHash;
 import com.ibm.gse.pattern.PatternCodec;
-import com.ibm.gse.pattern.PreorderPatternCodec;
+import com.ibm.gse.struct.ConcreteQueryGraphNode;
 import com.ibm.gse.struct.Pattern;
 import com.ibm.gse.struct.QueryGraph;
-import com.ibm.gse.struct.ConcreteQueryGraphNode;
 import com.ibm.gse.system.GraphStorage;
 import com.ibm.iodt.sor.query.SPARQLResultSet;
 import com.ibm.iodt.sor.utils.SORException;
@@ -36,7 +35,7 @@ public class IndexService {
         try {
             this.indexStorage = indexstorage;
             this.dataReader = dsr;
-            codec = new PreorderPatternCodec();
+            codec = new HashingPatternCodec(new ModHash());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -170,7 +169,7 @@ public class IndexService {
         
         GraphStorage gs = new GraphStorage();
         IndexStorage is = new IndexStorage();
-        PatternCodec codec = new PreorderPatternCodec();
+        PatternCodec codec = new HashingPatternCodec(new ModHash());
         
         /* test get all statistic */
 //        ResultSet rs = is.getAllStat();
