@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ibm.gse.pattern.PreorderPatternCodec;
+import com.ibm.gse.pattern.HashingPatternCodec;
 import com.ibm.gse.struct.QueryGraph;
 import com.ibm.gse.struct.QueryGraphNode;
 
@@ -21,7 +21,7 @@ public class PreorderCodecTest {
 	List<String> graphs = new ArrayList<String>();
 	
 	List<QueryGraph> qg = new ArrayList<QueryGraph>();
-	PreorderPatternCodec pc = new PreorderPatternCodec();
+	HashingPatternCodec pc = new HashingPatternCodec();
 
 	/**
 	 * @throws java.lang.Exception
@@ -43,7 +43,7 @@ public class PreorderCodecTest {
 	}
 
 	/**
-	 * Test method for {@link com.ibm.gse.pattern.PreorderPatternCodec#encodePattern(com.ibm.gse.struct.QueryGraph)}.
+	 * Test method for {@link com.ibm.gse.pattern.HashingPatternCodec#encodePattern(com.ibm.gse.struct.QueryGraph)}.
 	 */
 	@Test
 	public void testEncodePattern() {
@@ -51,7 +51,7 @@ public class PreorderCodecTest {
 	}
 
 	/**
-	 * Test method for {@link com.ibm.gse.pattern.PreorderPatternCodec#decodePattern(java.lang.String)}.
+	 * Test method for {@link com.ibm.gse.pattern.HashingPatternCodec#decodePattern(java.lang.String)}.
 	 */
 	@Test
 	public void testDecodePattern() {
