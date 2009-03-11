@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.ibm.gse.pattern.HashingPatternCodec;
+import com.ibm.gse.pattern.ModHash;
 import com.ibm.gse.struct.QueryGraph;
 import com.ibm.gse.struct.QueryGraphNode;
 
@@ -21,7 +22,7 @@ public class PreorderCodecTest {
 	List<String> graphs = new ArrayList<String>();
 	
 	List<QueryGraph> qg = new ArrayList<QueryGraph>();
-	HashingPatternCodec pc = new HashingPatternCodec();
+	HashingPatternCodec pc = new HashingPatternCodec(new ModHash());
 
 	/**
 	 * @throws java.lang.Exception
