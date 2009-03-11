@@ -544,10 +544,10 @@ public class FileIndexService {
 	public static void main(String[] args) {		
 		FileIndexService is = new FileIndexService();
 //
-		is.indexNode(args[0]);
-		is.indexEdge(args[1], 5000000, 3);
+//		is.indexNode(args[0]);
+//		is.indexEdge(args[1], 5000000, 3);
 //		is.loadKeyword(args[0]);
-//		is.indexComplex(1, 10000000, 3, 15000000);
+		is.indexComplex(1, 10000000, 3, 30000000);
 
 	}
 

@@ -148,6 +148,96 @@ public class QueryPlannerTest {
 			QuerySchema qs = new QuerySchema(g, seln); 
 			qsList.add(qs);
 		}
+		
+		/* TEST 9*/
+		{
+			QueryGraph g = new QueryGraph();
+			QueryGraphNode na, nb;
+			List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
+			na = g.addNode("atlanta");
+			nb = g.addNode();
+			g.addEdge(nb, na, "birthPlace");
+			seln.add(na);
+			seln.add(nb);
+			QuerySchema qs = new QuerySchema(g, seln); 
+			qsList.add(qs);
+		}
+		
+		/* TEST 10 */
+		{
+			QueryGraph g = new QueryGraph();
+			QueryGraphNode na, nb;
+			List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
+			na = g.addNode("atlanta");
+			nb = g.addNode("eric");
+			g.addEdge(nb, na, "birthPlace");
+			seln.add(na);
+			seln.add(nb);
+			QuerySchema qs = new QuerySchema(g, seln); 
+			qsList.add(qs);
+		}
+		
+		/* TEST 11 */
+		{
+			QueryGraph g = new QueryGraph();
+			QueryGraphNode na, nb, nc;
+			List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
+			na = g.addNode();
+			nb = g.addNode("eric");
+			nc = g.addNode();
+			g.addEdge(nb, na, "birthPlace");
+			g.addEdge(nb, nc, "trainer");
+			seln.add(na);
+			seln.add(nb);
+			seln.add(nc);
+			QuerySchema qs = new QuerySchema(g, seln); 
+			qsList.add(qs);
+		}
+		
+		/* TEST 12 */
+		{
+			QueryGraph g = new QueryGraph();
+			QueryGraphNode na, nb;
+			List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
+			na = g.addNode("martial");
+			nb = g.addNode();
+			g.addEdge(nb, na, "starring");
+			seln.add(na);
+			seln.add(nb);
+			QuerySchema qs = new QuerySchema(g, seln); 
+			qsList.add(qs);
+		}
+		
+		/* TEST 13 */
+		{
+			QueryGraph g = new QueryGraph();
+			QueryGraphNode na, nb;
+			List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
+			na = g.addNode("martial");
+			nb = g.addNode("action");
+			g.addEdge(nb, na, "starring");
+			seln.add(na);
+			seln.add(nb);
+			QuerySchema qs = new QuerySchema(g, seln); 
+			qsList.add(qs);
+		}
+		
+		/* TEST 14 */
+		{
+			QueryGraph g = new QueryGraph();
+			QueryGraphNode na, nb, nc;
+			List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
+			na = g.addNode("martial");
+			nb = g.addNode("action");
+			nc = g.addNode();
+			g.addEdge(nb, na, "starring");
+			g.addEdge(nb, nc, "director");
+			seln.add(na);
+			seln.add(nb);
+			seln.add(nc);
+			QuerySchema qs = new QuerySchema(g, seln); 
+			qsList.add(qs);
+		}
 	}
 
 	@Test
@@ -166,8 +256,7 @@ public class QueryPlannerTest {
 //				System.out.println();
 			}
 			
-			System.out.println("TIME = " + (System.currentTimeMillis() - time));
+			System.out.println(System.currentTimeMillis() - time);
 		}
 	}
-
 }
