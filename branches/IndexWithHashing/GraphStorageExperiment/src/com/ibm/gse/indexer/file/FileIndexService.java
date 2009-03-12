@@ -3,6 +3,8 @@ package com.ibm.gse.indexer.file;
 import java.io.File;
 import java.util.Map;
 
+import com.ibm.gse.hash.HashUnique;
+import com.ibm.gse.hash.ModHash;
 import com.ibm.gse.index.file.FileIndexReader;
 import com.ibm.gse.index.file.util.FileIndexMerger;
 import com.ibm.gse.indexer.IDManager;
@@ -10,7 +12,6 @@ import com.ibm.gse.indexer.InstanceKeywordRepository;
 import com.ibm.gse.indexer.LabelManager;
 import com.ibm.gse.indexer.RelationRepository;
 import com.ibm.gse.pattern.HashingPatternCodec;
-import com.ibm.gse.pattern.ModHash;
 import com.ibm.gse.pattern.PatternCodec;
 import com.ibm.gse.storage.file.FileRepositoryReader;
 import com.ibm.gse.storage.file.RecordRange;
@@ -118,7 +119,7 @@ public class FileIndexService {
 	}
 
 	/**
-	 * Index elementary pattern containing one edge from the given triple
+	 * Index from the given triple elementary patterns containing one edge without constraints on both nodes
 	 * @param filename
 	 * @param maxEntryCnt
 	 * @param maxThreadCnt
@@ -215,6 +216,7 @@ public class FileIndexService {
 	}
 	
 	public void indexComplex(int minJoinInsCnt, int mergeThreshold, int maxThreadCnt, int totalThreshold) {
+		HashUnique hu = new HashUnique(new ModHash());
 		String dataFolder = GraphStorage.config.getStringSetting("DataFolder", null);
 		String tempFolder = GraphStorage.config.getStringSetting("TempFolder", null);
 		String idx2 = dataFolder + "/index" + 1;
@@ -262,8 +264,8 @@ public class FileIndexService {
 					String pred = edge.getLabel();
 					String obj = idman.getURI(os);
 					
-					String[] left = labman.getLabel(sub);
-					String[] right = labman.getLabel(obj);
+					String[] left = hu.unique(labman.getLabel(sub));
+					String[] right = hu.unique(labman.getLabel(obj));
 
 
 					if (left == null || right == null) {

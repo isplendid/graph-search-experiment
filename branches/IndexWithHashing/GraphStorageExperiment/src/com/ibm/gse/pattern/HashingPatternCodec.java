@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
+import com.ibm.gse.hash.HashFunction;
 import com.ibm.gse.struct.Connectivity;
 import com.ibm.gse.struct.QueryGraph;
 import com.ibm.gse.struct.QueryGraphNode;
@@ -30,7 +31,7 @@ public class HashingPatternCodec implements PatternCodec {
 		boolean first = true;
 
 		visited.add(root);
-		sb.append(hf.hash(root.getLabel()));
+		sb.append(hf.hashStr(root.getLabel()));
 
 		List<Connectivity> linked = root.getConnectivities();
 		java.util.Collections.sort(linked, new ConnectivityComparator());
@@ -66,7 +67,7 @@ public class HashingPatternCodec implements PatternCodec {
 
 		for (int i = 1; i < graph.nodeCount(); i++) {
 			QueryGraphNode currentNode = graph.getNode(i);
-			if ((cmpRes = hf.hash(currentNode.getLabel()).compareTo(hf.hash(minNode.getLabel()))) < 0)
+			if ((cmpRes = hf.hashStr(currentNode.getLabel()).compareTo(hf.hashStr(minNode.getLabel()))) < 0)
 				minNode = currentNode;
 			else if (cmpRes == 0 && (cmpRes = (currentNode.getOutDegree() - minNode.getOutDegree())) > 0)
 				minNode = currentNode;
@@ -157,7 +158,7 @@ public class HashingPatternCodec implements PatternCodec {
 			Connectivity a = (Connectivity) o1;
 			Connectivity b = (Connectivity) o2;
 			
-			if ((cmpRes = hf.hash(a.getNode().getLabel()).compareTo(hf.hash(b.getNode().getLabel()))) != 0)
+			if ((cmpRes = hf.hashStr(a.getNode().getLabel()).compareTo(hf.hashStr(b.getNode().getLabel()))) != 0)
 				return cmpRes;
 			else if ((cmpRes = a.getEdge().getLabel().compareTo(b.getEdge().getLabel())) != 0)
 				return cmpRes;
