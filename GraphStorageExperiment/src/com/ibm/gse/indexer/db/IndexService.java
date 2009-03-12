@@ -15,8 +15,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.PriorityQueue;
 
+import com.ibm.gse.hash.ModHash;
 import com.ibm.gse.pattern.HashingPatternCodec;
-import com.ibm.gse.pattern.ModHash;
 import com.ibm.gse.pattern.PatternCodec;
 import com.ibm.gse.struct.ConcreteQueryGraphNode;
 import com.ibm.gse.struct.Pattern;

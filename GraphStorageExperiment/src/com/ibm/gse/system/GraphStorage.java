@@ -2,10 +2,10 @@ package com.ibm.gse.system;
 
 import com.ibm.gse.config.Configuration;
 import com.ibm.gse.config.FileConfig;
+import com.ibm.gse.hash.ModHash;
 import com.ibm.gse.metadata.IndexManager;
 import com.ibm.gse.metadata.PatternManager;
 import com.ibm.gse.pattern.HashingPatternCodec;
-import com.ibm.gse.pattern.ModHash;
 import com.ibm.gse.storage.map.ColumnNodeMap;
 import com.ibm.gse.storage.map.LexicoColumnNodeMap;
 

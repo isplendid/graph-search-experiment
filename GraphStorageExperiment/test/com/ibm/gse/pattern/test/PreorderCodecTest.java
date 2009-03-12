@@ -8,8 +8,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.ibm.gse.hash.ModHash;
 import com.ibm.gse.pattern.HashingPatternCodec;
-import com.ibm.gse.pattern.ModHash;
 import com.ibm.gse.struct.QueryGraph;
 import com.ibm.gse.struct.QueryGraphNode;
 

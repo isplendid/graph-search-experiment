@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Reader;
 
 /**
+ * This class reads keyword information from a file
  * 
  * @author Tian Yuan
  * 
