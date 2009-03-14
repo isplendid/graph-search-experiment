@@ -44,7 +44,7 @@ public class FileIndexReader {
 	}
 	
 	public String getPatternString() {
-		short len;
+		short len = 0;
 		
 		try {
 			file.seek(pointer);
@@ -53,7 +53,8 @@ public class FileIndexReader {
 			file.read(charBuf, 0, len);
 			
 			return new String(charBuf, 0, len);
-		} catch (IOException e) {
+		} catch (Exception e) {
+			System.err.println("POSITION = " + pointer + " , LEN = " + Short.toString(len));
 			e.printStackTrace();
 		}
 		

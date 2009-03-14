@@ -32,12 +32,15 @@ public class RelationRepository {
 				return false;
 			}
 
-			String[] split = temp.split("> ");
+			String[] split = temp.split("\t");
 			
-			if (split[2].startsWith("\"")) continue;
-			sub = split[0] + ">";
-			pred = split[1] + ">";
-			obj = split[2] + ">";
+			if (split.length < 3) {
+				System.out.println(split);
+				continue;
+			}
+			sub = split[0];
+			pred = split[1];
+			obj = split[2];
 			return true;
 		} while (true);
 	}
