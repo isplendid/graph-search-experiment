@@ -63,11 +63,9 @@ public class FileIndexService {
 				id = idman.addURI(uri);
 			for(int i = 0; i < terms.length; i++) {
 				entryCounter ++;
-				QueryGraph g = new QueryGraph();
 				int[] ins = new int[1];
-				g.addNode(terms[i]);
 				ins[0] = id;
-				TempFileEntry tfe = new TempFileEntry(codec.encodePattern(g), ins);
+				TempFileEntry tfe = new TempFileEntry(terms[i], ins);
 				wr.writeRecord(tfe);
 			}
 		}
@@ -89,13 +87,6 @@ public class FileIndexService {
 		ins[0] = c1;
 		ins[1] = c2;
 		wr.writeRecord(new TempFileEntry(pattern, ins));		
-	}
-
-	private String getAbbr(String uri) {
-		if (uri.lastIndexOf("/") > 0)
-			return uri.substring(uri.lastIndexOf("/") + 1, uri.length() - 1);
-		else
-			return uri;
 	}
 
 	private void deleteFile(String filename) {
@@ -146,7 +137,7 @@ public class FileIndexService {
 
 		while (rd.next()) {
 			String sub = rd.getSubject();
-			String pred = getAbbr(rd.getPredicate());
+			String pred = rd.getPredicate();
 			String obj = rd.getObject();
 			
 //			if (pred.length() > 50) continue;
@@ -548,9 +539,9 @@ public class FileIndexService {
 		FileIndexService is = new FileIndexService();
 //
 //		is.indexNode(args[0]);
-//		is.indexEdge(args[1], 5000000, 3);
+		is.indexEdge(args[1], 5000000, 5);
 //		is.loadKeyword(args[0]);
-		is.indexComplex(1, 10000000, 3, 30000000);
+//		is.indexComplex(1, 10000000, 3, 30000000);
 
 	}
 

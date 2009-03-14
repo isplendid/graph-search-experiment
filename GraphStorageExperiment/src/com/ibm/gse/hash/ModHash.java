@@ -8,6 +8,7 @@ package com.ibm.gse.hash;
  */
 public class ModHash implements HashFunction {
 	int mod;
+	final String wildcat = "*";
 	
 	public ModHash() {
 		mod = 13;
@@ -19,12 +20,14 @@ public class ModHash implements HashFunction {
 
 	@Override
 	public String hashStr(String str) {
-		return Integer.toString(str.hashCode() % mod);
+		if (str.equals(wildcat))
+			return str;
+		else
+			return Integer.toString(str.hashCode() % mod);
 	}
 
 	@Override
 	public Integer hashInt(String str) {
-		// TODO Auto-generated method stub
 		return str.hashCode() % mod;
 	}
 
