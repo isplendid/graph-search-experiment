@@ -1,6 +1,7 @@
 package com.ibm.gse.indexer.file;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Map;
 
 import com.ibm.gse.hash.HashUnique;
@@ -255,46 +256,32 @@ public class FileIndexService {
 					String pred = edge.getLabel();
 					String obj = idman.getURI(os);
 					
-					String[] left = hu.unique(labman.getLabel(sub));
-					String[] right = hu.unique(labman.getLabel(obj));
-
+					String[] left = labman.getLabel(sub);
+					String[] right = labman.getLabel(obj);
 
 					if (left == null || right == null) {
 						continue;
 					}
 					
+					left = hu.unique(left);
+					right = hu.unique(right);
+					
 					for (String l : left) {
-						String r = "*";
+						for (String r : right) {
 						
-						entryCnt ++;
-						totalCnt ++;
-						QueryGraph ng = new QueryGraph();
+							entryCnt ++;
+							totalCnt ++;
+							QueryGraph ng = new QueryGraph();
 							
-						QueryGraphNode na = ng.addNode(l);
-						QueryGraphNode nb = ng.addNode();
-						ng.addEdge(na, nb, pred);
+							QueryGraphNode na = ng.addNode(l);
+							QueryGraphNode nb = ng.addNode(r);
+							ng.addEdge(na, nb, pred);
 						
-						if (l.compareTo(r) < 0)
-							addEdge(tw, codec.encodePattern(ng), ss, os);
-						else
-							addEdge(tw, codec.encodePattern(ng), os, ss);
-					}
-					
-					for (String r : right) {
-						String l = "*";
-						
-						entryCnt ++;
-						totalCnt ++;
-						QueryGraph ng = new QueryGraph();
-						
-						QueryGraphNode na = ng.addNode();
-						QueryGraphNode nb = ng.addNode(r);
-						ng.addEdge(na, nb, pred);
-					
-						if (l.compareTo(r) < 0)
-							addEdge(tw, codec.encodePattern(ng), ss, os);
-						else
-							addEdge(tw, codec.encodePattern(ng), os, ss);
+							if (l.compareTo(r) < 0)
+								addEdge(tw, codec.encodePattern(ng), ss, os);
+							else
+								addEdge(tw, codec.encodePattern(ng), os, ss);
+						}
 					}
 					
 					if (entryCnt > mergeThreshold) {
@@ -539,9 +526,9 @@ public class FileIndexService {
 		FileIndexService is = new FileIndexService();
 //
 //		is.indexNode(args[0]);
-		is.indexEdge(args[1], 5000000, 5);
+//		is.indexEdge(args[1], 5000000, 5);
 //		is.loadKeyword(args[0]);
-//		is.indexComplex(1, 10000000, 3, 30000000);
+		is.indexComplex(1000, 10000000, 3, 30000000);
 
 	}
 
