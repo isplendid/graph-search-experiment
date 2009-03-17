@@ -19,6 +19,7 @@ import com.ibm.gse.struct.QueryGraphNode;
  */
 public class HashingPatternCodec implements PatternCodec {
 	
+	final String wildcard = "*";
 	HashFunction hf;
 	
 	public HashingPatternCodec(HashFunction hf) {
@@ -104,7 +105,8 @@ public class HashingPatternCodec implements PatternCodec {
 			edgeLabel = header.substring(1, pos);
 		}
 
-		QueryGraphNode n = g.addNode(nodeLabel);
+		QueryGraphNode n = g.addNode();
+		
 		if (edgeLabel != null) {
 			if (outEdge)
 				g.addEdge(last, n, edgeLabel);

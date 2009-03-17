@@ -1,5 +1,7 @@
 package com.ibm.gse.indexer;
 
+import java.util.ArrayList;
+
 
 public interface LabelManager {
 	
