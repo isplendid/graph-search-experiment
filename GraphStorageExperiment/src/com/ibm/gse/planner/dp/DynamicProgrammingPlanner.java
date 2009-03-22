@@ -36,7 +36,7 @@ public class DynamicProgrammingPlanner implements Planner {
 			Plan p = new PatternPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()));
 
 			pis.add(pi.getPatternString());
-			optArr.setInitValue(new OptimalArrayElem(p, pis));
+			optArr.setInitValue(new OptimalArrayElem(p, pis, null, pi));
 		}
 
 		Set<OptimalArrayElem> ext;
@@ -48,7 +48,7 @@ public class DynamicProgrammingPlanner implements Planner {
 					if (!containedPattern.contains(p.getPatternString()) && isExtendAndConnected(p, elem)){
 						Set<String> con = getContainedPattern(elem.getContainedPatterns(), p.getPatternString());
 						Plan pln = getJoinSelectPlan(elem, p, g);
-						OptimalArrayElem oae = new OptimalArrayElem(pln, con);
+						OptimalArrayElem oae = new OptimalArrayElem(pln, con, elem.getConstrainedNodes(), p);
 
 						optArr.update(oae);
 					}

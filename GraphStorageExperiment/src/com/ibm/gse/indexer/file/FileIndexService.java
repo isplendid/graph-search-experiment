@@ -1,9 +1,9 @@
 package com.ibm.gse.indexer.file;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Map;
 
+import com.ibm.gse.hash.HashFunction;
 import com.ibm.gse.hash.HashUnique;
 import com.ibm.gse.hash.ModHash;
 import com.ibm.gse.index.file.FileIndexReader;
@@ -208,7 +208,8 @@ public class FileIndexService {
 	}
 	
 	public void indexComplex(int minJoinInsCnt, int mergeThreshold, int maxThreadCnt, int totalThreshold) {
-		HashUnique hu = new HashUnique(new ModHash());
+		HashFunction func = new ModHash();
+		HashUnique hu = new HashUnique(func);
 		String dataFolder = GraphStorage.config.getStringSetting("DataFolder", null);
 		String tempFolder = GraphStorage.config.getStringSetting("TempFolder", null);
 		String idx2 = dataFolder + "/index" + 1;
@@ -267,6 +268,39 @@ public class FileIndexService {
 					right = hu.unique(right);
 					
 					for (String l : left) {
+						String r = "*";
+						entryCnt ++;
+						totalCnt ++;
+						QueryGraph ng = new QueryGraph();
+							
+						QueryGraphNode na = ng.addNode(l);
+						QueryGraphNode nb = ng.addNode(r);
+						ng.addEdge(na, nb, pred);
+						
+						if (func.hashStr(l).compareTo(func.hashStr(r)) < 0)
+							addEdge(tw, codec.encodePattern(ng), ss, os);
+						else
+							addEdge(tw, codec.encodePattern(ng), os, ss);
+					}
+					
+					for (String r : right) {
+						String l = "*";
+
+						entryCnt ++;
+						totalCnt ++;
+						QueryGraph ng = new QueryGraph();
+
+						QueryGraphNode na = ng.addNode(l);
+						QueryGraphNode nb = ng.addNode(r);
+						ng.addEdge(na, nb, pred);
+
+						if (func.hashStr(l).compareTo(func.hashStr(r)) < 0)
+							addEdge(tw, codec.encodePattern(ng), ss, os);
+						else
+							addEdge(tw, codec.encodePattern(ng), os, ss);
+					}
+					
+					for (String l : left) {
 						for (String r : right) {
 						
 							entryCnt ++;
@@ -277,7 +311,7 @@ public class FileIndexService {
 							QueryGraphNode nb = ng.addNode(r);
 							ng.addEdge(na, nb, pred);
 						
-							if (l.compareTo(r) < 0)
+							if (func.hashStr(l).compareTo(func.hashStr(r)) < 0)
 								addEdge(tw, codec.encodePattern(ng), ss, os);
 							else
 								addEdge(tw, codec.encodePattern(ng), os, ss);
@@ -528,7 +562,7 @@ public class FileIndexService {
 //		is.indexNode(args[0]);
 //		is.indexEdge(args[1], 5000000, 5);
 //		is.loadKeyword(args[0]);
-		is.indexComplex(1000, 10000000, 3, 30000000);
+		is.indexComplex(1000, 10000000, 3, 50000000);
 
 	}
 

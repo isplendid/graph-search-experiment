@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.ibm.gse.hash.HashFunction;
+import com.ibm.gse.struct.ConcreteQueryGraphNode;
 import com.ibm.gse.struct.Connectivity;
 import com.ibm.gse.struct.QueryGraph;
 import com.ibm.gse.struct.QueryGraphNode;
@@ -32,7 +33,8 @@ public class HashingPatternCodec implements PatternCodec {
 		boolean first = true;
 
 		visited.add(root);
-		sb.append(hf.hashStr(root.getLabel()));
+		
+		sb.append(hf.hashStr(root.getLabel()));			
 
 		List<Connectivity> linked = root.getConnectivities();
 		java.util.Collections.sort(linked, new ConnectivityComparator());
@@ -64,7 +66,11 @@ public class HashingPatternCodec implements PatternCodec {
 		
 		if (graph.nodeCount() == 0)
 			return "";
+		
 		QueryGraphNode minNode = graph.getNode(0);
+		
+		if (graph.nodeCount() == 1)
+			return minNode.getLabel();
 
 		for (int i = 1; i < graph.nodeCount(); i++) {
 			QueryGraphNode currentNode = graph.getNode(i);

@@ -1,8 +1,11 @@
 package com.ibm.gse.planner.dp;
 
+import java.util.HashSet;
 import java.util.Set;
 
+import com.ibm.gse.pattern.PatternInfo;
 import com.ibm.gse.query.Plan;
+import com.ibm.gse.struct.QueryGraph;
 import com.ibm.gse.struct.QueryGraphEdge;
 import com.ibm.gse.struct.QueryGraphNode;
 
@@ -18,11 +21,20 @@ public class OptimalArrayElem {
 	private Set<String> patterns;
 	private Plan plan;
 	
-	public OptimalArrayElem(Plan plan, Set<String> contained) {
+	public OptimalArrayElem(Plan plan, Set<String> contained, Set<QueryGraphNode> lastConstrained, PatternInfo joinedPattern) {
+		
+		if (lastConstrained != null)
+			this.constrained = new HashSet<QueryGraphNode>(lastConstrained);
+		else
+			this.constrained = new HashSet<QueryGraphNode>();
+		if (joinedPattern.getPattern().nodeCount() == 1)
+			constrained.add(joinedPattern.getPattern().getNode(0));
+		
+		QueryGraph qg = plan.getSchema().getQueryGraph();
 		this.patterns = contained;
-		this.edges = plan.getSchema().getQueryGraph().getEdgeSet();
-		this.nodes = plan.getSchema().getQueryGraph().getNodeSet();
-		this.constrained = plan.getSchema().getQueryGraph().getConstrainedNodeSet();
+		this.edges = qg.getEdgeSet();
+		this.nodes = qg.getNodeSet();
+		
 		this.plan = plan;
 	}
 	
