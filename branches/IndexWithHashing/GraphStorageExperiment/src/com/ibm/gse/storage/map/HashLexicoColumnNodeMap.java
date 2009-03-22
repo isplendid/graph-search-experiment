@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ibm.gse.hash.HashFunction;
+import com.ibm.gse.hash.ModHash;
 import com.ibm.gse.struct.QueryGraph;
 import com.ibm.gse.struct.QueryGraphNode;
 
@@ -15,7 +17,9 @@ import com.ibm.gse.struct.QueryGraphNode;
  * @author Tian Yuan
  *
  */
-public class LexicoColumnNodeMap implements ColumnNodeMap {
+public class HashLexicoColumnNodeMap implements ColumnNodeMap {
+	
+	public HashFunction func = new ModHash();
 
 	@Override
 	public Map<QueryGraphNode, Integer> getMap(QueryGraph graph) {
@@ -34,7 +38,7 @@ public class LexicoColumnNodeMap implements ColumnNodeMap {
 		@Override
 		public int compare(QueryGraphNode arg0, QueryGraphNode arg1) {
 			int cmp;
-			if ((cmp = arg0.getLabel().compareTo(arg1.getLabel())) != 0)
+			if ((cmp = func.hashStr(arg0.getLabel()).compareTo(func.hashStr(arg1.getLabel()))) != 0)
 				return cmp;
 			else if ((cmp = arg1.getOutDegree() - arg0.getOutDegree()) != 0)
 				return cmp;
