@@ -1,5 +1,5 @@
 TempFolder = d:/tien/barn/data/dbpedia/tmp
-DataFolder = d:/tien/barn/data/dbpedia
+DataFolder = d:/tien/barn/data/dbpedia.r
 IDMappingFolder = d:/tien/barn/data/dbpedia/id
 LabelRepository = d:/tien/barn/data/dbpedia/label
 PatternLength = 2
