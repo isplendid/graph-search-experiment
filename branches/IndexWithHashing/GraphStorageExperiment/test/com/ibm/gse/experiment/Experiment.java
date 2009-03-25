@@ -1,7 +1,9 @@
 package com.ibm.gse.experiment;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 
@@ -25,10 +27,13 @@ public class Experiment {
 	 */
 	public static void main(String[] args) throws IOException {
 		BufferedReader rd = new BufferedReader(new FileReader(args[0]));
+		BufferedWriter wr = new BufferedWriter(new FileWriter(args[1]));
 		String temp;
 		String[] ts;
+		int cnt = 0;
 		
 		while (true) {
+			System.out.println(++cnt);
 			QueryGraph graph = new QueryGraph();
 			
 			temp = rd.readLine();
@@ -67,8 +72,9 @@ public class Experiment {
 				/* DO SOMETHING */
 				count++;
 			}
-			System.out.println("TIME = " + (System.currentTimeMillis() - time) + ", COUNT = " + count);
+			wr.append((System.currentTimeMillis() - time) + "\t " + count + "\n");
 		}
+		wr.close();
 	}
 
 }
