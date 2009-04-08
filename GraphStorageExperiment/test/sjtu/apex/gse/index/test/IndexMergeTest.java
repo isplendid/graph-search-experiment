@@ -1,7 +1,7 @@
 package sjtu.apex.gse.index.test;
 
+import sjtu.apex.gse.index.file.util.FileIndexMerger;
 import sjtu.apex.gse.system.GraphStorage;
-import sjtu.apex.index.file.util.FileIndexMerger;
 
 
 public class IndexMergeTest {

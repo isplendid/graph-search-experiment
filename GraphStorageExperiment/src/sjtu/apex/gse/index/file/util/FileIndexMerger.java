@@ -1,4 +1,4 @@
-package sjtu.apex.index.file.util;
+package sjtu.apex.gse.index.file.util;
 
 import sjtu.apex.gse.index.file.FileIndexEntry;
 import sjtu.apex.gse.index.file.FileIndexReader;

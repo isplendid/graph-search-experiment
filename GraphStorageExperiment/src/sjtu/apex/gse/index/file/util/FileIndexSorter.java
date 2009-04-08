@@ -1,4 +1,4 @@
-package sjtu.apex.index.file.util;
+package sjtu.apex.gse.index.file.util;
 
 import java.io.File;
 import java.util.ArrayList;
