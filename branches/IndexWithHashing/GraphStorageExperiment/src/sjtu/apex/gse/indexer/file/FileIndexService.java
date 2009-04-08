@@ -7,6 +7,7 @@ import sjtu.apex.gse.hash.HashFunction;
 import sjtu.apex.gse.hash.HashUnique;
 import sjtu.apex.gse.hash.ModHash;
 import sjtu.apex.gse.index.file.FileIndexReader;
+import sjtu.apex.gse.index.file.util.FileIndexMerger;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.InstanceKeywordRepository;
 import sjtu.apex.gse.indexer.LabelManager;
@@ -23,7 +24,6 @@ import sjtu.apex.gse.temp.file.TempFileEntry;
 import sjtu.apex.gse.temp.file.TempRepositoryFileWriter;
 import sjtu.apex.gse.temp.file.util.TempRepositorySorter;
 import sjtu.apex.gse.util.Heap;
-import sjtu.apex.index.file.util.FileIndexMerger;
 
 
 public class FileIndexService {
