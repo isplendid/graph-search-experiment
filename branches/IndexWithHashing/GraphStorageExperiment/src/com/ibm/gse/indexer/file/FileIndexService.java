@@ -83,11 +83,12 @@ public class FileIndexService {
 		//		TempRepositorySorter.deleteDirectory(new File())
 	}
 
-	private void addEdge(TempRepositoryFileWriter wr, String pattern, int c1, int c2) {
+	private void addEdge(TempRepositoryFileWriter wr, QueryGraph graph, QueryGraphNode sub, QueryGraphNode obj, int subID, int objID) {
+		Map<QueryGraphNode, Integer> map = GraphStorage.columnNodeMap.getMap(graph);
 		int[] ins = new int[2];
-		ins[0] = c1;
-		ins[1] = c2;
-		wr.writeRecord(new TempFileEntry(pattern, ins));		
+		ins[map.get(sub)] = subID;
+		ins[map.get(obj)] = objID;
+		wr.writeRecord(new TempFileEntry(GraphStorage.patternMan.getCodec().encodePattern(graph), ins));		
 	}
 
 	private void deleteFile(String filename) {
@@ -164,7 +165,7 @@ public class FileIndexService {
 
 			g.addEdge(ln, rn, pred);
 
-			addEdge(wr, codec.encodePattern(g), ss, os);
+			addEdge(wr, g, ln, rn, ss, os);
 			
 			if (entryCnt > maxEntryCnt) {
 				wr.close();
@@ -277,10 +278,7 @@ public class FileIndexService {
 						QueryGraphNode nb = ng.addNode(r);
 						ng.addEdge(na, nb, pred);
 						
-						if (func.hashStr(l).compareTo(func.hashStr(r)) < 0)
-							addEdge(tw, codec.encodePattern(ng), ss, os);
-						else
-							addEdge(tw, codec.encodePattern(ng), os, ss);
+						addEdge(tw, ng, na, nb, ss, os);
 					}
 					
 					for (String r : right) {
@@ -294,10 +292,7 @@ public class FileIndexService {
 						QueryGraphNode nb = ng.addNode(r);
 						ng.addEdge(na, nb, pred);
 
-						if (func.hashStr(l).compareTo(func.hashStr(r)) < 0)
-							addEdge(tw, codec.encodePattern(ng), ss, os);
-						else
-							addEdge(tw, codec.encodePattern(ng), os, ss);
+						addEdge(tw, ng, na, nb, ss, os);
 					}
 					
 					for (String l : left) {
@@ -311,10 +306,7 @@ public class FileIndexService {
 							QueryGraphNode nb = ng.addNode(r);
 							ng.addEdge(na, nb, pred);
 						
-							if (func.hashStr(l).compareTo(func.hashStr(r)) < 0)
-								addEdge(tw, codec.encodePattern(ng), ss, os);
-							else
-								addEdge(tw, codec.encodePattern(ng), os, ss);
+							addEdge(tw, ng, na, nb, ss, os);
 						}
 					}
 					
