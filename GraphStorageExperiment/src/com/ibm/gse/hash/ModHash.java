@@ -1,5 +1,7 @@
 package com.ibm.gse.hash;
 
+import com.ibm.gse.system.GraphStorage;
+
 
 /**
  * Class ModHash is a hash function based on modulo operation  
@@ -11,7 +13,7 @@ public class ModHash implements HashFunction {
 	final String wildcat = "*";
 	
 	public ModHash() {
-		mod = 13;
+		mod = GraphStorage.config.getIntegerSetting("HashMod", 13);
 	}
 	
 	public ModHash(int mod) {

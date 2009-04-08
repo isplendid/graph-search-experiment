@@ -19,13 +19,14 @@ import com.ibm.gse.struct.QueryGraphNode;
  */
 public class HashLexicoColumnNodeMap implements ColumnNodeMap {
 	
-	public HashFunction func = new ModHash();
+	private HashFunction func = new ModHash();
+	private LexicoComparator comp = new LexicoComparator();
 
 	@Override
 	public Map<QueryGraphNode, Integer> getMap(QueryGraph graph) {
 		Map<QueryGraphNode, Integer> map = new HashMap<QueryGraphNode, Integer>();
 		List<QueryGraphNode> nl = new ArrayList<QueryGraphNode>(graph.getNodeSet());
-		Collections.sort(nl, new LexicoComparator());
+		Collections.sort(nl, comp);
 		
 		for (int i = 0; i < nl.size(); i++)
 			map.put(nl.get(i), i);
