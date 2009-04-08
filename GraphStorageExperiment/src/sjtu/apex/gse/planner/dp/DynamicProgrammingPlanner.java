@@ -5,11 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import sjtu.apex.gse.operator.MergeJoinPlan;
+import sjtu.apex.gse.operator.PatternPlan;
+import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.pattern.PatternInfo;
 import sjtu.apex.gse.planner.Planner;
-import sjtu.apex.gse.query.MergeJoinPlan;
-import sjtu.apex.gse.query.PatternPlan;
-import sjtu.apex.gse.query.Plan;
 import sjtu.apex.gse.struct.Connectivity;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphEdge;

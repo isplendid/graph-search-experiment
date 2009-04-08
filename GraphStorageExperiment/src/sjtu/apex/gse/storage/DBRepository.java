@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
-import sjtu.apex.gse.query.Scan;
+import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.system.ConnectionFactory;
 

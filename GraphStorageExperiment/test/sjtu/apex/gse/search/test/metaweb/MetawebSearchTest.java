@@ -13,10 +13,10 @@ import org.junit.Test;
 
 import sjtu.apex.gse.index.file.FileIndexEntry;
 import sjtu.apex.gse.index.file.FileIndexReader;
-import sjtu.apex.gse.query.MergeJoinPlan;
-import sjtu.apex.gse.query.PatternPlan;
-import sjtu.apex.gse.query.Plan;
-import sjtu.apex.gse.query.Scan;
+import sjtu.apex.gse.operator.MergeJoinPlan;
+import sjtu.apex.gse.operator.PatternPlan;
+import sjtu.apex.gse.operator.Plan;
+import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;

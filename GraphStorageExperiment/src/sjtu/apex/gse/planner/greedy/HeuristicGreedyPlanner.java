@@ -1,7 +1,7 @@
 package sjtu.apex.gse.planner.greedy;
 
+import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.planner.Planner;
-import sjtu.apex.gse.query.Plan;
 import sjtu.apex.gse.struct.QuerySchema;
 
 

@@ -1,4 +1,4 @@
-package sjtu.apex.gse.query;
+package sjtu.apex.gse.operator;
 
 import java.util.Map;
 

@@ -6,10 +6,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import sjtu.apex.gse.operator.Plan;
+import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.planner.Planner;
 import sjtu.apex.gse.planner.dp.DynamicProgrammingPlanner;
-import sjtu.apex.gse.query.Plan;
-import sjtu.apex.gse.query.Scan;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;

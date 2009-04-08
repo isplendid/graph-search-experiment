@@ -3,8 +3,8 @@ package sjtu.apex.gse.planner.dp;
 import java.util.HashSet;
 import java.util.Set;
 
+import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.pattern.PatternInfo;
-import sjtu.apex.gse.query.Plan;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphEdge;
 import sjtu.apex.gse.struct.QueryGraphNode;

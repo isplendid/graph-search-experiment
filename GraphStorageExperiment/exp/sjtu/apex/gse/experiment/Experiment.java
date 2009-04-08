@@ -4,10 +4,10 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import sjtu.apex.gse.operator.Plan;
+import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.parser.FileQueryParser;
 import sjtu.apex.gse.parser.QueryParser;
-import sjtu.apex.gse.query.Plan;
-import sjtu.apex.gse.query.Scan;
 import sjtu.apex.gse.struct.QuerySchema;
 import sjtu.apex.gse.system.GraphStorage;
 
