@@ -1,6 +1,5 @@
 package sjtu.apex.gse.indexer;
 
-import java.util.ArrayList;
 
 
 public interface LabelManager {
