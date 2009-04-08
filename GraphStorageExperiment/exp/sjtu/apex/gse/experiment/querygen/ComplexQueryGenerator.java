@@ -8,6 +8,7 @@ import sjtu.apex.gse.indexer.LabelManager;
 import sjtu.apex.gse.indexer.file.SleepyCatLabelManager;
 import sjtu.apex.gse.parser.FileQueryParser;
 import sjtu.apex.gse.parser.QueryParser;
+import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QuerySchema;
 
 /**
@@ -17,8 +18,8 @@ import sjtu.apex.gse.struct.QuerySchema;
  *
  */
 public class ComplexQueryGenerator {
-	final double pec = 0.5;
-	final double pee = 0.3;
+	final double pec = 0.3;
+	final double pee = 0.1;
 	
 	String elfn;
 	String initfn;
@@ -28,11 +29,16 @@ public class ComplexQueryGenerator {
 		this.initfn = initfn;
 	}
 	
-	private QuerySchema constraintExtend(QuerySchema qs) {
+	private void constraintExtend(QuerySchema qs, ArrayList<QuerySchema> qarr) {
+		QueryGraph qg = qs.getQueryGraph();
 		
+		for (int i = qg.nodeCount() - 1; i >= 0; i--)
+			if (qg.getNode(i).isGeneral() && Math.random() < pec) {
+				
+			}
 	}
 	
-	private QuerySchema addEdge(QuerySchema qs) {
+	private void addEdge(QuerySchema qs, ArrayList<QuerySchema> qarr) {
 		
 	}
 
@@ -43,7 +49,7 @@ public class ComplexQueryGenerator {
 			LabelManager lm = new SleepyCatLabelManager();
 			
 			ArrayList<String> elabels = new ArrayList<String>();
-			ArrayList<QuerySchema> initQueries = new ArrayList<QuerySchema>();
+			ArrayList<QuerySchema> qarr = new ArrayList<QuerySchema>();
 			String temp;
 			
 			while ((temp = rd.readLine()) != null)
@@ -52,13 +58,15 @@ public class ComplexQueryGenerator {
 			QuerySchema qs;
 			
 			while ((qs = qp.getNext()) != null)
-				initQueries.add(qs);
+				qarr.add(qs);
 			
-			int head = 0, tail = initQueries.size();
+			int head = 0;
 			
-			while (head < tail && tail < threshold) {
-				qs = initQueries.get(head);
+			while (head < qarr.size() && qarr.size() < threshold) {
+				qs = qarr.get(head);
 				
+				addEdge(qs, qarr);
+				constraintExtend(qs, qarr);
 			}
 			
 		} catch (Exception e) {
