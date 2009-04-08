@@ -3,6 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="preprocess"/>
 	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="src" path="exp"/>
 	<classpathentry kind="lib" path="lib/db2jcc_license_cu.jar"/>
 	<classpathentry kind="lib" path="lib/db2jcc.jar"/>
 	<classpathentry kind="lib" path="lib/lingpipe-3.5.1.jar"/>
