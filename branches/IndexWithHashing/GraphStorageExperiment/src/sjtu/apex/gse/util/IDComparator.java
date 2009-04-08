@@ -2,7 +2,7 @@ package sjtu.apex.gse.util;
 
 import java.util.List;
 
-import sjtu.apex.gse.query.Scan;
+import sjtu.apex.gse.operator.Scan;
 
 
 /**

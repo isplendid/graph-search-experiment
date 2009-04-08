@@ -1,6 +1,6 @@
 package sjtu.apex.gse.storage;
 
-import sjtu.apex.gse.query.UpdateScan;
+import sjtu.apex.gse.operator.UpdateScan;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
 

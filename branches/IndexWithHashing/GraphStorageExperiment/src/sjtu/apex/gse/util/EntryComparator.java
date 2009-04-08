@@ -1,6 +1,6 @@
 package sjtu.apex.gse.util;
 
-import sjtu.apex.gse.query.Scan;
+import sjtu.apex.gse.operator.Scan;
 
 /**
  * The comparator that compares respective entries from two scan which are

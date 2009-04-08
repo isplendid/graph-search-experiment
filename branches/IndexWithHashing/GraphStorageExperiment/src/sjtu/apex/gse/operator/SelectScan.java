@@ -1,4 +1,4 @@
-package sjtu.apex.gse.query;
+package sjtu.apex.gse.operator;
 
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;

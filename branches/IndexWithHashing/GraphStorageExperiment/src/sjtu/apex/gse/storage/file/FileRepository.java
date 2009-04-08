@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import sjtu.apex.gse.query.Scan;
+import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.system.GraphStorage;
 

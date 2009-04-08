@@ -3,8 +3,8 @@ package sjtu.apex.gse.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import sjtu.apex.gse.query.Scan;
-import sjtu.apex.gse.query.UpdateScan;
+import sjtu.apex.gse.operator.Scan;
+import sjtu.apex.gse.operator.UpdateScan;
 import sjtu.apex.gse.storage.RAMArrayRepository;
 import sjtu.apex.gse.struct.QuerySchema;
 

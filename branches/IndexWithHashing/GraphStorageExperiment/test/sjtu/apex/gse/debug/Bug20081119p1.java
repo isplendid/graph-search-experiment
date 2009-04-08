@@ -2,7 +2,7 @@ package sjtu.apex.gse.debug;
 
 import java.util.ArrayList;
 
-import sjtu.apex.gse.query.UpdateScan;
+import sjtu.apex.gse.operator.UpdateScan;
 import sjtu.apex.gse.storage.RAMArrayRepository;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphNode;
