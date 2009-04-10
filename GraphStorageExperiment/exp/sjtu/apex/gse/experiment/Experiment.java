@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
-import sjtu.apex.gse.parser.FileQueryParser;
-import sjtu.apex.gse.parser.QueryParser;
+import sjtu.apex.gse.query.FileQueryReader;
+import sjtu.apex.gse.query.QueryReader;
 import sjtu.apex.gse.struct.QuerySchema;
 import sjtu.apex.gse.system.GraphStorage;
 
@@ -24,12 +24,12 @@ public class Experiment {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		QueryParser rd = new FileQueryParser(args[0]);
+		QueryReader rd = new FileQueryReader(args[0]);
 		BufferedWriter wr = new BufferedWriter(new FileWriter(args[1]));
 		int cnt = 0;
 		QuerySchema qs;
 		
-		while ((qs = rd.getNext()) != null) {
+		while ((qs = rd.read()) != null) {
 			System.out.println(++cnt);
 			
 			Plan p = GraphStorage.queryPlanner.plan(qs);

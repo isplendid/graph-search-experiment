@@ -1,4 +1,4 @@
-package sjtu.apex.gse.parser;
+package sjtu.apex.gse.query;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -10,10 +10,10 @@ import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
 
-public class FileQueryParser implements QueryParser {
+public class FileQueryReader implements QueryReader {
 	BufferedReader rd = null;
 
-	public FileQueryParser(String filename) {
+	public FileQueryReader(String filename) {
 		try {
 			rd =  new BufferedReader(new FileReader(filename));
 		} catch (FileNotFoundException e) {
@@ -21,7 +21,7 @@ public class FileQueryParser implements QueryParser {
 		}
 	}
 
-	public QuerySchema getNext() {
+	public QuerySchema read() {
 		try {
 			String temp;
 			String[] ts;
