@@ -1,4 +1,4 @@
-package sjtu.apex.gse.parser;
+package sjtu.apex.gse.query;
 
 import sjtu.apex.gse.struct.QuerySchema;
 
@@ -7,7 +7,7 @@ import sjtu.apex.gse.struct.QuerySchema;
  * @author Tian Yuan
  *
  */
-public interface QueryParser {
-	public QuerySchema getNext();
+public interface QueryReader {
+	public QuerySchema read();
 	public void close();
 }

@@ -12,8 +12,8 @@ import sjtu.apex.gse.indexer.LabelManager;
 import sjtu.apex.gse.indexer.file.SleepyCatIDManager;
 import sjtu.apex.gse.indexer.file.SleepyCatLabelManager;
 import sjtu.apex.gse.operator.Scan;
-import sjtu.apex.gse.parser.FileQueryParser;
-import sjtu.apex.gse.parser.QueryParser;
+import sjtu.apex.gse.query.FileQueryReader;
+import sjtu.apex.gse.query.QueryReader;
 import sjtu.apex.gse.struct.GraphUtility;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphNode;
@@ -115,7 +115,7 @@ public class ComplexQueryGenerator {
 	public void generate(int threshold) {
 		try {
 			BufferedReader rd = new BufferedReader(new FileReader(elfn));
-			QueryParser qp = new FileQueryParser(initfn);
+			QueryReader qp = new FileQueryReader(initfn);
 			
 			ArrayList<String> elabels = new ArrayList<String>();
 			ArrayList<QuerySchema> qarr = new ArrayList<QuerySchema>();
@@ -126,7 +126,7 @@ public class ComplexQueryGenerator {
 			
 			QuerySchema qs;
 			
-			while ((qs = qp.getNext()) != null)
+			while ((qs = qp.read()) != null)
 				qarr.add(qs);
 			
 			int head = 0;
