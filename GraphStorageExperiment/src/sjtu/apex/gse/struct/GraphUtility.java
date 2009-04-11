@@ -24,12 +24,17 @@ public class GraphUtility {
 		for (int i = g.nodeCount() - 1; i >= 0; i--) {
 			QueryGraphNode tn = g.getNode(i); 
 			if (i == toExt)
-				map.put(tn, g.addNode(con));
+				map.put(tn, ng.addNode(con));
 			else
 				if (tn.isGeneral())
-					map.put(tn, g.addNode());
+					map.put(tn, ng.addNode());
 				else
-					map.put(tn, g.addNode(tn.getLabel()));
+					map.put(tn, ng.addNode(tn.getLabel()));
+		}
+		
+		for (int i = g.edgeCount() - 1; i >= 0; i--) {
+			QueryGraphEdge te = g.getEdge(i);
+			ng.addEdge(map.get(te.getNodeFrom()), map.get(te.getNodeTo()), te.getLabel());
 		}
 		
 		return ng;
@@ -43,9 +48,14 @@ public class GraphUtility {
 			QueryGraphNode tn = g.getNode(i);
 			
 			if (tn.isGeneral())
-				map.put(tn, g.addNode());
+				map.put(tn, ng.addNode());
 			else
-				map.put(tn, g.addNode(tn.getLabel()));
+				map.put(tn, ng.addNode(tn.getLabel()));
+		}
+		
+		for (int i = g.edgeCount() - 1; i >= 0; i--) {
+			QueryGraphEdge te = g.getEdge(i);
+			ng.addEdge(map.get(te.getNodeFrom()), map.get(te.getNodeTo()), te.getLabel());
 		}
 		
 		if (dir)

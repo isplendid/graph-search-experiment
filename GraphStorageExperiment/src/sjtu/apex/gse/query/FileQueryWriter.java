@@ -42,15 +42,15 @@ public class FileQueryWriter implements QueryWriter {
 			
 			for (int i = 0; i < count; i++) {
 				if (g.getNode(i).isGeneral())
-					wr.append("\n");
+					wr.append("*\n");
 				else
-					wr.append(g.getNode(i).getLabel());
+					wr.append(g.getNode(i).getLabel() + "\n");
 				
 				map.put(g.getNode(i), i + 1);
 			}
 			count = g.edgeCount();
 			for (int i = 0; i < count; i++)
-				wr.append(map.get(g.getEdge(i).getNodeFrom()) + " " + g.getEdge(i).getNodeTo() + " " + g.getEdge(i).getLabel() + "\n");
+				wr.append(map.get(g.getEdge(i).getNodeFrom()) + " " + map.get(g.getEdge(i).getNodeTo()) + " " + g.getEdge(i).getLabel() + "\n");
 			
 		} catch (IOException e) {
 			e.printStackTrace();

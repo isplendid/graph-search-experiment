@@ -41,6 +41,8 @@ public class MergeSorter {
 		
 		for (int i = 0; i < dest.length; i++) dest[i].beforeFirst();
 		
+		src.close();
+		
 		return cnt;
 	}
 	
@@ -76,6 +78,7 @@ public class MergeSorter {
 			if (!moveTo(least, dest, sch)) {
 				current.remove(least);
 				unsorted.remove(least);
+				least.close();
 			}
 			else if (comp.compare(least, dest) < 0)
 				current.remove(least);
