@@ -1,7 +1,6 @@
 package sjtu.apex.gse.experiment.querygen;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 

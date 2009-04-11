@@ -45,8 +45,7 @@ public class SortPlan implements Plan {
 	}
 
 	public QuerySchema getSchema() {
-		// TODO Auto-generated method stub
-		return null;
+		return src.getSchema();
 	}
 
 	@Override
@@ -59,4 +58,8 @@ public class SortPlan implements Plan {
 		return src.resultCount();
 	}
 
+	@Override
+	public String toString() {
+		return "SortPlan(" + src.toString() + ")";
+	}
 }
