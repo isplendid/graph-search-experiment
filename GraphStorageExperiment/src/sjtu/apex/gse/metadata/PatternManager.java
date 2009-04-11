@@ -68,7 +68,7 @@ public class PatternManager {
 	 */
 	public List<PatternInfo> getSubPatterns(QueryGraph graph) {
 		List<PatternInfo> elems = new ArrayList<PatternInfo>();
-		Set<String> generated = new HashSet<String>();
+		SubpatternSet generated = new SubpatternSet();
 		int pointer = 0;
 		PatternInfo toExt;
 
@@ -80,8 +80,9 @@ public class PatternManager {
 				ns.add(n);
 				QueryGraph g = graph.getInducedSubgraph(ns, null);
 				String ps = codec.encodePattern(g);
-				elems.add(new PatternInfo(g, ps, getPatternInstanceCount(ps, g.nodeCount())));
-				generated.add(ps);
+				PatternInfo pi = new PatternInfo(g, ps, getPatternInstanceCount(ps, g.nodeCount())); 
+				elems.add(pi);
+				generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
 			}
 		
 		for (int i = 0; i < graph.edgeCount(); i++) {
@@ -91,8 +92,9 @@ public class PatternManager {
 			es.add(e);
 			QueryGraph g = graph.getInducedSubgraph(null, es);
 			String ps = codec.encodePattern(g);
-			elems.add(new PatternInfo(g, ps, getPatternInstanceCount(ps, g.nodeCount())));
-			generated.add(ps);
+			PatternInfo pi = new PatternInfo(g, ps, getPatternInstanceCount(ps, g.nodeCount()));
+			elems.add(pi);
+			generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
 		}
 
 		while (pointer < elems.size()) {
@@ -109,9 +111,10 @@ public class PatternManager {
 						String ps = codec.encodePattern(ng);
 						Integer insCnt;
 						
-						if (!generated.contains(ps) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
-							elems.add(new PatternInfo(ng, ps, insCnt));
-							generated.add(ps);
+						if (!generated.contains(ps, ng.getEdgeSet(), ng.getNodeSet()) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
+							PatternInfo pi = new PatternInfo(ng, ps, insCnt);
+							elems.add(pi);
+							generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
 						}
 						
 						edgeContained.remove(c.getEdge());
@@ -125,9 +128,10 @@ public class PatternManager {
 					String ps = codec.encodePattern(ng);
 					Integer insCnt;
 					
-					if (!generated.contains(ps) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
-						elems.add(new PatternInfo(ng, ps, insCnt));
-						generated.add(ps);
+					if (!generated.contains(ps, ng.getEdgeSet(), ng.getNodeSet()) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
+						PatternInfo pi = new PatternInfo(ng, ps, insCnt);
+						elems.add(pi);
+						generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
 					}
 					
 					nodeConstrained.remove(n);
