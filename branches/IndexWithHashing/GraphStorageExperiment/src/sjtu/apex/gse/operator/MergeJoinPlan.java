@@ -62,5 +62,9 @@ public class MergeJoinPlan implements Plan {
 		return l.resultCount() + r.resultCount();
 	}
 
+	@Override
+	public String toString() {
+		return "MergeJoin(" + r.toString() + "," + l.toString() + ")";
+	}
 
 }

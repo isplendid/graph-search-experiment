@@ -50,5 +50,10 @@ public class PatternPlan implements Plan {
 		
 		return rcCache;
 	}
+	
+	@Override
+	public String toString() {
+		return "PatternPlan(" + ps + ")";
+	}
 
 }
