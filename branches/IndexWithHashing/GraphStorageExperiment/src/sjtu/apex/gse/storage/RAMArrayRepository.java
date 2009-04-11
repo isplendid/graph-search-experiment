@@ -74,7 +74,7 @@ public class RAMArrayRepository implements UpdateScan {
 	}
 
 	public void close() {
-		
+		data = null;
 	}
 
 	public int getID(QueryGraphNode n) {
