@@ -20,7 +20,7 @@ import sjtu.apex.gse.system.GraphStorage;
  */
 public class Experiment {
 	
-	final static boolean logPlan = true;
+	final static boolean logPlan = false;
 
 	/**
 	 * @param args
