@@ -1,11 +1,5 @@
 package sjtu.apex.gse.indexer;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import sjtu.apex.gse.system.ConnectionFactory;
 
 
 /**
