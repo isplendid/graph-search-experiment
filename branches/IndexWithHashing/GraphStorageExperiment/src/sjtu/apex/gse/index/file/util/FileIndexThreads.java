@@ -46,12 +46,16 @@ public class FileIndexThreads {
 
 	public void close() {
 		buildIndex();
+		
+		tw.close();
+		FilesystemUtility.deleteFile(trfn);
+		
 		mergeIndex();
 
 		if (FilesystemUtility.fileExist(idxfn) && FilesystemUtility.fileExist(strgfn)) {
 			FilesystemUtility.renameFile(idxfn, idxfn  + ".t1");
 			FilesystemUtility.renameFile(strgfn, strgfn  + ".t1");       
-			FileIndexMerger.merge(dtfldr, dtfldr, idxfn, strgfn, size, 2);
+			FileIndexMerger.merge(dtfldr, dtfldr, "index" + (size - 1), "storage" + (size - 1), size, 2);
 	        for (int i = 0; i < 2; i++) {
 	            FilesystemUtility.deleteFile(idxfn + ".t" + i);
 	            FilesystemUtility.deleteFile(strgfn + ".t" + i);
@@ -69,7 +73,7 @@ public class FileIndexThreads {
 		tw.close();
 		TempRepositorySorter.sort(trfn, tsfn, size, tmpfldr);
 		FilesystemUtility.deleteFile(trfn);
-		index(tsfn, strgfn + ".t" + tc, idxfn + ".t" + tc, 2);
+		index(tsfn, strgfn + ".t" + tc, idxfn + ".t" + tc, size);
 		FilesystemUtility.deleteFile(tsfn);
 		tc++;
 
