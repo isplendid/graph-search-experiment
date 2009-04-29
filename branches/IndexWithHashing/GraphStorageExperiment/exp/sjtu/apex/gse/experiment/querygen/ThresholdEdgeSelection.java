@@ -8,7 +8,13 @@ import sjtu.apex.gse.index.file.FileIndexReader;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.system.GraphStorage;
 
-public class EdgeSelection {
+/**
+ * This class selects edges with instances above a threshold
+ * 
+ * @author Yuan Tian
+ *
+ */
+public class ThresholdEdgeSelection {
 
 	/**
 	 * @param args
