@@ -22,7 +22,7 @@ public class FileIndexThreads {
 	private String dtfldr, trfn, tsfn, tmpfldr, strgfn, idxfn;
 	private int ec, mec, mtc, tc, size;
 
-	public FileIndexThreads(int size, int maxEntryCount, int maxThreadCount, String tempFolder, String dataFolder) {
+	public FileIndexThreads(int size, int maxEntryCount, int maxThreadCount, String dataFolder, String tempFolder) {
 		this.size = size;
 		dtfldr = dataFolder;
 		trfn = tempFolder + "/raw" + (size - 1);
@@ -75,6 +75,9 @@ public class FileIndexThreads {
 
 		if (tc > mtc)
 			mergeIndex();
+		
+		tw = new TempRepositoryFileWriter(trfn, size);
+		ec = 0;
 	}
 
 	/**

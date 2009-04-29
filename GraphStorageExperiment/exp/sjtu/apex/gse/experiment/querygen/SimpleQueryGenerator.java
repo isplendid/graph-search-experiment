@@ -25,6 +25,8 @@ import sjtu.apex.gse.system.GraphStorage;
  * @author Tian Yuan
  */
 public class SimpleQueryGenerator {
+	
+	static final double prob = 0.0001; 
 
 	/**
 	 * @param args
@@ -32,23 +34,24 @@ public class SimpleQueryGenerator {
 	 */
 	public static void main(String[] args) throws IOException {
 		BufferedReader rd = new BufferedReader(new FileReader(args[0]));
-		BufferedWriter wr = new BufferedWriter(new FileWriter(args[1]));
 		
 		String dataFolder = GraphStorage.config.getStringSetting("DataFolder", null);
 		IDManager idman = new SleepyCatIDManager();
 		LabelManager labman = new SleepyCatLabelManager();
 		String temp;
+		int count = 0;
 		
 		while ((temp = rd.readLine()) != null) {
 			if (temp.length() == 0) continue;
-			RecordRange rr = GraphStorage.indexMan.seek(temp, 2);
+			RecordRange rr = GraphStorage.indexMan.seek("*[+" + temp + "::*]", 2);
 
 			FileRepositoryReader fr = new FileRepositoryReader(dataFolder + "/storage1", 2, rr);
-			QueryGraph g = GraphStorage.patternMan.getCodec().decodePattern(temp);
+			QueryGraph g = GraphStorage.patternMan.getCodec().decodePattern("*[+" + temp + "::*]");
 			Map<QueryGraphNode, Integer> map = GraphStorage.columnNodeMap.getMap(g);
 			QueryGraphEdge edge = g.getEdge(0);
 			int ent[];
 
+			BufferedWriter wr = null;
 			while ((ent = fr.readEntry()) != null) {
 
 				int ss = ent[map.get(edge.getNodeFrom())];
@@ -67,7 +70,11 @@ public class SimpleQueryGenerator {
 
 				for (String l : left) {
 					for (String r : right) 
-						if (!l.equals(r) && Math.random() > 0.9999){
+						if (!l.equals(r) && Math.random() < (prob + (wr == null? 0.2 : 0))){
+							if (wr == null) {
+								wr = new BufferedWriter(new FileWriter(args[1] + "." + count));
+								count++;
+							}
 							wr.append("2 1\n");
 							wr.append(l + "\n");
 							wr.append(r + "\n");
@@ -76,11 +83,10 @@ public class SimpleQueryGenerator {
 				}
 
 			}
+			if (wr != null) wr.close();
 		}			
 		
 		rd.close();
-		wr.close();
-
 	}
 
 }
