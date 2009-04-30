@@ -1,13 +1,18 @@
 package sjtu.apex.gse.indexer.file;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.config.FileConfig;
 import sjtu.apex.gse.hash.HashFunction;
-import sjtu.apex.gse.hash.HashUnique;
 import sjtu.apex.gse.hash.ModHash;
 import sjtu.apex.gse.index.file.FileIndexReader;
 import sjtu.apex.gse.index.file.util.FileIndexer;
@@ -15,13 +20,16 @@ import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.InstanceKeywordRepository;
 import sjtu.apex.gse.indexer.LabelManager;
 import sjtu.apex.gse.indexer.RelationRepository;
+import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.pattern.HashingPatternCodec;
 import sjtu.apex.gse.pattern.PatternCodec;
-import sjtu.apex.gse.storage.file.RecordRange;
 import sjtu.apex.gse.storage.map.ColumnNodeMap;
 import sjtu.apex.gse.storage.map.HashLexicoColumnNodeMap;
+import sjtu.apex.gse.struct.GraphUtility;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphNode;
+import sjtu.apex.gse.struct.QuerySchema;
+import sjtu.apex.gse.system.QuerySystem;
 import sjtu.apex.gse.util.Heap;
 
 public class IterativeIndexService {
@@ -115,10 +123,19 @@ public class IterativeIndexService {
 		indexEdge(relationFile);
 	}
 	
-	public void indexComplexPatterns(int minJoinInsCnt, int totalThreshold, Configuration source) {
+	public void indexComplexPatterns(int minJoinInsCnt, int totalThreshold, Configuration source, String edges) {
+		List<String> elabels = new ArrayList<String>();
+		
+		BufferedReader rd = new BufferedReader(new FileReader(edges));
+		String temp;
+		while ((temp = rd.readLine()) != null)
+			elabels.add(temp);
+		rd.close();
+		
+		QuerySystem sys = new QuerySystem(source);
 		String sf = source.getStringSetting("DataFolder", null);
 		int spsl = source.getIntegerSetting("PatternStrSize", 128);
-        HashUnique hu = new HashUnique(hash);
+		int hashMod = source.getIntegerSetting("HashMod", 1);
         Heap h = new Heap();
         HeapContainer hc;
         int tc = 0;
@@ -133,7 +150,7 @@ public class IterativeIndexService {
         		if (insCnt > minJoinInsCnt) {
         			String ps = fir.getPatternString();
         			
-        			h.insert(new HeapContainer(ps, codec.decodePattern(ps), insCnt, fir.getRange()));
+        			h.insert(new HeapContainer(ps, codec.decodePattern(ps), insCnt));
         		}
         	}
         	fir.close();
@@ -142,12 +159,95 @@ public class IterativeIndexService {
 
         while ((hc = (HeapContainer)h.remove()) != null && tc < totalThreshold) {
         	QueryGraph g = hc.graph;
-        	String ps = hc.patternStr;
+        	boolean tag = false;
 
+        	//Check if node can be extended
+        	for (int i = g.nodeCount() - 1; i >= 0; i--)
+        		if (g.getNode(i).isGeneral()) {
+        			QueryGraphNode extNode = g.getNode(i);
+        			
+        			Scan s = sys.queryPlanner().plan(getFullSchema(g)).open();
+        			Set<String> avl = new HashSet<String>();
+        			
+        			while (s.next() && avl.size() < hashMod) {
+        				int ni = s.getID(extNode);
+        				String[] sl = lblman.getLabel(idman.getURI(ni));
+        				
+        				for (int j = sl.length - 1; j >= 0; j--)
+        					avl.add(hash.hashStr(sl[j]));
+        			}
+        			
+        			for (String lb : avl) {
+        				QueryGraph ng = GraphUtility.extendConstraint(g, i, lb);
+        				
+        				Scan ts = sys.queryPlanner().plan(getFullSchema(ng)).open();
+        				
+        				int cnt = 0;
+        				
+        				while (ts.next()) {
+        					Map<QueryGraphNode, Integer> ins = new HashMap<QueryGraphNode, Integer>();
+        					for (int k = ng.nodeCount() - 1; k >= 0; k--) {
+        						QueryGraphNode tn = ng.getNode(k);
+        						ins.put(tn, ts.getID(tn));
+        					}
+        					cnt++;
+        					tag = true;
+        					addPattern(ng, ins);
+        				}
+        				
+        				if (cnt > minJoinInsCnt)
+        					h.insert(new HeapContainer(codec.encodePattern(ng), ng, cnt));
+        				
+        			}
+        		}
+        	
+        	//If no node gets extended on constraints, we extend edges
+        	if (!tag) {
+        		int nodeCount = g.nodeCount(), labelCount = elabels.size(); 
+        		Set<QueryGraphNode> usedNode = new HashSet<QueryGraphNode>();
+        		
+        		for (int i = nodeCount - 1; i >= 0; i--) {
+        			
+        			System.out.println("  Extend edges from node " + i);
+        			int toExt;
+        			while (usedNode.contains(g.getNode(toExt = (int)(Math.random() * nodeCount)))) ;
+        			usedNode.add(g.getNode(toExt));
+        			
+        			Set<String>	testedLabel = new HashSet<String>();
+        			boolean found = false;
+        			
+        			int itr = 0;
+        			while (!found && itr < labelCount * propEdgeCheck) {
+        				itr ++;
+        				String el;
+        				
+        				while (testedLabel.contains(el = elabels.get((int)(labelCount * Math.random())))) ;
+        				testedLabel.add(el);
+        				
+        				boolean dir = (Math.random() > 0.5);
+        				
+        				System.out.println("    Querying [+Edge :: " + el + "] ...");
+        				QuerySchema nqs = getFullSchema(GraphUtility.extendEdge(qg, toExt, el, dir));
+        				found = checkNotEmpty(nqs);
+        				
+        				if (!found) {
+        					nqs = getFullSchema(GraphUtility.extendEdge(qg, toExt, el, dir));
+        					
+        					found = checkNotEmpty(nqs);
+        					if (found) qarr.add(nqs);
+        				}
+        				else
+        					qarr.add(nqs);
+        				
+        				System.out.println("    Query ended");
+        				
+        				testedLabel.add(el);
+        			}
+        		}
+        	}
         	
         }
 
-        
 
 	}
 
@@ -169,6 +269,13 @@ public class IterativeIndexService {
 		fidx.addEntry(codec.encodePattern(graph), graph.nodeCount(), tmp);
 	}
 	
+	private QuerySchema getFullSchema(QueryGraph g) {
+		Set<QueryGraphNode> nset = new HashSet<QueryGraphNode>();
+		for (int j = g.nodeCount() - 1; j >= 0; j--)
+			nset.add(g.getNode(j));
+		return new QuerySchema(g, nset);
+	}
+	
 	public static void main(String[] args) {
 		IterativeIndexService idx = new IterativeIndexService(new FileConfig(args[0]));
 		
@@ -180,13 +287,11 @@ public class IterativeIndexService {
         String patternStr;
         QueryGraph graph;
         int insCnt;
-        RecordRange recRange;
 
-        HeapContainer(String patternStr, QueryGraph g, int c, RecordRange recRange) {
+        HeapContainer(String patternStr, QueryGraph g, int c) {
                 this.patternStr = patternStr;
                 this.graph = g;
                 this.insCnt = c;
-                this.recRange = recRange;
         }
 
         @Override

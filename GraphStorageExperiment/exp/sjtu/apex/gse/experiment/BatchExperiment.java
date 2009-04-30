@@ -10,13 +10,14 @@ public class BatchExperiment {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		File f = new File(args[0]);
+		File f = new File(args[1]);
 		File[] queries = f.listFiles();
 
 		for (File q : queries) {
-			String[] pa = new String[2];
-			pa[0] = q.getAbsolutePath();
-			pa[1] = args[1] + "\\" + q.getName();
+			String[] pa = new String[3];
+			pa[0] = args[0];
+			pa[1] = q.getAbsolutePath();
+			pa[2] = args[1] + "\\" + q.getName();
 			Experiment.main(pa);
 		}
 	}
