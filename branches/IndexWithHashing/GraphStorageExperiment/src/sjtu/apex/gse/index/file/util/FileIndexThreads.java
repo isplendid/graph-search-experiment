@@ -20,17 +20,18 @@ public class FileIndexThreads {
 
 	private TempRepositoryFileWriter tw;
 	private String dtfldr, trfn, tsfn, tmpfldr, strgfn, idxfn;
-	private int ec, mec, mtc, tc, size;
+	private int ec, mec, mtc, tc, size, strSize;
 
-	public FileIndexThreads(int size, int maxEntryCount, int maxThreadCount, String dataFolder, String tempFolder) {
+	public FileIndexThreads(int size, int strSize, int maxEntryCount, int maxThreadCount, String dataFolder, String tempFolder) {
 		this.size = size;
+		this.strSize = strSize;
 		dtfldr = dataFolder;
 		trfn = tempFolder + "/raw" + (size - 1);
 		tsfn = tempFolder + "/sort" + (size - 1);
 		tmpfldr = tempFolder + "/SortTmp";
 		strgfn = dataFolder + "/storage" + (size - 1);
 		idxfn = dataFolder + "/index" + (size - 1);
-		tw = new TempRepositoryFileWriter(trfn, size);
+		tw = new TempRepositoryFileWriter(trfn, size, strSize);
 		ec = 0;
 		tc = 0;
 		mec = maxEntryCount;
@@ -55,7 +56,7 @@ public class FileIndexThreads {
 		if (FilesystemUtility.fileExist(idxfn) && FilesystemUtility.fileExist(strgfn)) {
 			FilesystemUtility.renameFile(idxfn, idxfn  + ".t1");
 			FilesystemUtility.renameFile(strgfn, strgfn  + ".t1");       
-			FileIndexMerger.merge(dtfldr, dtfldr, "index" + (size - 1), "storage" + (size - 1), size, 2);
+			FileIndexMerger.merge(dtfldr, dtfldr, "index" + (size - 1), "storage" + (size - 1), size, strSize, 2);
 	        for (int i = 0; i < 2; i++) {
 	            FilesystemUtility.deleteFile(idxfn + ".t" + i);
 	            FilesystemUtility.deleteFile(strgfn + ".t" + i);
@@ -71,16 +72,16 @@ public class FileIndexThreads {
 	 */
 	private void buildIndex() {
 		tw.close();
-		TempRepositorySorter.sort(trfn, tsfn, size, tmpfldr);
+		TempRepositorySorter.sort(trfn, tsfn, size, strSize, tmpfldr);
 		FilesystemUtility.deleteFile(trfn);
-		index(tsfn, strgfn + ".t" + tc, idxfn + ".t" + tc, size);
+		index(tsfn, strgfn + ".t" + tc, idxfn + ".t" + tc, size, strSize);
 		FilesystemUtility.deleteFile(tsfn);
 		tc++;
 
 		if (tc > mtc)
 			mergeIndex();
 		
-		tw = new TempRepositoryFileWriter(trfn, size);
+		tw = new TempRepositoryFileWriter(trfn, size, strSize);
 		ec = 0;
 	}
 
@@ -90,7 +91,7 @@ public class FileIndexThreads {
 	private void mergeIndex() {
 		if (tc == 1)
 			return;
-		FileIndexMerger.merge(dtfldr, dtfldr, "index" + (size - 1) + ".t", "storage" + (size - 1) + ".t", size, tc);
+		FileIndexMerger.merge(dtfldr, dtfldr, idxfn + ".t", strgfn + ".t", size, strSize, tc);
 		for (int i = 0; i < tc; i++) {
 			FilesystemUtility.deleteFile(idxfn + ".t"  + i);
 			FilesystemUtility.deleteFile(strgfn + ".t" + i);
@@ -108,10 +109,10 @@ public class FileIndexThreads {
 	 * @param idx 
 	 * @param size
 	 */
-	static private void index(String src, String dest, String idx, int size) {
-		TempRepositoryFileReader srd = new TempRepositoryFileReader(src, size);
+	static private void index(String src, String dest, String idx, int size, int strSize) {
+		TempRepositoryFileReader srd = new TempRepositoryFileReader(src, size, strSize);
 		FileRepositoryWriter dwr = new FileRepositoryWriter(dest, size);
-		FileIndexWriter iwr = new FileIndexWriter(idx, size);
+		FileIndexWriter iwr = new FileIndexWriter(idx, size, strSize);
 		TempFileEntry tfe;
 		RID start = null, last = null;
 		String currentPat = null;

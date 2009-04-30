@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
+import sjtu.apex.gse.config.FileConfig;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.LabelManager;
 import sjtu.apex.gse.indexer.file.SleepyCatIDManager;
@@ -16,7 +17,7 @@ import sjtu.apex.gse.storage.file.RecordRange;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphEdge;
 import sjtu.apex.gse.struct.QueryGraphNode;
-import sjtu.apex.gse.system.GraphStorage;
+import sjtu.apex.gse.system.QuerySystem;
 
 
 /**
@@ -33,21 +34,22 @@ public class SimpleQueryGenerator {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		BufferedReader rd = new BufferedReader(new FileReader(args[0]));
+		QuerySystem sys = new QuerySystem(new FileConfig(args[0]));
+		BufferedReader rd = new BufferedReader(new FileReader(args[1]));
 		
-		String dataFolder = GraphStorage.config.getStringSetting("DataFolder", null);
-		IDManager idman = new SleepyCatIDManager();
-		LabelManager labman = new SleepyCatLabelManager();
+		String dataFolder = sys.config().getStringSetting("DataFolder", null);
+		IDManager idman = new SleepyCatIDManager(sys.config());
+		LabelManager labman = new SleepyCatLabelManager(sys.config());
 		String temp;
 		int count = 0;
 		
 		while ((temp = rd.readLine()) != null) {
 			if (temp.length() == 0) continue;
-			RecordRange rr = GraphStorage.indexMan.seek("*[+" + temp + "::*]", 2);
+			RecordRange rr = sys.indexManager().seek("*[+" + temp + "::*]", 2);
 
 			FileRepositoryReader fr = new FileRepositoryReader(dataFolder + "/storage1", 2, rr);
-			QueryGraph g = GraphStorage.patternMan.getCodec().decodePattern("*[+" + temp + "::*]");
-			Map<QueryGraphNode, Integer> map = GraphStorage.columnNodeMap.getMap(g);
+			QueryGraph g = sys.patternCodec().decodePattern("*[+" + temp + "::*]");
+			Map<QueryGraphNode, Integer> map = sys.columnNodeMap().getMap(g);
 			QueryGraphEdge edge = g.getEdge(0);
 			int ent[];
 

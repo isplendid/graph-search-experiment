@@ -1,6 +1,6 @@
 package sjtu.apex.gse.hash;
 
-import sjtu.apex.gse.system.GraphStorage;
+import sjtu.apex.gse.config.Configuration;
 
 
 /**
@@ -12,8 +12,8 @@ public class ModHash implements HashFunction {
 	int mod;
 	final String wildcat = "*";
 	
-	public ModHash() {
-		mod = GraphStorage.config.getIntegerSetting("HashMod", 13);
+	public ModHash(Configuration conf) {
+		mod = conf.getIntegerSetting("HashMod", 13);
 	}
 	
 	public ModHash(int mod) {

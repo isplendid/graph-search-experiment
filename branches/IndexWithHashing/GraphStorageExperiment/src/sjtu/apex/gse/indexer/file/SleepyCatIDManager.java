@@ -2,8 +2,8 @@ package sjtu.apex.gse.indexer.file;
 
 import java.io.File;
 
+import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.indexer.IDManager;
-import sjtu.apex.gse.system.GraphStorage;
 
 import com.sleepycat.bind.tuple.IntegerBinding;
 import com.sleepycat.bind.tuple.StringBinding;
@@ -28,8 +28,8 @@ public class SleepyCatIDManager implements IDManager {
 	Database id2uri;
 	Environment env;
 	
-	public SleepyCatIDManager() {
-		String idDir = GraphStorage.config.getStringSetting("IDMappingFolder", null);
+	public SleepyCatIDManager(Configuration config) {
+		String idDir = config.getStringSetting("IDMappingFolder", null);
 		EnvironmentConfig ec = new EnvironmentConfig();
 		ec.setAllowCreate(true);
 		ec.setTransactional(false);

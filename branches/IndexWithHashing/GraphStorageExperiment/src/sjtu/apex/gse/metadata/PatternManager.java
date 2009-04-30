@@ -11,7 +11,6 @@ import sjtu.apex.gse.struct.Connectivity;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphEdge;
 import sjtu.apex.gse.struct.QueryGraphNode;
-import sjtu.apex.gse.system.GraphStorage;
 
 
 /**
@@ -23,9 +22,11 @@ public class PatternManager {
 
 	//	static Connection conn = ConnectionFactory.createConnection();
 	PatternCodec codec;
+	IndexManager indexMan;
 
-	public PatternManager(PatternCodec codec) {
+	public PatternManager(PatternCodec codec, IndexManager indexMan) {
 		this.codec = codec;
+		this.indexMan = indexMan;
 	}
 
 	/**
@@ -36,7 +37,7 @@ public class PatternManager {
 	public Integer getPatternInstanceCount(QueryGraph graph) {
 		String pattern = codec.encodePattern(graph);
 
-		return GraphStorage.indexMan.getPatternCount(pattern, graph.nodeCount());
+		return indexMan.getPatternCount(pattern, graph.nodeCount());
 		//		return getPatternInstanceCount(pattern);
 	}
 
@@ -46,7 +47,7 @@ public class PatternManager {
 	 * @return The number of instances
 	 */
 	public Integer getPatternInstanceCount(String ps, int size) {
-		int res = GraphStorage.indexMan.getPatternCount(ps, size);
+		int res = indexMan.getPatternCount(ps, size);
 		if (res == -1)
 			return null;
 		else

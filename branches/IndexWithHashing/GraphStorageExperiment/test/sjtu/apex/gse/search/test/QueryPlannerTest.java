@@ -22,7 +22,7 @@ public class QueryPlannerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		qp = new DynamicProgrammingPlanner();
+		qp = new DynamicProgrammingPlanner(null);
 		qsList = new ArrayList<QuerySchema>();
 		
 		/* TEST CASE 1 */

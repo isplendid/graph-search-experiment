@@ -20,13 +20,13 @@ public class TempRepositorySorter {
 
 	final static int segmentLength = 2000000;
 
-	static public void sort(String src, String dest, int size, String tmpDir) {
-		sort(src, dest, tmpDir, size, true);
+	static public void sort(String src, String dest, int size, int strSize, String tmpDir) {
+		sort(src, dest, tmpDir, size, strSize, true);
 	}
 
-	static public void sort(String src, String dest, String tmpDir, int size, boolean autoDelete) {
+	static public void sort(String src, String dest, String tmpDir, int size, int strSize, boolean autoDelete) {
 		List<TempFileEntry> entryList = new ArrayList<TempFileEntry>();
-		TempRepositoryFileReader rd = new TempRepositoryFileReader(src, size);
+		TempRepositoryFileReader rd = new TempRepositoryFileReader(src, size, strSize);
 		TempFileEntry tfe;
 		int segCnt = 0;
 
@@ -40,7 +40,7 @@ public class TempRepositorySorter {
 
 			if (entryList.size() >= segmentLength) {
 				Collections.sort(entryList, new TempFileEntryComparator());
-				writeEntryFile(tmpDir + "/seg" + (segCnt ++), size, entryList);
+				writeEntryFile(tmpDir + "/seg" + (segCnt ++), size, strSize, entryList);
 				entryList.clear();
 			}
 		}
@@ -48,12 +48,12 @@ public class TempRepositorySorter {
 		rd.close();
 
 		Collections.sort(entryList, new TempFileEntryComparator());
-		writeEntryFile(tmpDir + "/seg" + (segCnt ++), size, entryList);
+		writeEntryFile(tmpDir + "/seg" + (segCnt ++), size, strSize, entryList);
 
-		TempRepositoryFileWriter wr = new TempRepositoryFileWriter(dest, size);
+		TempRepositoryFileWriter wr = new TempRepositoryFileWriter(dest, size, strSize);
 		Heap h = new Heap();
 		for (int i = 0; i < segCnt; i++) {
-			TempRepositoryFileReader trd = new TempRepositoryFileReader(tmpDir + "/seg" + i, size);
+			TempRepositoryFileReader trd = new TempRepositoryFileReader(tmpDir + "/seg" + i, size, strSize);
 
 			if ((tfe = trd.readRecord()) != null) 
 				h.insert(new HeapContainer(trd, tfe));
@@ -78,8 +78,8 @@ public class TempRepositorySorter {
 		}
 	}
 
-	static private void writeEntryFile(String filename, int size, List<TempFileEntry> ent) {
-		TempRepositoryFileWriter wr = new TempRepositoryFileWriter(filename, size);
+	static private void writeEntryFile(String filename, int size, int strSize, List<TempFileEntry> ent) {
+		TempRepositoryFileWriter wr = new TempRepositoryFileWriter(filename, size, strSize);
 
 		for (TempFileEntry e : ent) {
 			wr.writeRecord(e);

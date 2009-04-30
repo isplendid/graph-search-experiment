@@ -23,7 +23,7 @@ public class PreorderCodecTest {
 	List<String> graphs = new ArrayList<String>();
 	
 	List<QueryGraph> qg = new ArrayList<QueryGraph>();
-	HashingPatternCodec pc = new HashingPatternCodec(new ModHash());
+	HashingPatternCodec pc = new HashingPatternCodec(new ModHash(null));
 
 	/**
 	 * @throws java.lang.Exception

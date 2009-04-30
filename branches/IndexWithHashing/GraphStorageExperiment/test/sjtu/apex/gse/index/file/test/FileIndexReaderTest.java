@@ -8,8 +8,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.index.file.FileIndexReader;
-import sjtu.apex.gse.system.GraphStorage;
 
 
 public class FileIndexReaderTest {
@@ -19,7 +19,8 @@ public class FileIndexReaderTest {
 
 	@Before
 	public void setUp() throws Exception {
-		rd = new FileIndexReader(GraphStorage.config.getStringSetting("DataFolder", null) + "/index" + (size - 1), size);
+		Configuration config = null;
+		rd = new FileIndexReader(config.getStringSetting("DataFolder", null) + "/index" + (size - 1), size, 128);
 	}
 
 	@Test

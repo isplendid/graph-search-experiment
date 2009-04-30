@@ -6,25 +6,26 @@ import java.io.RandomAccessFile;
 
 import sjtu.apex.gse.storage.file.RID;
 import sjtu.apex.gse.storage.file.RecordRange;
-import sjtu.apex.gse.system.GraphStorage;
+import sjtu.apex.gse.system.QuerySystem;
 
 
 public class FileIndexReader {
 	
 	static final int lenSize = 2, intSize = 4;
-	static final int strSize = GraphStorage.config.getIntegerSetting("PatternStrSize", 128);
 	
 	RandomAccessFile file;
 	int recLen;
 	int entLen;
 	long pointer;
+	int strSize;
 
-	public FileIndexReader(String filename, int size) {
+	public FileIndexReader(String filename, int size, int strSize) {
 		try {
 			file = new RandomAccessFile(filename, "r");
 			recLen = strSize + lenSize + intSize * 4;
 			entLen = intSize * size;
 			pointer = -recLen;
+			this.strSize = strSize;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

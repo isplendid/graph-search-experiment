@@ -11,7 +11,7 @@ public class ContentPrinter {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		TempRepositoryFileReader tr = new TempRepositoryFileReader("data/raw/raw0", 1);
+		TempRepositoryFileReader tr = new TempRepositoryFileReader("data/raw/raw0", 1, 128);
 		TempFileEntry tfe;
 		int cnt = 0;
 		

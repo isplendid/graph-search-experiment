@@ -8,7 +8,7 @@ public class IDManagerTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SleepyCatIDManager idm = new SleepyCatIDManager();
+		SleepyCatIDManager idm = new SleepyCatIDManager(null);
 		
 		System.out.println(idm.getURI(1764));
 		

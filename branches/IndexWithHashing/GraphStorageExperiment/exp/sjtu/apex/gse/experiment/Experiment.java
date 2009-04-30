@@ -5,12 +5,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import sjtu.apex.gse.config.FileConfig;
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.query.FileQueryReader;
 import sjtu.apex.gse.query.QueryReader;
 import sjtu.apex.gse.struct.QuerySchema;
-import sjtu.apex.gse.system.GraphStorage;
+import sjtu.apex.gse.system.QuerySystem;
 
 
 /**
@@ -27,15 +28,16 @@ public class Experiment {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		QueryReader rd = new FileQueryReader(args[0]);
-		BufferedWriter wr = new BufferedWriter(new FileWriter(args[1]));
+		QuerySystem sys = new QuerySystem(new FileConfig(args[0]));
+		QueryReader rd = new FileQueryReader(args[1]);
+		BufferedWriter wr = new BufferedWriter(new FileWriter(args[2]));
 		int cnt = 0;
 		QuerySchema qs;
 		
 		while ((qs = rd.read()) != null) {
 			System.out.println(++cnt);
 			
-			Plan p = GraphStorage.queryPlanner.plan(qs);
+			Plan p = sys.queryPlanner().plan(qs);
 			
 			if (logPlan) {
 				FileWriter lw = new FileWriter("plan.log");

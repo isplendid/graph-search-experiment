@@ -19,7 +19,7 @@ public class IndexSearchTest {
 
 	@Before
 	public void setUp() throws Exception {
-		idman = new SleepyCatIDManager();
+		idman = new SleepyCatIDManager(null);
 		patterns = new ArrayList<String>();
 		size = new ArrayList<Integer>();
 		
@@ -72,7 +72,7 @@ public class IndexSearchTest {
 		long time = System.currentTimeMillis();
 		
 		for (int i = 0; i < patterns.size(); i++) {
-			fr = new FileRepository(patterns.get(i), size.get(i));
+			fr = new FileRepository(null, null, patterns.get(i), size.get(i));
 			
 			System.out.println(patterns.get(i));
 			

@@ -15,7 +15,7 @@ import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphEdge;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
-import sjtu.apex.gse.system.GraphStorage;
+import sjtu.apex.gse.system.QuerySystem;
 
 
 /**
@@ -24,17 +24,23 @@ import sjtu.apex.gse.system.GraphStorage;
  *
  */
 public class DynamicProgrammingPlanner implements Planner {
+	
+	private QuerySystem qs;
+	
+	public DynamicProgrammingPlanner(QuerySystem querySystem) {
+		this.qs = querySystem;
+	}
 
 	@Override
 	public Plan plan(QuerySchema g) {
 		QueryGraph graph = g.getQueryGraph();
 		OptimalArray optArr = new OptimalArray(graph);
-		List<PatternInfo> sbp = GraphStorage.patternMan.getSubPatterns(graph); 
+		List<PatternInfo> sbp = qs.patternManager().getSubPatterns(graph); 
 
 		for (PatternInfo pi : sbp) {
 			Set<String> pis = new HashSet<String>();
 			
-			Plan p = new PatternPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()));
+			Plan p = new PatternPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()), qs);
 
 			pis.add(pi.getPatternString());
 			optArr.setInitValue(new OptimalArrayElem(p, pis, null, pi));
@@ -76,7 +82,7 @@ public class DynamicProgrammingPlanner implements Planner {
 		Set<QueryGraphNode> ons = new HashSet<QueryGraphNode>(elem.getConstrainedNodes());
 		Set<QueryGraphNode> notSat = getPlanSelectedNode(g, p.getCoveredNodes(), oes);
 
-		Plan pp = new PatternPlan(new QuerySchema(p.getPattern(), notSat), p.getPatternString());
+		Plan pp = new PatternPlan(new QuerySchema(p.getPattern(), notSat), qs, p.getPatternString());
 
 		List<QueryGraphNode> joinNode = new ArrayList<QueryGraphNode>();
 		for (int i = 0; i < p.getPattern().nodeCount(); i++) {
@@ -148,7 +154,7 @@ public class DynamicProgrammingPlanner implements Planner {
 	 * @return
 	 */
 	private Set<QueryGraphNode> getPlanSelectedNode(QuerySchema qs, Set<QueryGraphNode> patternNodeSet, Set<QueryGraphEdge> patternEdgeSet) {
-		QueryGraph graph = qs.getQueryGraph();
+//		QueryGraph graph = qs.getQueryGraph();
 		Set<QueryGraphNode> result = new HashSet<QueryGraphNode>();
 
 		
