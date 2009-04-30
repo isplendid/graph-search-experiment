@@ -20,13 +20,13 @@ public class FileIndexSorter {
 
 	final static int segmentLength = 500000;
 
-	static public void sort(String src, String dest, int size, String tmpDir) {
-		sort(src, dest, tmpDir, size, true);
+	static public void sort(String src, String dest, int size, int strSize, String tmpDir) {
+		sort(src, dest, tmpDir, size, strSize, true);
 	}
 
-	static public void sort(String src, String dest, String tmpDir, int size, boolean autoDelete) {
+	static public void sort(String src, String dest, String tmpDir, int size, int strSize, boolean autoDelete) {
 		List<FileIndexEntry> entryList = new ArrayList<FileIndexEntry>();
-		FileIndexReader rd = new FileIndexReader(src, size);
+		FileIndexReader rd = new FileIndexReader(src, size, strSize);
 		FileIndexEntry tfe;
 		int segCnt = 0;
 
@@ -41,7 +41,7 @@ public class FileIndexSorter {
 
 			if (entryList.size() >= segmentLength) {
 				Collections.sort(entryList);
-				writeEntryFile(tmpDir + "/seg" + (segCnt ++), size, entryList);
+				writeEntryFile(tmpDir + "/seg" + (segCnt ++), size, strSize, entryList);
 				entryList.clear();
 			}
 		}
@@ -49,12 +49,12 @@ public class FileIndexSorter {
 		rd.close();
 
 		Collections.sort(entryList);
-		writeEntryFile(tmpDir + "/seg" + (segCnt ++), size, entryList);
+		writeEntryFile(tmpDir + "/seg" + (segCnt ++), size, strSize, entryList);
 
-		FileIndexWriter wr = new FileIndexWriter(dest, size);
+		FileIndexWriter wr = new FileIndexWriter(dest, size, strSize);
 		Heap h = new Heap();
 		for (int i = 0; i < segCnt; i++) {
-			FileIndexReader trd = new FileIndexReader(tmpDir + "/seg" + i, size);
+			FileIndexReader trd = new FileIndexReader(tmpDir + "/seg" + i, size, strSize);
 
 			if (trd.next()) {
 				tfe = trd.readEntry();
@@ -82,8 +82,8 @@ public class FileIndexSorter {
 		}
 	}
 
-	static private void writeEntryFile(String filename, int size, List<FileIndexEntry> ent) {
-		FileIndexWriter wr = new FileIndexWriter(filename, size);
+	static private void writeEntryFile(String filename, int size, int strSize, List<FileIndexEntry> ent) {
+		FileIndexWriter wr = new FileIndexWriter(filename, size, strSize);
 
 		for (FileIndexEntry e : ent) {
 			wr.writeEntry(e.pattern, e.range);

@@ -4,9 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import sjtu.apex.gse.metadata.IndexManager;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.struct.QueryGraphNode;
-import sjtu.apex.gse.system.GraphStorage;
 
 
 /**
@@ -22,11 +22,11 @@ public class FileRepository implements Scan {
 	int page = -1, offset = -1;
 	int recLen;
 
-	public FileRepository(String pattern, int size) {
-		range = GraphStorage.indexMan.seek(pattern, size);
+	public FileRepository(IndexManager indexMan, String filename, String pattern, int size) {
+		range = indexMan.seek(pattern, size);
 		recLen = 4 * size;
 		try {
-			file = new RandomAccessFile(GraphStorage.config.getStringSetting("DataFolder", null) + "/Storage" + (size - 1), "r");
+			file = new RandomAccessFile(filename, "r");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

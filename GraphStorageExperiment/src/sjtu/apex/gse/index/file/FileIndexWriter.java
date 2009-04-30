@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import sjtu.apex.gse.storage.file.RecordRange;
-import sjtu.apex.gse.system.GraphStorage;
+import sjtu.apex.gse.system.QuerySystem;
 
 
 /**
@@ -16,14 +16,15 @@ import sjtu.apex.gse.system.GraphStorage;
 public class FileIndexWriter {
 	
 	static final int lenSize = 2, intSize = 4;
-	static final int strSize = GraphStorage.config.getIntegerSetting("PatternStrSize", 128);
 	
 	byte[] buf = new byte[4096];
 	RandomAccessFile file;
 	int recLen;
+	int strSize;
 	
-	public FileIndexWriter(String filename, int size) {
+	public FileIndexWriter(String filename, int size, int strSize) {
 		try {
+			this.strSize = strSize;
 			file = new RandomAccessFile(filename, "rw");
 			recLen = strSize + lenSize + intSize * 4;
 		} catch (FileNotFoundException e) {

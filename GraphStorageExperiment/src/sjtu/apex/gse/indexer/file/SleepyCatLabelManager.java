@@ -2,9 +2,9 @@ package sjtu.apex.gse.indexer.file;
 
 import java.io.File;
 
+import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.indexer.InstanceKeywordRepository;
 import sjtu.apex.gse.indexer.LabelManager;
-import sjtu.apex.gse.system.GraphStorage;
 
 import com.sleepycat.bind.tuple.StringBinding;
 import com.sleepycat.je.Database;
@@ -21,8 +21,8 @@ public class SleepyCatLabelManager implements LabelManager {
 	Environment env;
 	Database uri2kw;
 	
-	public SleepyCatLabelManager() {
-		String dir = GraphStorage.config.getStringSetting("LabelRepository", null);
+	public SleepyCatLabelManager(Configuration config) {
+		String dir = config.getStringSetting("LabelRepository", null);
 		EnvironmentConfig ec = new EnvironmentConfig();
 		ec.setAllowCreate(true);
 		ec.setTransactional(false);

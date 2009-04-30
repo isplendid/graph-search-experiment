@@ -1,9 +1,5 @@
 package sjtu.apex.gse.struct;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A node in query graph

@@ -25,8 +25,8 @@ public class FileIndexMerger {
 	 * @param size The node count of the indices
 	 * @param threadCnt The number of indices to be merged
 	 */
-	public static void merge(String src, String dest, int size, int threadCnt) {
-		merge(src, dest, "index" + (size - 1), "storage" + (size - 1), size, threadCnt);
+	public static void merge(String src, String dest, int size, int strSize, int threadCnt) {
+		merge(src, dest, "index" + (size - 1), "storage" + (size - 1), size, strSize, threadCnt);
 	}
 	
 	/**
@@ -38,15 +38,15 @@ public class FileIndexMerger {
 	 * @param size The node count of the indices
 	 * @param threadCnt The number of indices to be merged
 	 */
-	public static void merge(String src, String dest, String destIdxFn, String destStrFn, int size, int threadCnt) {
-		FileIndexWriter fiw = new FileIndexWriter(dest + "/" + destIdxFn, size);
+	public static void merge(String src, String dest, String destIdxFn, String destStrFn, int size, int strSize, int threadCnt) {
+		FileIndexWriter fiw = new FileIndexWriter(dest + "/" + destIdxFn, size, strSize);
 		FileRepositoryWriter frw = new FileRepositoryWriter(dest + "/" + destStrFn, size);
 		Heap h = new Heap();
 		FileIndexReader[] fir = new FileIndexReader[threadCnt];
 //		FileRepositoryReader[] frr = new FileRepositoryReader[threadCnt];
 		
 		for (int i = 0; i < threadCnt; i++) {
-			fir[i] = new FileIndexReader(src + "/index" + (size - 1) + ".t" + i, size);
+			fir[i] = new FileIndexReader(src + "/index" + (size - 1) + ".t" + i, size, strSize);
 			
 			FileIndexEntry fie;
 			

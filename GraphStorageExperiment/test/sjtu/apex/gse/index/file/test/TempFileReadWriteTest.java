@@ -21,7 +21,7 @@ public class TempFileReadWriteTest {
 	@Test
 	public void testWriteRecord() {
 //		assertNotNull(GraphStorage.config.getStringSetting("TempFileName" + 0, null));
-		tw = new TempRepositoryFileWriter("data/test", 3);
+		tw = new TempRepositoryFileWriter("data/test", 3, 128);
 		int[] tmp = new int[3];
 
 		for (int i = 0; i < 10000; i++) {
@@ -36,7 +36,7 @@ public class TempFileReadWriteTest {
 	@Test
 	public void testReadRecord() {
 //		fail("Not yet implemented");
-		tr = new TempRepositoryFileReader("data/test", 3);
+		tr = new TempRepositoryFileReader("data/test", 3, 128);
 		TempFileEntry tfe;
 		int cnt = 0;
 		

@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import sjtu.apex.gse.config.Configuration;
+import sjtu.apex.gse.config.FileConfig;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.LabelManager;
 import sjtu.apex.gse.indexer.file.SleepyCatIDManager;
@@ -21,7 +23,7 @@ import sjtu.apex.gse.struct.GraphUtility;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
-import sjtu.apex.gse.system.GraphStorage;
+import sjtu.apex.gse.system.QuerySystem;
 
 /**
  * ComplexQueryGenerator generates complex queries with more edges and nodes
@@ -40,16 +42,18 @@ public class ComplexQueryGenerator {
 	String outfn;
 	LabelManager lm;
 	IDManager im;
+	QuerySystem sys;
 	
 	static int errSerial = 0;
 	
 
-	public ComplexQueryGenerator(String elfn, String initfn, String outfn) {
+	public ComplexQueryGenerator(Configuration config, String elfn, String initfn, String outfn) {
 		this.elfn = elfn;
 		this.initfn = initfn;
 		this.outfn = outfn;
-		lm = new SleepyCatLabelManager();
-		im = new SleepyCatIDManager();
+		lm = new SleepyCatLabelManager(config);
+		im = new SleepyCatIDManager(config);
+		sys = new QuerySystem(config);
 	}
 	
 	private QuerySchema getFullSchema(QueryGraph g) {
@@ -68,7 +72,7 @@ public class ComplexQueryGenerator {
 				wr.close();
 			}
 			
-			Scan s = GraphStorage.queryPlanner.plan(sch).open();
+			Scan s = sys.queryPlanner().plan(sch).open();
 			if (s.next()) {
 				s.close();
 				return true;
@@ -95,7 +99,7 @@ public class ComplexQueryGenerator {
 			if (qg.getNode(i).isGeneral() && Math.random() < pec) {
 				QueryGraphNode extNode = qg.getNode(i);
 				List<String> avl = new ArrayList<String>();
-				Scan s = GraphStorage.queryPlanner.plan(qs).open();
+				Scan s = sys.queryPlanner().plan(qs).open();
 				
 				while (s.next()) {
 					int ni = s.getID(extNode);
@@ -209,9 +213,9 @@ public class ComplexQueryGenerator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ComplexQueryGenerator qg = new ComplexQueryGenerator(args[0], args[1], args[2]);
+		ComplexQueryGenerator qg = new ComplexQueryGenerator(new FileConfig(args[0]), args[1], args[2], args[3]);
 		
-		qg.generate(Integer.parseInt(args[3]));
+		qg.generate(Integer.parseInt(args[4]));
 	}
 
 }

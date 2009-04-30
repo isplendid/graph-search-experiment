@@ -6,7 +6,6 @@ import java.io.RandomAccessFile;
 
 import sjtu.apex.gse.storage.file.RID;
 import sjtu.apex.gse.storage.file.RecordRange;
-import sjtu.apex.gse.system.GraphStorage;
 
 
 /**
@@ -16,17 +15,18 @@ import sjtu.apex.gse.system.GraphStorage;
 public class IndexManager {
 
 	static final int lenSize = 2, intSize = 4;
-	static final int strSize = GraphStorage.config.getIntegerSetting("PatternStrSize", 128);
 	
 	RandomAccessFile file[];
 	int recLen;
+	int strSize;
 	
-	public IndexManager(int size) {
+	public IndexManager(String folder, int size, int strSize) {
+		this.strSize = strSize;
 		file = new RandomAccessFile[size];
 		recLen = lenSize + strSize + intSize * 4;
 		for (int i = 0; i < size; i++)
 			try {
-				file[i] = new RandomAccessFile(GraphStorage.config.getStringSetting("DataFolder", "") + "/index" + i, "r");
+				file[i] = new RandomAccessFile(folder + "/index" + i, "r");
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}

@@ -20,7 +20,7 @@ public class TempReposSorterTest {
 	
 	@Test
 	public void testWrite() {
-		TempRepositoryFileWriter tw = new TempRepositoryFileWriter("data/sort0", 3);
+		TempRepositoryFileWriter tw = new TempRepositoryFileWriter("data/sort0", 3, 128);
 		
 		int[] tmp = new int[3];
 
@@ -35,9 +35,9 @@ public class TempReposSorterTest {
 	
 	@Test
 	public void testSort() {
-		TempRepositorySorter.sort("data/sort0", "data/sortout0", 3, "data/tmp");
+		TempRepositorySorter.sort("data/sort0", "data/sortout0", 3, 128, "data/tmp");
 		
-		TempRepositoryFileReader rd = new TempRepositoryFileReader("data/sortout0", 3);
+		TempRepositoryFileReader rd = new TempRepositoryFileReader("data/sortout0", 3, 128);
 		TempFileEntry tfe;
 		int cnt = 0;
 		

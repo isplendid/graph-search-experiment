@@ -59,7 +59,7 @@ public class SortTest {
 	public void testOpen() {
 		for (int i = 0; i < qs.size(); i++) {
 
-			Plan pp = new PatternPlan(qs.get(i));
+			Plan pp = new PatternPlan(qs.get(i), null);
 			Plan sp = new SortPlan(pp, seln.get(i));
 
 			Scan s = sp.open();

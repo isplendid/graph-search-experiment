@@ -20,7 +20,7 @@ import sjtu.apex.gse.temp.file.TempRepositoryFileReader;
 public class Bug20081023p1 {
 
 	public static void main(String[] args) {
-		TempRepositoryFileReader trr = new TempRepositoryFileReader("H:/Barn/data/dbpedia/raw/raw1", 2);
+		TempRepositoryFileReader trr = new TempRepositoryFileReader("H:/Barn/data/dbpedia/raw/raw1", 2, 128);
 		TempFileEntry tfe = null;
 		
 //		try {

@@ -55,7 +55,7 @@ public class PatternScanTest {
 			seln.add(nb);
 			QuerySchema qs = new QuerySchema(g, seln); 
 			qsAll.add(qs);
-			plan.add(new PatternPlan(qs));
+			plan.add(new PatternPlan(qs, null));
 		}
 
 	}

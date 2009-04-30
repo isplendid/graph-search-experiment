@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.hash.HashFunction;
 import sjtu.apex.gse.hash.ModHash;
 import sjtu.apex.gse.struct.QueryGraph;
@@ -20,8 +21,16 @@ import sjtu.apex.gse.struct.QueryGraphNode;
  */
 public class HashLexicoColumnNodeMap implements ColumnNodeMap {
 	
-	private HashFunction func = new ModHash();
+	private HashFunction func;
 	private LexicoComparator comp = new LexicoComparator();
+	
+	public HashLexicoColumnNodeMap(HashFunction func) {
+		this.func = func;
+	}
+	
+	public HashLexicoColumnNodeMap(Configuration config) {
+		func = new ModHash(config);
+	}
 
 	@Override
 	public Map<QueryGraphNode, Integer> getMap(QueryGraph graph) {

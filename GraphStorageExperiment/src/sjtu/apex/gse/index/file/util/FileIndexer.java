@@ -1,6 +1,6 @@
 package sjtu.apex.gse.index.file.util;
 
-import sjtu.apex.gse.system.GraphStorage;
+import sjtu.apex.gse.config.Configuration;
 
 
 
@@ -15,13 +15,14 @@ public class FileIndexer {
 	private FileIndexThreads[] threads;
 	private String dtfldr, tmpfldr;
 	
-	public FileIndexer(int maxSize) {
+	public FileIndexer(int maxSize, Configuration config) {
+		int strSize = config.getIntegerSetting("PatternStrSize", 128);
 		threads = new FileIndexThreads[maxSize];
-		dtfldr = GraphStorage.config.getStringSetting("DataFolder", null);
-		tmpfldr = GraphStorage.config.getStringSetting("TempFolder", null);
+		dtfldr = config.getStringSetting("DataFolder", null);
+		tmpfldr = config.getStringSetting("TempFolder", null);
 		
 		for (int i = 0; i < maxSize; i++)
-			threads[i] = new FileIndexThreads(i + 1, maxEntryCnt, maxThreadCnt, dtfldr, tmpfldr);
+			threads[i] = new FileIndexThreads(i + 1, strSize, maxEntryCnt, maxThreadCnt, dtfldr, tmpfldr);
 	}
 	
 	/**

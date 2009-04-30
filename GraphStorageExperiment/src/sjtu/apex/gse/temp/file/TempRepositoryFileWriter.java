@@ -4,20 +4,19 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import sjtu.apex.gse.system.GraphStorage;
-
 
 public class TempRepositoryFileWriter {
 	
 	static final int lenSize = 2;
-	static final int strSize = GraphStorage.config.getIntegerSetting("PatternStrSize", 128);
 	
 	byte buf[] = new byte[4096];
 	int recLen, page, offset, size;
+	int strSize;
 	RandomAccessFile file;
 	
-	public TempRepositoryFileWriter(String filename, int size) {
+	public TempRepositoryFileWriter(String filename, int size, int strSize) {
 		try {
+			this.strSize = strSize;
 			this.size = size;
 			file = new RandomAccessFile(filename, "rw");
 			recLen = lenSize + strSize + size * 4;
