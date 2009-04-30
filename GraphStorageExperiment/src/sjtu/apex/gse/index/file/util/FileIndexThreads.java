@@ -91,7 +91,7 @@ public class FileIndexThreads {
 	private void mergeIndex() {
 		if (tc == 1)
 			return;
-		FileIndexMerger.merge(dtfldr, dtfldr, idxfn + ".t", strgfn + ".t", size, strSize, tc);
+		FileIndexMerger.merge(dtfldr, dtfldr, "index" + (size - 1) + ".t", "storage" + (size - 1) + ".t", size, strSize, tc);
 		for (int i = 0; i < tc; i++) {
 			FilesystemUtility.deleteFile(idxfn + ".t"  + i);
 			FilesystemUtility.deleteFile(strgfn + ".t" + i);
