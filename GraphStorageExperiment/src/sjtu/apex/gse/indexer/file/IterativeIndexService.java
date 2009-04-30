@@ -1,6 +1,7 @@
 package sjtu.apex.gse.indexer.file;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -126,11 +127,16 @@ public class IterativeIndexService {
 	public void indexComplexPatterns(int minJoinInsCnt, int totalThreshold, Configuration source, String edges) {
 		List<String> elabels = new ArrayList<String>();
 		
-		BufferedReader rd = new BufferedReader(new FileReader(edges));
-		String temp;
-		while ((temp = rd.readLine()) != null)
-			elabels.add(temp);
-		rd.close();
+		BufferedReader rd;
+		try {
+			rd = new BufferedReader(new FileReader(edges));
+			String temp;
+			while ((temp = rd.readLine()) != null)
+				elabels.add(temp);
+			rd.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		QuerySystem sys = new QuerySystem(source);
 		String sf = source.getStringSetting("DataFolder", null);
@@ -204,44 +210,36 @@ public class IterativeIndexService {
         	//If no node gets extended on constraints, we extend edges
         	if (!tag) {
         		int nodeCount = g.nodeCount(), labelCount = elabels.size(); 
-        		Set<QueryGraphNode> usedNode = new HashSet<QueryGraphNode>();
         		
-        		for (int i = nodeCount - 1; i >= 0; i--) {
+        		for (int toExt = nodeCount - 1; toExt >= 0; toExt--) {
         			
-        			System.out.println("  Extend edges from node " + i);
-        			int toExt;
-        			while (usedNode.contains(g.getNode(toExt = (int)(Math.random() * nodeCount)))) ;
-        			usedNode.add(g.getNode(toExt));
+        			System.out.println("  Extend edges from node " + toExt);
         			
-        			Set<String>	testedLabel = new HashSet<String>();
-        			boolean found = false;
-        			
-        			int itr = 0;
-        			while (!found && itr < labelCount * propEdgeCheck) {
-        				itr ++;
-        				String el;
-        				
-        				while (testedLabel.contains(el = elabels.get((int)(labelCount * Math.random())))) ;
-        				testedLabel.add(el);
-        				
-        				boolean dir = (Math.random() > 0.5);
+        			for (int j = labelCount - 1; j >= 0; j --) {
+        				String el = elabels.get(j);        				
         				
         				System.out.println("    Querying [+Edge :: " + el + "] ...");
-        				QuerySchema nqs = getFullSchema(GraphUtility.extendEdge(qg, toExt, el, dir));
-        				found = checkNotEmpty(nqs);
         				
-        				if (!found) {
-        					nqs = getFullSchema(GraphUtility.extendEdge(qg, toExt, el, dir));
+        				for (boolean dir = true; dir != false; dir = !dir) {
+        					QueryGraph ng = GraphUtility.extendEdge(g, toExt, el, dir);        					
+        					Scan ts = sys.queryPlanner().plan(getFullSchema(ng)).open();
+        					int cnt = 0;
         					
-        					found = checkNotEmpty(nqs);
-        					if (found) qarr.add(nqs);
+        					while (ts.next()) {
+        						Map<QueryGraphNode, Integer> ins = new HashMap<QueryGraphNode, Integer>();
+        						for (int k = ng.nodeCount() - 1; k >= 0; k--) {
+        							QueryGraphNode tn = ng.getNode(k);
+        							ins.put(tn, ts.getID(tn));
+        						}
+        						cnt++;
+        						tag = true;
+        						addPattern(ng, ins);
+        					}
+        					
+        					if (cnt > minJoinInsCnt)
+            					h.insert(new HeapContainer(codec.encodePattern(ng), ng, cnt));
         				}
-        				else
-        					qarr.add(nqs);
         				
-        				System.out.println("    Query ended");
-        				
-        				testedLabel.add(el);
         			}
         		}
         	}
