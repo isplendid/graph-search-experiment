@@ -53,6 +53,7 @@ public class IterativeIndexer {
 	
 	public void indexComplexPatterns(int minJoinInsCnt, int totalThreshold, Configuration source, String edges) {
 		List<String> elabels = new ArrayList<String>();
+		Set<String> extended = new HashSet<String>();
 		
 		BufferedReader rd;
 		try {
@@ -91,10 +92,13 @@ public class IterativeIndexer {
 
 
         while ((hc = (HeapContainer)h.remove()) != null && tc < totalThreshold) {
+        	
+        	System.out.println(hc.patternStr);
         	QueryGraph g = hc.graph;
         	boolean tag = false;
 
         	//Check if node can be extended
+        	System.out.println("Extending node constraints");
         	for (int i = g.nodeCount() - 1; i >= 0; i--)
         		if (g.getNode(i).isGeneral()) {
         			QueryGraphNode extNode = g.getNode(i);
@@ -113,7 +117,8 @@ public class IterativeIndexer {
         			for (String lb : avl) {
         				QueryGraph ng = GraphUtility.extendConstraint(g, i, lb);
         				
-        				int cnt = batchAddPattern(ng, sys, hc.insCnt);
+        				tag = true;
+        				int cnt = batchAddPattern(extended, ng, sys, hc.insCnt);
         				
         				tc += cnt;
         				
@@ -124,12 +129,11 @@ public class IterativeIndexer {
         		}
         	
         	//If no node gets extended on constraints, we extend edges
-        	if (!tag) {
+        	System.out.println("Extending edges...");
+        	if (!tag && g.nodeCount() < maxSize) {
         		int nodeCount = g.nodeCount(), labelCount = elabels.size(); 
         		
         		for (int toExt = nodeCount - 1; toExt >= 0; toExt--) {
-        			
-        			System.out.println("  Extend edges from node " + toExt);
         			
         			for (int j = labelCount - 1; j >= 0; j --) {
         				String el = elabels.get(j);        				
@@ -139,7 +143,7 @@ public class IterativeIndexer {
         				for (boolean dir = true; dir != false; dir = !dir) {
         					QueryGraph ng = GraphUtility.extendEdge(g, toExt, el, dir);        					
         					
-        					int cnt = batchAddPattern(ng, sys, (int)(hc.insCnt * coef));
+        					int cnt = batchAddPattern(extended, ng, sys, (int)(hc.insCnt * coef));
         					
         					tc += cnt;
         					
@@ -154,7 +158,13 @@ public class IterativeIndexer {
         }
 	}
 	
-	private int batchAddPattern(QueryGraph graph, QuerySystem sys, int maxInsCnt) {
+	private int batchAddPattern(Set<String> extended, QueryGraph graph, QuerySystem sys, int maxInsCnt) {
+		String ps = codec.encodePattern(graph);
+		
+		if (extended.contains(ps))
+			return 0;
+		extended.add(ps);
+
 		Scan ts = sys.queryPlanner().plan(getFullSchema(graph)).open();
 		ArrayList<int[]> list = new ArrayList<int[]>();
 		int nodeCnt = graph.nodeCount();
@@ -177,10 +187,11 @@ public class IterativeIndexer {
 			cnt++;
 		}
 		
-		if (cnt < maxInsCnt)
-			for (int[] ins : list)
-				fidx.addEntry(codec.encodePattern(graph), graph.nodeCount(), ins);
 		
+		if (cnt >= maxInsCnt) return 0;
+		
+		for (int[] ins : list)
+			fidx.addEntry(ps, graph.nodeCount(), ins);
 		
 		return cnt;
 	}
@@ -192,7 +203,7 @@ public class IterativeIndexer {
 		return new QuerySchema(g, nset);
 	}
 
-	public void main(String[] args) {
+	static public void main(String[] args) {
 		IterativeIndexer idx = new IterativeIndexer(new FileConfig(args[0]));
 		
 		idx.indexComplexPatterns(5000, 50000000, new FileConfig(args[1]), args[2]);		
