@@ -43,4 +43,13 @@ public class FileIndexer {
 			t.close();
 	}
 	
+	public void flushAll() {
+		for (FileIndexThreads t : threads)
+			t.flush();
+	}
+	
+	public void flush(int size) {
+		threads[size - 1].flush();
+	}
+	
 }

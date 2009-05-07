@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import sjtu.apex.gse.hash.HashFunction;
+
 public abstract class QueryGraphNode {
 	
 	static int serialCounter = 1;
@@ -24,6 +26,12 @@ public abstract class QueryGraphNode {
 	 * Get the label of this node 
 	 */
 	abstract public String getLabel();
+	
+	/**
+	 * Get the hashed label
+	 * @return
+	 */
+	abstract public String getHashLabel(HashFunction hash);
 	
 	/**
 	 * Get the in-degree of this node 
@@ -80,14 +88,23 @@ public abstract class QueryGraphNode {
 	
 	/**
 	 * Get the clone of a node with no edge and set the constraint empty
-	 * @param isEmpty The emptiness property
 	 */
 	abstract QueryGraphNode getGeneralClone();
+	
+	/**
+	 * Get the clone of a node with no edge and set the constraint to be hashed
+	 */
+	abstract QueryGraphNode getHashClone(HashFunction hf);
 	
 	/**
 	 * Tell whether this node is without constraint
 	 */
 	public abstract boolean isGeneral();
+	
+	/**
+	 * Tell whether this node is a generalization of its ancestor
+	 */
+	public abstract boolean isGeneralized();
 	
 	/**
 	 * Hash according to the node's serial number

@@ -17,10 +17,12 @@ public class IndexManager {
 	static final int lenSize = 2, intSize = 4;
 	
 	RandomAccessFile file[];
+	String folder;
 	int recLen;
 	int strSize;
 	
 	public IndexManager(String folder, int size, int strSize) {
+		this.folder = folder;
 		this.strSize = strSize;
 		file = new RandomAccessFile[size];
 		recLen = lenSize + strSize + intSize * 4;
@@ -33,6 +35,15 @@ public class IndexManager {
 	}
 	
 	public RecordRange seek(String pattern, int size) {
+		//Reopen file when seek after close() is invoked
+		if (file[size - 1] == null) {
+			try {
+				file[size - 1] = new RandomAccessFile(folder + "/index" + (size - 1), "r");
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		RandomAccessFile currentFile = file[size - 1];
 		long pos, mid, head, tail;
 		short strLen;
@@ -84,5 +95,17 @@ public class IndexManager {
 		long endpos = ((long)rr.getEndRID().getPageID() * 4096) + rr.getEndRID().getOffset();
 		
 		return (int)((endpos - startpos)/(4 * size)) + 1;
+	}
+	
+	public void close() {
+		try {
+			for (int i = 0; i < file.length; i++) 
+			if (file[i] != null){
+				file[i].close();
+				file[i] = null;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -44,6 +44,12 @@ public class FileIndexThreads {
 
 		if (ec > mec) buildIndex();
 	}
+	
+	public void flush() {
+		close();
+		tc = 0;
+		tw = new TempRepositoryFileWriter(trfn, size, strSize);
+	}
 
 	public void close() {
 		buildIndex();

@@ -3,10 +3,12 @@ package sjtu.apex.gse.indexer.file;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.config.FileConfig;
@@ -15,10 +17,10 @@ import sjtu.apex.gse.hash.ModHash;
 import sjtu.apex.gse.index.file.FileIndexReader;
 import sjtu.apex.gse.index.file.util.FileIndexer;
 import sjtu.apex.gse.indexer.IDManager;
+import sjtu.apex.gse.indexer.InstanceKeywordRepository;
 import sjtu.apex.gse.indexer.LabelManager;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.pattern.HashingPatternCodec;
-import sjtu.apex.gse.pattern.PatternCodec;
 import sjtu.apex.gse.storage.map.ColumnNodeMap;
 import sjtu.apex.gse.storage.map.HashLexicoColumnNodeMap;
 import sjtu.apex.gse.struct.GraphUtility;
@@ -31,16 +33,19 @@ import sjtu.apex.gse.util.Heap;
 public class IterativeIndexer {
 	
 	static final double coef = 0.9;
+	static final boolean extendEdge = false;
 	
 	private int maxSize;
 	private FileIndexer fidx;
 	private IDManager idman;
 	private LabelManager lblman;
-	private PatternCodec codec;
+	private HashingPatternCodec codec;
 	private HashFunction hash;
+	private Configuration config;
 	private ColumnNodeMap cnm;
 	
 	public IterativeIndexer(Configuration config) {
+		this.config = config;
 		maxSize = config.getIntegerSetting("PatternLength", 3);
 		fidx = new FileIndexer(maxSize, config);
 		hash = new ModHash(config);
@@ -51,9 +56,10 @@ public class IterativeIndexer {
 		cnm = new HashLexicoColumnNodeMap(hash);
 	}
 	
-	public void indexComplexPatterns(int minJoinInsCnt, int totalThreshold, Configuration source, String edges) {
+	public void indexComplexPatterns(int minJoinInsCnt, int totalThreshold, String edges) {
 		List<String> elabels = new ArrayList<String>();
 		Set<String> extended = new HashSet<String>();
+		QuerySystem sys = new QuerySystem(config);
 		
 		BufferedReader rd;
 		try {
@@ -66,10 +72,8 @@ public class IterativeIndexer {
 			e.printStackTrace();
 		}
 		
-		QuerySystem sys = new QuerySystem(source);
-		String sf = source.getStringSetting("DataFolder", null);
-		int spsl = source.getIntegerSetting("PatternStrSize", 128);
-		int hashMod = source.getIntegerSetting("HashMod", 1);
+		String sf = config.getStringSetting("DataFolder", null);
+		int spsl = config.getIntegerSetting("PatternStrSize", 128);
         Heap h = new Heap();
         HeapContainer hc;
         int tc = 0;
@@ -84,7 +88,7 @@ public class IterativeIndexer {
         		if (insCnt > minJoinInsCnt) {
         			String ps = fir.getPatternString();
         			
-        			h.insert(new HeapContainer(ps, codec.decodePattern(ps), insCnt));
+        			h.insert(new HeapContainer(ps, codec.decodePattern(ps, true), insCnt));
         		}
         	}
         	fir.close();
@@ -92,56 +96,101 @@ public class IterativeIndexer {
 
 
         while ((hc = (HeapContainer)h.remove()) != null && tc < totalThreshold) {
-        	
         	System.out.println(hc.patternStr);
+        	
         	QueryGraph g = hc.graph;
+        	int psize = g.nodeCount();
+        	
+        	if (sys.patternManager().getPatternInstanceCount(hc.patternStr, psize) == null) {
+        		sys.indexManager().close();
+        		fidx.flush(psize);
+        	}
+        	
         	boolean tag = false;
 
         	//Check if node can be extended
-        	System.out.println("Extending node constraints");
-        	for (int i = g.nodeCount() - 1; i >= 0; i--)
+        	
+        	for (int i = psize - 1; i >= 0; i--)
         		if (g.getNode(i).isGeneral()) {
+        			System.out.println("Extending node constraints");
         			QueryGraphNode extNode = g.getNode(i);
         			
-        			Scan s = sys.queryPlanner().plan(getFullSchema(g)).open();
-        			Set<String> avl = new HashSet<String>();
         			
-        			while (s.next() && avl.size() < hashMod) {
+        			Scan s = sys.queryPlanner().plan(getFullSchema(g)).open();
+        			
+        			int tmpcntr = 0;
+        			
+        			Map<Integer, HashCatContainer> nps = new HashMap<Integer, HashCatContainer>();
+					
+        			while (s.next()) {
+        				
+        				if ((++tmpcntr) % 1000 == 0)
+        					System.out.println("\t" + tmpcntr + " entries checked, total " + tc + " entries.");
+        				
         				int ni = s.getID(extNode);
         				String[] sl = lblman.getLabel(idman.getURI(ni));
         				
-        				for (int j = sl.length - 1; j >= 0; j--)
-        					avl.add(hash.hashStr(sl[j]));
+        				if (sl != null) {
+        					Set<Integer> visited = new HashSet<Integer>();
+        					for (int j = sl.length - 1; j >= 0; j--) {
+        						int lb = hash.hashInt(sl[j]);
+        						        						
+        						if (visited.contains(lb))
+        							continue;
+        					
+        						visited.add(lb);
+        						
+        						HashCatContainer hcc;
+        						
+        						if ((hcc = nps.get(lb)) == null) {
+        							QueryGraph ng = GraphUtility.extendConstraint(g, i, Integer.toString(lb), true);
+        							hcc = new HashCatContainer(ng, extended);
+        							
+        							nps.put(lb, hcc);
+        						}
+        						
+        						if (!hcc.checked) {
+        							int[] ins = new int[psize];
+        							for (int k = 0; k < psize; k++)
+        								ins[hcc.cm.get(g.getNode(k))] = s.getID(g.getNode(k));
+
+        							tc ++;
+        							hcc.cntr ++;
+
+        							tag = true;
+        							fidx.addEntry(hcc.ps, psize, ins);
+        						}
+        					}
+        				}
         			}
         			
-        			for (String lb : avl) {
-        				QueryGraph ng = GraphUtility.extendConstraint(g, i, lb);
+        			s.close();
+        			
+        			for (Entry<Integer, HashCatContainer> e : nps.entrySet()) {
+        				HashCatContainer hcc = e.getValue();
         				
-        				tag = true;
-        				int cnt = batchAddPattern(extended, ng, sys, hc.insCnt);
-        				
-        				tc += cnt;
-        				
-        				if (cnt > minJoinInsCnt)
-        					h.insert(new HeapContainer(codec.encodePattern(ng), ng, cnt));
-        				
+        				extended.add(hcc.ps);
+        				if (hcc.cntr > minJoinInsCnt)
+        					h.insert(new HeapContainer(hcc.ps, hcc.graph, hcc.cntr));
         			}
+        			
+        			
         		}
         	
         	//If no node gets extended on constraints, we extend edges
-        	System.out.println("Extending edges...");
-        	if (!tag && g.nodeCount() < maxSize) {
-        		int nodeCount = g.nodeCount(), labelCount = elabels.size(); 
+        	if (extendEdge && !tag && g.nodeCount() < maxSize) {
+        		System.out.println("Extending edges...");
+        		int labelCount = elabels.size(); 
         		
-        		for (int toExt = nodeCount - 1; toExt >= 0; toExt--) {
+        		for (int toExt = psize - 1; toExt >= 0; toExt--) {
         			
         			for (int j = labelCount - 1; j >= 0; j --) {
         				String el = elabels.get(j);        				
         				
-        				System.out.println("    Querying [+Edge :: " + el + "] ...");
+        				System.out.println("    Querying +Edge '" + el + "' ...");
         				
         				for (boolean dir = true; dir != false; dir = !dir) {
-        					QueryGraph ng = GraphUtility.extendEdge(g, toExt, el, dir);        					
+        					QueryGraph ng = GraphUtility.extendEdge(g, toExt, el, dir, true);        					
         					
         					int cnt = batchAddPattern(extended, ng, sys, (int)(hc.insCnt * coef));
         					
@@ -156,6 +205,20 @@ public class IterativeIndexer {
         	}
         	
         }
+        
+        sys.indexManager().close();
+	}
+	
+	public void close() {
+		lblman.close();
+		idman.close();
+		fidx.close();
+	}
+	
+	private void loadKeyword(String filename) {
+        InstanceKeywordRepository rd = new InstanceKeywordRepository(filename);
+        lblman.load(rd);
+        rd.close();
 	}
 	
 	private int batchAddPattern(Set<String> extended, QueryGraph graph, QuerySystem sys, int maxInsCnt) {
@@ -187,11 +250,15 @@ public class IterativeIndexer {
 			cnt++;
 		}
 		
+		ts.close();
+		
 		
 		if (cnt >= maxInsCnt) return 0;
 		
 		for (int[] ins : list)
 			fidx.addEntry(ps, graph.nodeCount(), ins);
+		
+		System.out.println("Pattern " + ps + " added with " + cnt + " instances");
 		
 		return cnt;
 	}
@@ -206,7 +273,10 @@ public class IterativeIndexer {
 	static public void main(String[] args) {
 		IterativeIndexer idx = new IterativeIndexer(new FileConfig(args[0]));
 		
-		idx.indexComplexPatterns(5000, 50000000, new FileConfig(args[1]), args[2]);		
+		
+		idx.loadKeyword(args[2]);
+		idx.indexComplexPatterns(5000, 50000000, args[1]);	
+		idx.close();
 	}
 	
 	class HeapContainer implements Comparable<Object> {
@@ -228,5 +298,20 @@ public class IterativeIndexer {
                         return 0;
         }
 
+	}
+	
+	class HashCatContainer {
+		int cntr = 0;
+		QueryGraph graph;
+		Map<QueryGraphNode, Integer> cm;
+		String ps;
+		boolean checked;
+		
+		public HashCatContainer(QueryGraph graph, Set<String> extended) {
+			this.graph = graph;
+			ps = codec.encodePattern(graph);
+			cm = cnm.getMap(graph);
+			this.checked = extended.contains(ps); 
+		}
 	}
 }

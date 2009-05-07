@@ -89,7 +89,7 @@ public class MergeJoinTest {
 
 			nl.add(na);
 			nl.add(nb);
-			QueryGraph gc = g.getInducedSubgraph(new HashSet<QueryGraphNode>(nl), null);
+			QueryGraph gc = g.getInducedSubgraph(new HashSet<QueryGraphNode>(nl), null, null, null);
 			QuerySchema qs = new QuerySchema(gc, nl);
 			
 			Plan pp = new PatternPlan(qs, null);
@@ -101,7 +101,7 @@ public class MergeJoinTest {
 
 			nl.add(na);
 			nl.add(nc);
-			QueryGraph gc = g.getInducedSubgraph(new HashSet<QueryGraphNode>(nl), null);
+			QueryGraph gc = g.getInducedSubgraph(new HashSet<QueryGraphNode>(nl), null, null, null);
 			QuerySchema qs = new QuerySchema(gc, nl);
 			
 			Plan pp = new PatternPlan(qs, null);

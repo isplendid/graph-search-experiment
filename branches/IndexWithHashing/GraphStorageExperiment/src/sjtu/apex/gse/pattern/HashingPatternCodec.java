@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import sjtu.apex.gse.hash.HashFunction;
-import sjtu.apex.gse.struct.ConcreteQueryGraphNode;
 import sjtu.apex.gse.struct.Connectivity;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphNode;
@@ -35,7 +34,7 @@ public class HashingPatternCodec implements PatternCodec {
 
 		visited.add(root);
 		
-		sb.append(hf.hashStr(root.getLabel()));			
+		sb.append(root.getHashLabel(hf));			
 
 		List<Connectivity> linked = root.getConnectivities();
 		java.util.Collections.sort(linked, new ConnectivityComparator());
@@ -75,7 +74,7 @@ public class HashingPatternCodec implements PatternCodec {
 
 		for (int i = 1; i < graph.nodeCount(); i++) {
 			QueryGraphNode currentNode = graph.getNode(i);
-			if ((cmpRes = hf.hashStr(currentNode.getLabel()).compareTo(hf.hashStr(minNode.getLabel()))) < 0)
+			if ((cmpRes = currentNode.getHashLabel(hf).compareTo(minNode.getHashLabel(hf))) < 0)
 				minNode = currentNode;
 			else if (cmpRes == 0 && (cmpRes = (currentNode.getOutDegree() - minNode.getOutDegree())) > 0)
 				minNode = currentNode;
@@ -87,7 +86,7 @@ public class HashingPatternCodec implements PatternCodec {
 	}
 
 	private void iterativeDecode(QueryGraph g, QueryGraphNode last,
-			String pattern) {
+			String pattern, boolean isHash) {
 		String header, content, nodeLabel, edgeLabel;
 		boolean outEdge;
 		int pos;
@@ -112,7 +111,11 @@ public class HashingPatternCodec implements PatternCodec {
 			edgeLabel = header.substring(1, pos);
 		}
 
-		QueryGraphNode n = g.addNode();
+		QueryGraphNode n;
+		if (isHash && !nodeLabel.equals(wildcard))
+			n = g.addNode(nodeLabel, true); 
+		else
+			n = g.addNode();
 		
 		if (edgeLabel != null) {
 			if (outEdge)
@@ -136,18 +139,17 @@ public class HashingPatternCodec implements PatternCodec {
 
 			for (int i = 1; i < splitPos.size(); i++)
 				iterativeDecode(g, n, content.substring(
-						splitPos.get(i - 1) + 1, splitPos.get(i)));
+						splitPos.get(i - 1) + 1, splitPos.get(i)), isHash);
 		}
 	}
 
-	@Override
 	/**
 	 * 
 	 */
-	public QueryGraph decodePattern(String pattern) {
+	public QueryGraph decodePattern(String pattern, boolean isHash) {
 		QueryGraph g = new QueryGraph();
 
-		iterativeDecode(g, null, pattern);
+		iterativeDecode(g, null, pattern, isHash);
 		return g;
 	}
 
@@ -167,7 +169,7 @@ public class HashingPatternCodec implements PatternCodec {
 			Connectivity a = (Connectivity) o1;
 			Connectivity b = (Connectivity) o2;
 			
-			if ((cmpRes = hf.hashStr(a.getNode().getLabel()).compareTo(hf.hashStr(b.getNode().getLabel()))) != 0)
+			if ((cmpRes = a.getNode().getHashLabel(hf).compareTo(b.getNode().getHashLabel(hf))) != 0)
 				return cmpRes;
 			else if ((cmpRes = a.getEdge().getLabel().compareTo(b.getEdge().getLabel())) != 0)
 				return cmpRes;
@@ -175,6 +177,11 @@ public class HashingPatternCodec implements PatternCodec {
 				return 0;	
 		}
 
+	}
+
+	@Override
+	public QueryGraph decodePattern(String pattern) {
+		return decodePattern(pattern, false);
 	}
 
 }

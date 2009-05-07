@@ -39,7 +39,7 @@ class OptimalArray {
 		for (QueryGraphEdge e : value.getCoveredEdges())
 			total += p2[eMap.get(e)];
 		
-		for (QueryGraphNode n : value.getConstrainedNodes())
+		for (QueryGraphNode n : value.getSatisfiedNodes())
 			total += p2[nMap.get(n)];
 		
 		return total;
@@ -76,7 +76,7 @@ class OptimalArray {
 			
 			if (encode[code] == null || eval.evaluate(encode[code]) > eval.evaluate(value)) {
 				encode[code] = value;
-				pending[value.getCoveredEdges().size() + value.getConstrainedNodes().size()].add(value);
+				pending[value.getCoveredEdges().size() + value.getSatisfiedNodes().size()].add(value);
 			}
 		}
 	}
@@ -101,8 +101,8 @@ class OptimalArray {
 		int enc = encodeElem(value);
 		
 		if (encode[enc] == null || eval.evaluate(value) < eval.evaluate(encode[enc])) {
-			pending[value.getCoveredEdges().size() + value.getConstrainedNodes().size()].remove(encode[enc]);
-			pending[value.getCoveredEdges().size() + value.getConstrainedNodes().size()].add(value);
+			pending[value.getCoveredEdges().size() + value.getSatisfiedNodes().size()].remove(encode[enc]);
+			pending[value.getCoveredEdges().size() + value.getSatisfiedNodes().size()].add(value);
 			encode[enc] = value;
 		}
 	}

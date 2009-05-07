@@ -100,15 +100,8 @@ public class AtomicPatternIndexService {
 		rd.close();
 	}
 	
-	private void loadKeyword(String filename) {
-        InstanceKeywordRepository rd = new InstanceKeywordRepository(filename);
-        lblman.load(rd);
-        rd.close();
-	}
-	
 	public void indexAtomicPatterns(String labelFile, String relationFile) {
 		indexLabel(labelFile);
-		loadKeyword(labelFile);
 		indexEdge(relationFile);
 	}
 
@@ -123,7 +116,7 @@ public class AtomicPatternIndexService {
 		Map<QueryGraphNode, Integer> map = cnm.getMap(graph);
 		int[] tmp = new int[graph.nodeCount()];
 		
-		for (Entry<QueryGraphNode, Integer> e : map.entrySet()) {
+		for (Entry<QueryGraphNode, Integer> e : ins.entrySet()) {
 			tmp[map.get(e.getKey())] = e.getValue();
 		}
 		

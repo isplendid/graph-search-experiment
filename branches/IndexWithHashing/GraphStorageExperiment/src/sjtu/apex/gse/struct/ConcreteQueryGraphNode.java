@@ -1,5 +1,7 @@
 package sjtu.apex.gse.struct;
 
+import sjtu.apex.gse.hash.HashFunction;
+
 
 /**
  * A node in query graph
@@ -55,6 +57,25 @@ public class ConcreteQueryGraphNode extends QueryGraphNode {
 	@Override
 	public boolean isGeneral() {
 		return false;
+	}
+
+	@Override
+	public String getHashLabel(HashFunction hash) {
+		return hash.hashStr(label);
+	}
+
+	@Override
+	public boolean isGeneralized() {
+		return false;
+	}
+
+	@Override
+	QueryGraphNode getHashClone(HashFunction hf) {
+		return new HashQueryGraphNode(serialNo, this.getAncestor(), hf.hashStr(label));
+	}
+	
+	public String toString() {
+		return "CN[" + serialNo + ",'" + label + "']";
 	}
 	
 }

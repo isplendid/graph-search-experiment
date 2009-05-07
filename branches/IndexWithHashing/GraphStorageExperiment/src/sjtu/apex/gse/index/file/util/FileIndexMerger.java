@@ -83,6 +83,10 @@ public class FileIndexMerger {
 			else
 				hc.reader.close();
 		}
+		
+		if (end != null)
+			fiw.writeEntry(currentPattern, new RecordRange(start, end));
+			
 		fiw.close();
 		frw.close();
 	}

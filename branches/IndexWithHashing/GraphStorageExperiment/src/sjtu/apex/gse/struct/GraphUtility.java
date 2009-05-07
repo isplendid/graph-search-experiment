@@ -10,6 +10,21 @@ import java.util.HashMap;
  */
 public class GraphUtility {
 	
+	public static QueryGraph extendConstraint(QueryGraph g, int toExt, String con) {
+		return extendConstraint(g, toExt, con, false);
+	}
+	
+	public static QueryGraph extendEdge(QueryGraph g, int toExt, String e, boolean dir) {
+		return extendEdge(g, toExt, e, false);
+	}
+	
+	private static QueryGraphNode getNewNode(String lbl, int sn, boolean isHash) {
+		if (isHash)
+			return new HashQueryGraphNode(sn, null, lbl);
+		else
+			return new ConcreteQueryGraphNode(lbl, sn, null);
+	}
+	
 	/**
 	 * Extend a query graph by adding constraint on a general node
 	 * @param g The original query graph
@@ -17,19 +32,24 @@ public class GraphUtility {
 	 * @param con The label of the constraint	
 	 * @return The graph generated
 	 */
-	public static QueryGraph extendConstraint(QueryGraph g, int toExt, String con) {
+	public static QueryGraph extendConstraint(QueryGraph g, int toExt, String con, boolean isHash) {
 		QueryGraph ng = new QueryGraph();
 		HashMap<QueryGraphNode, QueryGraphNode> map = new HashMap<QueryGraphNode, QueryGraphNode>();
 		
 		for (int i = g.nodeCount() - 1; i >= 0; i--) {
-			QueryGraphNode tn = g.getNode(i); 
+			QueryGraphNode tn = g.getNode(i);
+			QueryGraphNode nn;
+			
 			if (i == toExt)
-				map.put(tn, ng.addNode(con));
+				nn = getNewNode(con, tn.serialNo, isHash);
 			else
 				if (tn.isGeneral())
-					map.put(tn, ng.addNode());
+					nn = new GeneralQueryGraphNode(tn.serialNo, null);
 				else
-					map.put(tn, ng.addNode(tn.getLabel()));
+					nn = getNewNode(tn.getLabel(), tn.serialNo, isHash);
+			
+			ng.addNode(nn);
+			map.put(tn, nn);
 		}
 		
 		for (int i = g.edgeCount() - 1; i >= 0; i--) {
@@ -40,7 +60,7 @@ public class GraphUtility {
 		return ng;
 	}
 	
-	public static QueryGraph extendEdge(QueryGraph g, int toExt, String e, boolean dir) {
+	public static QueryGraph extendEdge(QueryGraph g, int toExt, String e, boolean dir, boolean isHash) {
 		QueryGraph ng = new QueryGraph();
 		HashMap<QueryGraphNode, QueryGraphNode> map = new HashMap<QueryGraphNode, QueryGraphNode>();
 		
@@ -48,9 +68,9 @@ public class GraphUtility {
 			QueryGraphNode tn = g.getNode(i);
 			
 			if (tn.isGeneral())
-				map.put(tn, ng.addNode());
+				map.put(tn, new GeneralQueryGraphNode(tn.serialNo, null));
 			else
-				map.put(tn, ng.addNode(tn.getLabel()));
+				map.put(tn, ng.addNode(getNewNode(tn.getLabel(), tn.serialNo, isHash)));
 		}
 		
 		for (int i = g.edgeCount() - 1; i >= 0; i--) {
