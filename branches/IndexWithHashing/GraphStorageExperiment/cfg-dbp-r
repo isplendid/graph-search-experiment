@@ -5,3 +5,4 @@ LabelRepository = d:/tien/barn/data/dbpedia.r/label
 HashMod = 1
 PatternLength = 3
 PatternStrSize = 128
+IndexComplex = 0
