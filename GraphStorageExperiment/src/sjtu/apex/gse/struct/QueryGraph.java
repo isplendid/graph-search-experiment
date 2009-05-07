@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import sjtu.apex.gse.hash.HashFunction;
+
 /**
  * The structure of a query graph, i.e. a query pattern
  * @author Tian Yuan
@@ -25,11 +27,12 @@ public class QueryGraph {
 	
 	/**
 	 * Create an induced subgraph according to node constraints set and edge constraints set
-	 * @param ns 
-	 * @param es
+	 * @param ns Node set
+	 * @param es Edge set
+	 * @param toHash Nodes that are to be converted to hash nodes
 	 * @return
 	 */
-	public QueryGraph getInducedSubgraph(Set<QueryGraphNode> ns, Set<QueryGraphEdge> es) {
+	public QueryGraph getInducedSubgraph(Set<QueryGraphNode> ns, Set<QueryGraphEdge> es, Set<QueryGraphNode> toHash, HashFunction hf) {
 		QueryGraph result = new QueryGraph();
 		Map<QueryGraphNode, QueryGraphNode> map = new HashMap<QueryGraphNode, QueryGraphNode>();
 		
@@ -39,7 +42,10 @@ public class QueryGraph {
 			
 			if ((from = map.get(e.from)) == null) {
 				if (ns != null && ns.contains(e.from))
-					from = e.from.getAncestor().clone();
+					if (toHash != null && toHash.contains(e.from))
+						from = e.from.getAncestor().getHashClone(hf);
+					else
+						from = e.from.getAncestor().clone();
 				else
 					from = e.from.getGeneralClone();
 				map.put(e.from, from);
@@ -48,7 +54,10 @@ public class QueryGraph {
 			
 			if ((to = map.get(e.to)) == null) {
 				if (ns != null && ns.contains(e.to))
-					to = e.to.getAncestor().clone();
+					if (toHash != null && toHash.contains(e.to))
+						to = e.to.getAncestor().getHashClone(hf);
+					else
+						to = e.to.getAncestor().clone();
 				else
 					to = e.to.getGeneralClone();
 				map.put(e.to, to);
@@ -61,7 +70,16 @@ public class QueryGraph {
 		if (ns != null) {
 			Set<QueryGraphNode> added = map.keySet();
 			for (QueryGraphNode n : ns)
-				if (!added.contains(n)) result.addNode(n.clone());
+				if (!added.contains(n)) {
+					QueryGraphNode nn;
+					
+					if (toHash != null && toHash.contains(n))
+						nn = n.getHashClone(hf);
+					else
+						nn = n.clone();
+					
+					result.addNode(nn);
+				}
 		}
 		
 		return result;
@@ -130,13 +148,23 @@ public class QueryGraph {
 		return node;
 	}
 	
+	public QueryGraphNode addNode(String label) {
+		return addNode(label, false);
+	}
+	
 	/**
 	 * Generate a node with the specified label and add into the graph
 	 * @param label The given label
+	 * @param isHash indicates whether to add an hash node
 	 * @return The node generated
 	 */
-	public QueryGraphNode addNode(String label) {
-		QueryGraphNode node = new ConcreteQueryGraphNode(label);
+	public QueryGraphNode addNode(String label, boolean isHash) {
+		QueryGraphNode node;
+		
+		if (isHash)
+			node = new HashQueryGraphNode(label);
+		else
+			node = new ConcreteQueryGraphNode(label);
 		
 		nodes.add(node);
 		return node;
@@ -257,10 +285,24 @@ public class QueryGraph {
 	}
 	
 	/**
+	 * Get the set of nodes that satisfied the constraints on them
+	 * @return
+	 */
+	public Set<QueryGraphNode> getSatisfiedNodeSet() {
+		Set<QueryGraphNode> result = new HashSet<QueryGraphNode>();
+		
+		for (QueryGraphNode n : nodes)
+			if (!n.isGeneralized())
+				result.add(n);
+		
+		return result;
+	}
+	
+	/**
 	 * Get a clone of this graph
 	 */
 	public QueryGraph clone() {
-		return getInducedSubgraph(getConstrainedNodeSet(), getEdgeSet());
+		return getInducedSubgraph(getConstrainedNodeSet(), getEdgeSet(), null, null);
 		
 	}
 }

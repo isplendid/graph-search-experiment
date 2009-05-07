@@ -21,7 +21,7 @@ import sjtu.apex.gse.system.QuerySystem;
  */
 public class Experiment {
 	
-	final static boolean logPlan = false;
+	final static boolean logPlan = true;
 
 	/**
 	 * @param args

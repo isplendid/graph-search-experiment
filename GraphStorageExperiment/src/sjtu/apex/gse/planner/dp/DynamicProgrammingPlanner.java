@@ -38,24 +38,24 @@ public class DynamicProgrammingPlanner implements Planner {
 		List<PatternInfo> sbp = qs.patternManager().getSubPatterns(graph); 
 
 		for (PatternInfo pi : sbp) {
-			Set<String> pis = new HashSet<String>();
+			Set<PatternInfo> pis = new HashSet<PatternInfo>();
 			
 			Plan p = new PatternPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()), qs);
 
-			pis.add(pi.getPatternString());
+			pis.add(pi);
 			optArr.setInitValue(new OptimalArrayElem(p, pis, null, pi));
 		}
 
 		Set<OptimalArrayElem> ext;
 		while ((ext = optArr.nextStage()) != null) {
 			for (OptimalArrayElem elem : ext) {
-				Set<String> containedPattern = elem.getContainedPatterns();
+				Set<PatternInfo> containedPattern = elem.getContainedPatterns();
 				
 				for (PatternInfo p : sbp)
-					if (!containedPattern.contains(p.getPatternString()) && isExtendAndConnected(p, elem)){
-						Set<String> con = getContainedPattern(elem.getContainedPatterns(), p.getPatternString());
+					if (!containedPattern.contains(p) && isExtendAndConnected(p, elem)){
+						Set<PatternInfo> con = getContainedPattern(elem.getContainedPatterns(), p);
 						Plan pln = getJoinSelectPlan(elem, p, g);
-						OptimalArrayElem oae = new OptimalArrayElem(pln, con, elem.getConstrainedNodes(), p);
+						OptimalArrayElem oae = new OptimalArrayElem(pln, con, elem.getSatisfiedNodes(), p);
 
 						optArr.update(oae);
 					}
@@ -79,7 +79,7 @@ public class DynamicProgrammingPlanner implements Planner {
 		Set<QueryGraphEdge> nes = p.getCoveredEdges();
 		Set<QueryGraphNode> nns = p.getConstrainedNodes();
 		Set<QueryGraphEdge> oes = new HashSet<QueryGraphEdge>(elem.getCoveredEdges());
-		Set<QueryGraphNode> ons = new HashSet<QueryGraphNode>(elem.getConstrainedNodes());
+		Set<QueryGraphNode> ons = new HashSet<QueryGraphNode>(elem.getSatisfiedNodes());
 		Set<QueryGraphNode> notSat = getPlanSelectedNode(g, p.getCoveredNodes(), oes);
 
 		Plan pp = new PatternPlan(new QuerySchema(p.getPattern(), notSat), qs, p.getPatternString());
@@ -93,7 +93,7 @@ public class DynamicProgrammingPlanner implements Planner {
 
 		oes.addAll(nes);
 		ons.addAll(nns);
-		QueryGraph ng = g.getQueryGraph().getInducedSubgraph(ons, oes);
+		QueryGraph ng = g.getQueryGraph().getInducedSubgraph(ons, oes, null, null);
 		notSat = getPlanSelectedNode(g, ng.getNodeSet(), oes);
 
 		pp = new MergeJoinPlan(pp, plan, joinNode, new QuerySchema(ng, notSat));
@@ -108,23 +108,23 @@ public class DynamicProgrammingPlanner implements Planner {
 	 * @param coverage Edges contained within the coverage
 	 */
 	private boolean isExtendAndConnected(PatternInfo subpattern, OptimalArrayElem coverage) {
-		Set<QueryGraphEdge> containedEdge = coverage.getCoveredEdges();
-		Set<QueryGraphNode> containedNode = coverage.getCoveredNodes();
-		Set<QueryGraphNode> constrainedNode = coverage.getConstrainedNodes();
+		Set<QueryGraphEdge> coveredEdge = coverage.getCoveredEdges();
+		Set<QueryGraphNode> coveredNode = coverage.getCoveredNodes();
+		Set<QueryGraphNode> satisfiedNode = coverage.getSatisfiedNodes();
 		boolean extended = false, connected = false; 
 
 		for (QueryGraphEdge e : subpattern.getCoveredEdges()) {
 			
-			if (!extended && !containedEdge.contains(e)) extended = true;
+			if (!extended && !coveredEdge.contains(e)) extended = true;
 			
 			if (extended) break;
 		}
 		
 		for (QueryGraphNode n : subpattern.getCoveredNodes()) {
 			
-			if (!extended && !n.isGeneral() && !constrainedNode.contains(n)) extended = true;
+			if (!extended && !n.isGeneralized() && !satisfiedNode.contains(n)) extended = true;
 			
-			if (containedNode.contains(n)) connected = true;
+			if (coveredNode.contains(n)) connected = true;
 			
 		}
 		
@@ -136,8 +136,8 @@ public class DynamicProgrammingPlanner implements Planner {
 	 * @param prev The set of checked patterns before;
 	 * @param ps The newly checked pattern
 	 */
-	private Set<String> getContainedPattern(Set<String> prev, String ps) {
-		Set<String> result = new HashSet<String>(prev);
+	private Set<PatternInfo> getContainedPattern(Set<PatternInfo> prev, PatternInfo ps) {
+		Set<PatternInfo> result = new HashSet<PatternInfo>(prev);
 		result.add(ps);
 		return result;
 	}

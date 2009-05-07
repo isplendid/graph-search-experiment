@@ -18,18 +18,21 @@ import sjtu.apex.gse.struct.QueryGraphNode;
 public class OptimalArrayElem {
 	private Set<QueryGraphEdge> edges;
 	private Set<QueryGraphNode> nodes;
-	private Set<QueryGraphNode> constrained;
-	private Set<String> patterns;
+	private Set<QueryGraphNode> satisfied;
+	private Set<PatternInfo> patterns;
 	private Plan plan;
 	
-	public OptimalArrayElem(Plan plan, Set<String> contained, Set<QueryGraphNode> lastConstrained, PatternInfo joinedPattern) {
+	public OptimalArrayElem(Plan plan, Set<PatternInfo> contained, Set<QueryGraphNode> lastSatisfied, PatternInfo joinedPattern) {
 		
-		if (lastConstrained != null)
-			this.constrained = new HashSet<QueryGraphNode>(lastConstrained);
+		if (lastSatisfied != null)
+			this.satisfied = new HashSet<QueryGraphNode>(lastSatisfied);
 		else
-			this.constrained = new HashSet<QueryGraphNode>();
-		if (joinedPattern.getPattern().nodeCount() == 1)
-			constrained.add(joinedPattern.getPattern().getNode(0));
+			this.satisfied = new HashSet<QueryGraphNode>();
+		
+		QueryGraph tg = joinedPattern.getPattern();
+		for (int i = tg.nodeCount() - 1; i >= 0; i--)
+			if (!tg.getNode(i).isGeneral() && !tg.getNode(i).isGeneralized())
+				satisfied.add(joinedPattern.getPattern().getNode(i));
 		
 		QueryGraph qg = plan.getSchema().getQueryGraph();
 		this.patterns = contained;
@@ -47,12 +50,12 @@ public class OptimalArrayElem {
 		return nodes;
 	}
 	
-	public Set<String> getContainedPatterns() {
+	public Set<PatternInfo> getContainedPatterns() {
 		return patterns;
 	}
 	
-	public Set<QueryGraphNode> getConstrainedNodes() {
-		return constrained;
+	public Set<QueryGraphNode> getSatisfiedNodes() {
+		return satisfied;
 	}
 	
 	public Plan getPlan() {

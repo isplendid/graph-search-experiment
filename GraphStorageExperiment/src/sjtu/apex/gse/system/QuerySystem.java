@@ -1,6 +1,7 @@
 package sjtu.apex.gse.system;
 
 import sjtu.apex.gse.config.Configuration;
+import sjtu.apex.gse.hash.HashFunction;
 import sjtu.apex.gse.hash.ModHash;
 import sjtu.apex.gse.metadata.IndexManager;
 import sjtu.apex.gse.metadata.PatternManager;
@@ -23,6 +24,7 @@ public class QuerySystem {
 	private int pl, psl;
 	
 	public QuerySystem(Configuration config) {
+		HashFunction hf;
 		this.config = config;
 		codec = new HashingPatternCodec(new ModHash(config));
 		
@@ -31,8 +33,9 @@ public class QuerySystem {
 		psl = config.getIntegerSetting("PatternStrSize", 128);
 		
 		indexMan = new IndexManager(folder, pl, psl);
-		patternMan = new PatternManager(codec, indexMan);
-		columnNodeMap = new HashLexicoColumnNodeMap(config);
+		hf = new ModHash(config);
+		patternMan = new PatternManager(codec, indexMan, hf);
+		columnNodeMap = new HashLexicoColumnNodeMap(hf);
 		queryPlanner = new DynamicProgrammingPlanner(this);
 	}
 	

@@ -1,5 +1,7 @@
 package sjtu.apex.gse.struct;
 
+import sjtu.apex.gse.hash.HashFunction;
+
 /**
  * 
  * @author Tian Yuan
@@ -39,6 +41,27 @@ public class GeneralQueryGraphNode extends QueryGraphNode {
 	public boolean isGeneral() {
 		return true;
 	}
-	
 
+	@Override
+	public String getHashLabel(HashFunction hash) {
+		// TODO Auto-generated method stub
+		return "*";
+	}
+
+	@Override
+	public boolean isGeneralized() {
+		if (ancestor instanceof GeneralQueryGraphNode)
+			return false;
+		else
+			return true;
+	}
+
+	@Override
+	QueryGraphNode getHashClone(HashFunction hf) {
+		return null;
+	}
+	
+	public String toString() {
+		return "GN[" + serialNo + "]";
+	}
 }

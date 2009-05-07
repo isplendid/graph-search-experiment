@@ -77,4 +77,8 @@ public class QueryGraphEdge {
 	public boolean equals(Object e) {
 		return ((e instanceof QueryGraphEdge) && (e.hashCode() == hashCode()));
 	}
+	
+	public String toString() {
+		return from.toString() + "->" + to.toString();
+	}
 }

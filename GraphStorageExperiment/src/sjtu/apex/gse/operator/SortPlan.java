@@ -50,7 +50,7 @@ public class SortPlan implements Plan {
 
 	@Override
 	public int diskIO() {
-		return c * src.resultCount();
+		return src.diskIO() + c * src.resultCount();
 	}
 
 	@Override

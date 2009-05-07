@@ -18,9 +18,11 @@ public class PatternInfo {
 	private Set<QueryGraphEdge> usedEdge;
 	private Set<QueryGraphNode> usedNode;
 	private Set<QueryGraphNode> constrainedNode;
+	private Set<QueryGraphNode> satisfiedNode;
 	private int insCnt;
 	
 	public PatternInfo(QueryGraph graph, String patternStr, int insCnt) {
+		this.satisfiedNode = graph.getSatisfiedNodeSet();
 		this.graph = graph;
 		this.patternStr = patternStr;
 		this.usedEdge = graph.getEdgeSet();
@@ -62,6 +64,13 @@ public class PatternInfo {
 	 */
 	public Set<QueryGraphNode> getConstrainedNodes() {
 		return constrainedNode;
+	}
+	
+	/**
+	 * Get the nodes that satisfy their constraints
+	 */
+	public Set<QueryGraphNode> getSatisfiedNodes() {
+		return satisfiedNode;
 	}
 	
 	/**
