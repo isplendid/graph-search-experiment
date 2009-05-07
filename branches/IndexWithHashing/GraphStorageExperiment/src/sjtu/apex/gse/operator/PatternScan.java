@@ -19,7 +19,7 @@ public class PatternScan implements Scan{
 		this.sch = sch;
 		this.cmap = cmap;
 		int size = sch.getQueryGraph().nodeCount();
-		src = new FileRepository(qs.indexManager(), qs.workingDirectory()  + "/Storage" + (size - 1), ps, size);
+		src = new FileRepository(qs.indexManager(), qs.workingDirectory()  + "/storage" + (size - 1), ps, size);
 		
 	}
 
