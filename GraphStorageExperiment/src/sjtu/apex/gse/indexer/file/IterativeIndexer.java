@@ -33,8 +33,8 @@ import sjtu.apex.gse.util.Heap;
 public class IterativeIndexer {
 	
 	static final double coef = 0.9;
-	static final boolean extendEdge = false;
 	
+	private boolean extendEdge;
 	private int maxSize;
 	private FileIndexer fidx;
 	private IDManager idman;
@@ -47,6 +47,7 @@ public class IterativeIndexer {
 	public IterativeIndexer(Configuration config) {
 		this.config = config;
 		maxSize = config.getIntegerSetting("PatternLength", 3);
+		extendEdge = (config.getIntegerSetting("IndexComplex", 0) != 0);
 		fidx = new FileIndexer(maxSize, config);
 		hash = new ModHash(config);
 		codec = new HashingPatternCodec(hash);
