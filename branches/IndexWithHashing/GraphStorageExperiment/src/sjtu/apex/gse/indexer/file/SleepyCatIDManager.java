@@ -28,8 +28,11 @@ public class SleepyCatIDManager implements IDManager {
 	Database id2uri;
 	Environment env;
 	
-	public SleepyCatIDManager(Configuration config) {
-		String idDir = config.getStringSetting("IDMappingFolder", null);
+	public  SleepyCatIDManager(Configuration config) {		
+		this(config.getStringSetting("IDMappingFolder", null));
+	}
+	
+	public SleepyCatIDManager(String idDir) {
 		EnvironmentConfig ec = new EnvironmentConfig();
 		ec.setAllowCreate(true);
 		ec.setTransactional(false);

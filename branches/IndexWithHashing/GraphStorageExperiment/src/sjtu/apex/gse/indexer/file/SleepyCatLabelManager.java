@@ -22,7 +22,10 @@ public class SleepyCatLabelManager implements LabelManager {
 	Database uri2kw;
 	
 	public SleepyCatLabelManager(Configuration config) {
-		String dir = config.getStringSetting("LabelRepository", null);
+		this(config.getStringSetting("LabelRepository", null));
+	}
+	
+	public SleepyCatLabelManager(String dir) {
 		EnvironmentConfig ec = new EnvironmentConfig();
 		ec.setAllowCreate(true);
 		ec.setTransactional(false);
