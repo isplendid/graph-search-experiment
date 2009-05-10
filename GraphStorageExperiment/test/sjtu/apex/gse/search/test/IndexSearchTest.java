@@ -19,7 +19,7 @@ public class IndexSearchTest {
 
 	@Before
 	public void setUp() throws Exception {
-		idman = new SleepyCatIDManager(null);
+		idman = null;//new SleepyCatIDManager(null);
 		patterns = new ArrayList<String>();
 		size = new ArrayList<Integer>();
 		
