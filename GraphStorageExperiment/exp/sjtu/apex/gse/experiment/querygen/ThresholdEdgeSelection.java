@@ -32,7 +32,7 @@ public class ThresholdEdgeSelection {
 			if (fir.getInstanceCount() >= threshold) {
 				QueryGraph g = sys.patternManager().getCodec().decodePattern(fir.getPatternString());
 				
-				wr.append(g.getEdge(0).getLabel() + "\n");
+				wr.append(g.getEdge(0).getLabel() + "\t" + fir.getInstanceCount() + "\n");
 			}
 			
 		}

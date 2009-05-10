@@ -59,7 +59,7 @@ public class MergeJoinPlan implements Plan {
 	 */
 	@Override
 	public int resultCount() {
-		return l.resultCount() + r.resultCount();
+		return Math.min(l.resultCount(), r.resultCount());
 	}
 
 	@Override

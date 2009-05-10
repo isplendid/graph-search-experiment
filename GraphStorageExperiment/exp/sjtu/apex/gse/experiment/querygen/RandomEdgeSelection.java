@@ -17,17 +17,17 @@ import sjtu.apex.gse.system.QuerySystem;
  */
 public class RandomEdgeSelection {
 	
-	static final int basis = 300000;
+	static final int basis = 200000;
 	
 	public static void main(String[] args) throws IOException {
 		Configuration conf = new FileConfig(args[0]);
 		QuerySystem sys = new QuerySystem(conf);
 		
-		FileIndexReader fir = new FileIndexReader(args[1], 2, sys.patternStrSize());
-		BufferedWriter wr = new BufferedWriter(new FileWriter(args[2]));
+		FileIndexReader fir = new FileIndexReader(conf.getStringSetting("DataFolder", null) + "/index1", 2, sys.patternStrSize());
+		BufferedWriter wr = new BufferedWriter(new FileWriter(args[1]));
 		
 		while (fir.next()) {
-			if (Math.random() < ((double)fir.getInstanceCount() / basis) * 0.99 + 0.01) {
+			if (Math.random() < ((double)fir.getInstanceCount() / basis) * 0.999 + 0.001) {
 				QueryGraph g = sys.patternManager().getCodec().decodePattern(fir.getPatternString());
 				
 				wr.append(g.getEdge(0).getLabel() + "\t" + fir.getInstanceCount() + "\n");
