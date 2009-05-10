@@ -15,7 +15,7 @@ public class GraphUtility {
 	}
 	
 	public static QueryGraph extendEdge(QueryGraph g, int toExt, String e, boolean dir) {
-		return extendEdge(g, toExt, e, false);
+		return extendEdge(g, toExt, e, dir, false);
 	}
 	
 	private static QueryGraphNode getNewNode(String lbl, int sn, boolean isHash) {

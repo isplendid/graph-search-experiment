@@ -51,9 +51,9 @@ public class ComplexQueryGenerator {
 		this.elfn = elfn;
 		this.initfn = initfn;
 		this.outfn = outfn;
+		sys = new QuerySystem(config);
 		lm = new SleepyCatLabelManager(config);
 		im = new SleepyCatIDManager(config);
-		sys = new QuerySystem(config);
 	}
 	
 	private QuerySchema getFullSchema(QueryGraph g) {
@@ -121,6 +121,11 @@ public class ComplexQueryGenerator {
 		QueryGraph qg = qs.getQueryGraph();
 		int nodeCount = qg.nodeCount(), labelCount = elabels.size(); 
 		Set<QueryGraphNode> usedNode = new HashSet<QueryGraphNode>();
+		Set<String> existEdgeLabel = new HashSet<String>();
+		
+		for (int i = qg.edgeCount() - 1; i >= 0; i--)
+			existEdgeLabel.add(qg.getEdge(i).getLabel());
+		
 		
 		for (int i = nodeCount - 1; i >= 0; i--) {
 			
@@ -129,7 +134,7 @@ public class ComplexQueryGenerator {
 			while (usedNode.contains(qg.getNode(toExt = (int)(Math.random() * nodeCount)))) ;
 			usedNode.add(qg.getNode(toExt));
 			
-			Set<String>	testedLabel = new HashSet<String>();
+			Set<String>	testedLabel = new HashSet<String>(existEdgeLabel);
 			boolean found = false;
 			
 			int itr = 0;
@@ -173,7 +178,7 @@ public class ComplexQueryGenerator {
 			String temp;
 			
 			while ((temp = rd.readLine()) != null)
-				elabels.add(temp);
+				elabels.add(temp.split("\t")[0]);
 			
 			QuerySchema qs;
 			
@@ -182,7 +187,7 @@ public class ComplexQueryGenerator {
 			
 			int head = 0, orgsize = qarr.size();
 			
-			while (head < qarr.size() && (qarr.size() - orgsize < threshold)) {
+			while (head < orgsize && head < qarr.size() && (qarr.size() - orgsize < threshold)) {
 				qs = qarr.get(head);
 				
 				int pp = qarr.size();
@@ -208,14 +213,32 @@ public class ComplexQueryGenerator {
 		}
 
 	}
+	
+	public void close() {
+		lm.close();
+		im.close();
+	}
 
 	/**
-	 * @param args
+	 * 
+	 * @param args Configuration, Edge label filename, Initial queries, Output, threshold
 	 */
 	public static void main(String[] args) {
-		ComplexQueryGenerator qg = new ComplexQueryGenerator(new FileConfig(args[0]), args[1], args[2], args[3]);
+		Configuration cf = new FileConfig(args[0]); 
+		String edgelabel = args[1];
+		int t = 500;
 		
-		qg.generate(Integer.parseInt(args[4]));
+		File f = new File(args[2]);
+		File[] queries = f.listFiles();
+
+		for (File q : queries) {
+			String in = q.getAbsolutePath();
+			String out = args[3] + "\\" + q.getName();
+			ComplexQueryGenerator qg = new ComplexQueryGenerator(cf, edgelabel, in, out);
+			qg.generate(t);
+			qg.close();
+		}
+		
 	}
 
 }

@@ -45,10 +45,11 @@ public class SimpleQueryGenerator {
 		
 		while ((temp = rd.readLine()) != null) {
 			if (temp.length() == 0) continue;
-			RecordRange rr = sys.indexManager().seek("*[+" + temp + "::*]", 2);
+			String p = temp.split("\t")[0];
+			RecordRange rr = sys.indexManager().seek("*[+" + p + "::*]", 2);
 
 			FileRepositoryReader fr = new FileRepositoryReader(dataFolder + "/storage1", 2, rr);
-			QueryGraph g = sys.patternCodec().decodePattern("*[+" + temp + "::*]");
+			QueryGraph g = sys.patternCodec().decodePattern("*[+" + p + "::*]");
 			Map<QueryGraphNode, Integer> map = sys.columnNodeMap().getMap(g);
 			QueryGraphEdge edge = g.getEdge(0);
 			int ent[];
@@ -74,7 +75,7 @@ public class SimpleQueryGenerator {
 					for (String r : right) 
 						if (!l.equals(r) && Math.random() < (prob + (wr == null? 0.2 : 0))){
 							if (wr == null) {
-								wr = new BufferedWriter(new FileWriter(args[1] + "." + count));
+								wr = new BufferedWriter(new FileWriter(args[2] + "." + count));
 								count++;
 							}
 							wr.append("2 1\n");
