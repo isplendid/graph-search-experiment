@@ -35,8 +35,8 @@ import sjtu.apex.gse.system.QuerySystem;
  */
 public class ComplexQueryGenerator {
 	final double pec = 0.3;
-	final double pee = 0.7;
-	final double pce = 0.05;
+	final double pee = 0.5;
+	final double pce = 0.03;
 	final int scanmax = 100;
 	final boolean logging = true;
 	
@@ -198,7 +198,7 @@ public class ComplexQueryGenerator {
 	public static void main(String[] args) {
 		Configuration cf = new FileConfig(args[0]); 
 		String edgelabel = args[1];
-		int t = 500;
+		int t = 1000;
 		
 		File f = new File(args[2]);
 		File[] queries = f.listFiles();
