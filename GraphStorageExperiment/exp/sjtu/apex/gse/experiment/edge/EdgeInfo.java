@@ -41,22 +41,25 @@ public class EdgeInfo {
 		}
 	}
 	
-	public void addEdge(int id, String edgeLab, boolean dir) {
-		String temp;
+	public void addEdge(int id, List<Edge> edges) {
+		StringBuffer sb = new StringBuffer();
 		DatabaseEntry idEnt = new DatabaseEntry();
 		DatabaseEntry edgeEnt = new DatabaseEntry();
 		IntegerBinding.intToEntry(id, idEnt);
 		OperationStatus os;
 		
 		try {
-			os = edge.get(null, idEnt, edgeEnt, LockMode.DEFAULT);
-			if (os == OperationStatus.NOTFOUND)
-				temp = (dir ? "+" : "-") + edgeLab;
-			else
-				temp = StringBinding.entryToString(edgeEnt) + "\t" + (dir ? "+" : "-") + edgeLab;
-			
-			StringBinding.stringToEntry(temp, edgeEnt);
-			edge.put(null, idEnt, edgeEnt);
+			for (Edge e : edges)
+				if (sb.length() == 0)
+					sb.append(e.toString());
+				else {
+					sb.append("\t");
+					sb.append(e.toString());
+				}
+			StringBinding.stringToEntry(sb.toString(), edgeEnt);
+			os = edge.put(null, idEnt, edgeEnt);
+			if (os != OperationStatus.SUCCESS)
+				System.err.println("ERROR");	
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -65,7 +68,7 @@ public class EdgeInfo {
 	public List<Edge> getEdges(int id) {
 		DatabaseEntry idEnt = new DatabaseEntry();
 		DatabaseEntry edgeEnt = new DatabaseEntry();
-		IntegerBinding.intToEntry(id, edgeEnt);
+		IntegerBinding.intToEntry(id, idEnt);
 		OperationStatus os;
 		
 		try {
@@ -77,7 +80,8 @@ public class EdgeInfo {
 				List<Edge> res = new ArrayList<Edge>();
 				
 				for (String s : ts)
-					res.add(new Edge(s.substring(1), s.startsWith("+")));
+					if (s.length() != 0)
+						res.add(new Edge(s));
 					
 				return res;
 			}

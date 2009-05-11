@@ -1,10 +1,10 @@
 package sjtu.apex.gse.index.file.util;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import sjtu.apex.gse.filesystem.FilesystemUtility;
 import sjtu.apex.gse.index.file.FileIndexEntry;
 import sjtu.apex.gse.index.file.FileIndexReader;
 import sjtu.apex.gse.index.file.FileIndexWriter;
@@ -31,8 +31,8 @@ public class FileIndexSorter {
 		int segCnt = 0;
 
 		if (autoDelete) {
-			deleteDir(tmpDir);
-			createDir(tmpDir);
+			FilesystemUtility.deleteDir(tmpDir);
+			FilesystemUtility.createDir(tmpDir);
 		}
 		
 		while (rd.next()) {
@@ -78,7 +78,7 @@ public class FileIndexSorter {
 		wr.close();
 
 		if (autoDelete) {
-			deleteDir(tmpDir);
+			FilesystemUtility.deleteDir(tmpDir);
 		}
 	}
 
@@ -92,32 +92,7 @@ public class FileIndexSorter {
 		wr.close();
 	}
 
-	static private void createDir(String dir) {
-		File f = new File(dir);
-		if (!f.exists()) f.mkdir();
-	}
-
-	static private void deleteDir(String dir) {
-		deleteDirectory(new File(dir));
-	}
-
-	static public boolean deleteDirectory(File path) {
-		if (path.exists()) {
-			File[] files = path.listFiles();
-			for (int i=0; i<files.length; i++) {
-				if (files[i].isDirectory()) {
-					deleteDirectory(files[i]);
-				}
-				else {
-					files[i].delete();
-				}
-			}
-		}
-		return(path.delete());
-	}
-
-
-	static class HeapContainer implements Comparable {
+	static class HeapContainer implements Comparable<Object> {
 		FileIndexReader rd;
 		FileIndexEntry tfe;
 

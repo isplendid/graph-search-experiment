@@ -10,6 +10,8 @@ import java.util.Set;
 
 import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.config.FileConfig;
+import sjtu.apex.gse.experiment.edge.Edge;
+import sjtu.apex.gse.experiment.edge.EdgeInfo;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.LabelManager;
 import sjtu.apex.gse.indexer.file.SleepyCatIDManager;
@@ -34,7 +36,8 @@ import sjtu.apex.gse.system.QuerySystem;
 public class ComplexQueryGenerator {
 	final double pec = 0.3;
 	final double pee = 0.7;
-	final double propEdgeCheck = 0.5;
+	final double pce = 0.05;
+	final int scanmax = 100;
 	final boolean logging = true;
 	
 	String elfn;
@@ -42,18 +45,20 @@ public class ComplexQueryGenerator {
 	String outfn;
 	LabelManager lm;
 	IDManager im;
+	EdgeInfo einfo;
 	QuerySystem sys;
 	
 	static int errSerial = 0;
 	
 
-	public ComplexQueryGenerator(Configuration config, String elfn, String initfn, String outfn) {
+	public ComplexQueryGenerator(Configuration config, String elfn, String initfn, String outfn, String eip) {
 		this.elfn = elfn;
 		this.initfn = initfn;
 		this.outfn = outfn;
 		sys = new QuerySystem(config);
 		lm = new SleepyCatLabelManager(config);
 		im = new SleepyCatIDManager(config);
+		einfo = new EdgeInfo(eip);
 	}
 	
 	private QuerySchema getFullSchema(QueryGraph g) {
@@ -61,35 +66,6 @@ public class ComplexQueryGenerator {
 		for (int j = g.nodeCount() - 1; j >= 0; j--)
 			nset.add(g.getNode(j));
 		return new QuerySchema(g, nset);
-	}
-	
-	private boolean checkNotEmpty(QuerySchema sch) {
-		try {
-			if (logging) {
-				QueryWriter wr = new FileQueryWriter("crash.log");
-				
-				wr.write(sch);
-				wr.close();
-			}
-			
-			Scan s = sys.queryPlanner().plan(sch).open();
-			if (s.next()) {
-				s.close();
-				return true;
-			}
-			else {
-				s.close();
-				return false;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			if (logging) {
-				QueryWriter wr = new FileQueryWriter("err" + (errSerial ++) + ".log");
-				wr.write(sch);
-				wr.close();
-			}
-			return false;
-		}
 	}
 	
 	private void constraintExtend(QuerySchema qs, List<QuerySchema> qarr) {
@@ -116,54 +92,49 @@ public class ComplexQueryGenerator {
 			}
 	}
 	
-	private void addEdge(QuerySchema qs, List<QuerySchema> qarr, List<String> elabels) {
+	private void edgeExtend(QuerySchema qs, List<QuerySchema> qarr, List<String> elabels) {
 		if (Math.random() > pee) return; 
-		QueryGraph qg = qs.getQueryGraph();
-		int nodeCount = qg.nodeCount(), labelCount = elabels.size(); 
-		Set<QueryGraphNode> usedNode = new HashSet<QueryGraphNode>();
 		Set<String> existEdgeLabel = new HashSet<String>();
+		QueryGraph qg = qs.getQueryGraph();
+		int nodeCount = qg.nodeCount();
+		int cnt = 0;
 		
 		for (int i = qg.edgeCount() - 1; i >= 0; i--)
 			existEdgeLabel.add(qg.getEdge(i).getLabel());
 		
 		
-		for (int i = nodeCount - 1; i >= 0; i--) {
-			
-			System.out.println("  Extend edges from node " + i);
-			int toExt;
-			while (usedNode.contains(qg.getNode(toExt = (int)(Math.random() * nodeCount)))) ;
-			usedNode.add(qg.getNode(toExt));
-			
-			Set<String>	testedLabel = new HashSet<String>(existEdgeLabel);
-			boolean found = false;
-			
-			int itr = 0;
-			while (!found && itr < labelCount * propEdgeCheck) {
-				itr ++;
-				String el;
+		List<Set<Edge>> list = new ArrayList<Set<Edge>>();
+		
+		for (int i = 0; i < nodeCount; i++)
+			list.add(new HashSet<Edge>());
+		
+		Scan s = sys.queryPlanner().plan(qs).open();
+		
+		while (s.next() && cnt < scanmax) {
+			cnt ++;
+			for (int i = 0; i < nodeCount; i++) {
+				QueryGraphNode qn = qg.getNode(i);
+				int nid = s.getID(qn);
+				List<Edge> edges = einfo.getEdges(nid); 
+				Set<Edge> set = list.get(i);
 				
-				while (testedLabel.contains(el = elabels.get((int)(labelCount * Math.random())))) ;
-				testedLabel.add(el);
-				
-				boolean dir = (Math.random() > 0.5);
-				
-				System.out.println("    Querying [+Edge :: " + el + "] ...");
-				QuerySchema nqs = getFullSchema(GraphUtility.extendEdge(qg, toExt, el, dir));
-				found = checkNotEmpty(nqs);
-				
-				if (!found) {
-					nqs = getFullSchema(GraphUtility.extendEdge(qg, toExt, el, dir));
-					
-					found = checkNotEmpty(nqs);
-					if (found) qarr.add(nqs);
-				}
-				else
-					qarr.add(nqs);
-				
-				System.out.println("    Query ended");
-				
-				testedLabel.add(el);
+				for (Edge e : edges)
+					if (!set.contains(e)) set.add(e);
 			}
+		}
+		s.close();
+		
+		System.out.println("\tRandomly generating queries ...");
+		for (int i = 0; i < nodeCount; i++) {
+			
+			for (Edge e : list.get(i))
+				if (!existEdgeLabel.contains(e.getLabel()) && Math.random() < pce) {
+					System.out.println("\t" + e.getLabel() + " added.");
+					QuerySchema nqs = getFullSchema(GraphUtility.extendEdge(qg, i, e.getLabel(), e.getDir()));
+					
+					qarr.add(nqs);
+				}
+			
 		}
 	}
 
@@ -192,7 +163,7 @@ public class ComplexQueryGenerator {
 				
 				int pp = qarr.size();
 				System.out.println("CHECKING nodeid = " + head);
-				addEdge(qs, qarr, elabels);
+				edgeExtend(qs, qarr, elabels);
 				constraintExtend(qs, qarr);
 				System.out.println((qarr.size() - orgsize) + "ADDED");
 				
@@ -217,6 +188,7 @@ public class ComplexQueryGenerator {
 	public void close() {
 		lm.close();
 		im.close();
+		einfo.close();
 	}
 
 	/**
@@ -233,8 +205,8 @@ public class ComplexQueryGenerator {
 
 		for (File q : queries) {
 			String in = q.getAbsolutePath();
-			String out = args[3] + "\\" + q.getName();
-			ComplexQueryGenerator qg = new ComplexQueryGenerator(cf, edgelabel, in, out);
+			String out = args[3] + "/" + q.getName();
+			ComplexQueryGenerator qg = new ComplexQueryGenerator(cf, edgelabel, in, out, args[4]);
 			qg.generate(t);
 			qg.close();
 		}
