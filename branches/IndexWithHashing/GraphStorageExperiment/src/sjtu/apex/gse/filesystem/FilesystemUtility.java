@@ -19,4 +19,28 @@ public class FilesystemUtility {
 		return f.exists();
 	}
 	
+	public static void createDir(String dir) {
+		File f = new File(dir);
+		if (!f.exists()) f.mkdir();
+	}
+
+	public static void deleteDir(String dir) {
+		deleteDirectory(new File(dir));
+	}
+
+	private static boolean deleteDirectory(File path) {
+		if (path.exists()) {
+			File[] files = path.listFiles();
+			for (int i=0; i<files.length; i++) {
+				if (files[i].isDirectory()) {
+					deleteDirectory(files[i]);
+				}
+				else {
+					files[i].delete();
+				}
+			}
+		}
+		return(path.delete());
+	}
+
 }
