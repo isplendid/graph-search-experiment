@@ -16,6 +16,7 @@ import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.LabelManager;
 import sjtu.apex.gse.indexer.file.SleepyCatIDManager;
 import sjtu.apex.gse.indexer.file.SleepyCatLabelManager;
+import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.query.FileQueryReader;
 import sjtu.apex.gse.query.FileQueryWriter;
@@ -34,7 +35,7 @@ import sjtu.apex.gse.system.QuerySystem;
  *
  */
 public class ComplexQueryGenerator {
-	final double pec = 0.3;
+	final double pec = 0.01;
 	final double pee = 0.5;
 	final double pce = 0.03;
 	final int scanmax = 100;
@@ -71,25 +72,24 @@ public class ComplexQueryGenerator {
 	private void constraintExtend(QuerySchema qs, List<QuerySchema> qarr) {
 		QueryGraph qg = qs.getQueryGraph();
 		
-		for (int i = qg.nodeCount() - 1; i >= 0; i--)
-			if (qg.getNode(i).isGeneral() && Math.random() < pec) {
-				QueryGraphNode extNode = qg.getNode(i);
-				List<String> avl = new ArrayList<String>();
-				Scan s = sys.queryPlanner().plan(qs).open();
-				
-				while (s.next()) {
+		Plan p = sys.queryPlanner().plan(qs);
+		Scan s = p.open();
+		while (s.next()) {
+			for (int i = qg.nodeCount() - 1; i >= 0; i--)
+				if (qg.getNode(i).isGeneral() && Math.random() < pec) {
+					QueryGraphNode extNode = qg.getNode(i);
 					int ni = s.getID(extNode);
 					String[] sl = lm.getLabel(im.getURI(ni));
-					for (int j = sl.length - 1; j >= 0; j--) {
-						
-						avl.add(sl[j]);
+
+
+					if (sl.length != 0) {
+						QueryGraph ng = GraphUtility.extendConstraint(qg, i, sl[(int)(sl.length * Math.random())]);
+
+						qarr.add(getFullSchema(ng));
 					}
 				}
-				
-				QueryGraph ng = GraphUtility.extendConstraint(qg, i, avl.get((int)Math.round(avl.size() * Math.random())));
-				
-				qarr.add(getFullSchema(ng));
-			}
+		}
+		s.close();
 	}
 	
 	private void edgeExtend(QuerySchema qs, List<QuerySchema> qarr, List<String> elabels) {
@@ -129,7 +129,7 @@ public class ComplexQueryGenerator {
 			
 			for (Edge e : list.get(i))
 				if (!existEdgeLabel.contains(e.getLabel()) && Math.random() < pce) {
-					System.out.println("\t" + e.getLabel() + " added.");
+					System.out.println("\t" + e.toString() + " added to node " + qg.getNode(i) + ".");
 					QuerySchema nqs = getFullSchema(GraphUtility.extendEdge(qg, i, e.getLabel(), e.getDir()));
 					
 					qarr.add(nqs);
@@ -138,7 +138,7 @@ public class ComplexQueryGenerator {
 		}
 	}
 
-	public void generate(int threshold) {
+	public void generate(int threshold, int mod) {
 		try {
 			BufferedReader rd = new BufferedReader(new FileReader(elfn));
 			QueryWriter wr = new FileQueryWriter(outfn);
@@ -163,8 +163,10 @@ public class ComplexQueryGenerator {
 				
 				int pp = qarr.size();
 				System.out.println("CHECKING nodeid = " + head);
-				edgeExtend(qs, qarr, elabels);
-				constraintExtend(qs, qarr);
+				
+				if ((mod & 0x00000001) != 0) edgeExtend(qs, qarr, elabels);
+				if ((mod & 0x00000002) != 0) constraintExtend(qs, qarr);
+				
 				System.out.println((qarr.size() - orgsize) + "ADDED");
 				
 				if (qarr.size() > pp)
@@ -207,7 +209,7 @@ public class ComplexQueryGenerator {
 			String in = q.getAbsolutePath();
 			String out = args[3] + "/" + q.getName();
 			ComplexQueryGenerator qg = new ComplexQueryGenerator(cf, edgelabel, in, out, args[4]);
-			qg.generate(t);
+			qg.generate(t, Integer.parseInt(args[5]));
 			qg.close();
 		}
 		
