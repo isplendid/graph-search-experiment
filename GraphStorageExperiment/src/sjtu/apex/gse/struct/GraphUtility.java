@@ -79,9 +79,9 @@ public class GraphUtility {
 		}
 		
 		if (dir)
-			ng.addEdge(ng.getNode(toExt), ng.addNode(), e);
+			ng.addEdge(map.get(g.getNode(toExt)), ng.addNode(), e);
 		else
-			ng.addEdge(ng.addNode(), ng.getNode(toExt), e);
+			ng.addEdge(ng.addNode(), map.get(g.getNode(toExt)), e);
 		
 		return ng; 
 	}
