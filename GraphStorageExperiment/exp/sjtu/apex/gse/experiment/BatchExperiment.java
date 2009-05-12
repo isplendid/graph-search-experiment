@@ -17,7 +17,7 @@ public class BatchExperiment {
 			String[] pa = new String[3];
 			pa[0] = args[0];
 			pa[1] = q.getAbsolutePath();
-			pa[2] = args[2] + "\\" + q.getName();
+			pa[2] = args[2] + "/" + q.getName();
 			Experiment.main(pa);
 		}
 	}
