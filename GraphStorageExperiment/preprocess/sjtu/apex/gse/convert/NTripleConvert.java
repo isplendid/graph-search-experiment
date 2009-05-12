@@ -26,38 +26,44 @@ public class NTripleConvert {
 		convert(inFn, outFn, url);
 	}
 	
-	public static void convert(String inFn, String outFn, String url) throws Exception
+	public static void convert(String inPath, String outFn, String url) throws Exception
 	{
-		Parser parser = new RdfXmlParser();
-		InputStream inp = new FileInputStream(inFn);
-		OutputStream oup = new FileOutputStream(outFn);
-		final NTriplesWriter writer = new NTriplesWriter(oup);
-		writer.startDocument();
-		parser.setStatementHandler(new StatementHandler()
-		{
-			public void handleStatement(Resource s, URI p, Value o) throws StatementHandlerException {
-				try
-				{
-					writer.writeStatement(s, p, o);
-				}
+		File f = new File(inPath);
+		File[] queries = f.listFiles();
 
-				catch (IOException e)
+		OutputStream oup = new FileOutputStream(outFn);
+		for (File q : queries)
+			if (q.isFile() && q.getAbsolutePath().endsWith(".owl")) {
+				
+				Parser parser = new RdfXmlParser();
+				InputStream inp = new FileInputStream(q.getAbsoluteFile());
+				final NTriplesWriter writer = new NTriplesWriter(oup);
+				writer.startDocument();
+				parser.setStatementHandler(new StatementHandler()
 				{
-					throw new StatementHandlerException(e);
-				}
+					public void handleStatement(Resource s, URI p, Value o) throws StatementHandlerException {
+						try
+						{
+							writer.writeStatement(s, p, o);
+						}
+
+						catch (IOException e)
+						{
+							throw new StatementHandlerException(e);
+						}
+					}
+				});
+				
+				parser.parse(inp, url);
+				writer.endDocument();
+				inp.close();
 			}
-		});
-		
-		parser.parse(inp, url);
-		writer.endDocument();
+
+		oup.close();
 	}
 	
 	public static void main(String[] args) throws Exception {
-		File f = new File(args[0]);
-		File[] queries = f.listFiles();
-
-		for (File q : queries)
-			NTripleConvert.convert(q.getAbsolutePath(), args[1] + q.getName());
+		NTripleConvert.convert(args[0], args[1]);
 		
 	}
 
