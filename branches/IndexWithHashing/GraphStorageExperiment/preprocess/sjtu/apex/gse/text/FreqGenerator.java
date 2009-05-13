@@ -20,7 +20,14 @@ public class FreqGenerator {
 	public static boolean isLegal(String s) {
 		if (s.length() == 0) return false;
 		for (int i = 0; i < s.length(); i++)
-			if (s.charAt(i) < 'a' || s.charAt(i) > 'z') return false;
+			if (s.charAt(i) == '@' || s.charAt(i) == '.')
+				continue;
+			else if (s.charAt(i) >= '0' && s.charAt(i) <='9')
+				continue;
+			else if (s.charAt(i) >= 'a' && s.charAt(i) <= 'z')
+				continue;
+			else
+				return false;
 		return true;
 	}
 	

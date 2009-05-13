@@ -9,7 +9,7 @@ import sjtu.apex.gse.util.Heap;
 
 public class NTSorter {
 	
-	static final int threadMax = 500000;
+	static final int threadMax = 1000000;
 	
 	static public void sort(String src, String dst, String tmpFldr) {
 		FilesystemUtility.createDir(tmpFldr);
@@ -63,10 +63,15 @@ public class NTSorter {
 				rd.close();
 		}
 		
+		Triple lt = null;
+		
 		while (hp.size() > 0) {
 			NTReaderContainer nrc = (NTReaderContainer)hp.remove();
 			
-			wr.write(nrc.getReader().tri);
+			if (lt == null || cmp.compare(lt, nrc.getReader().tri) != 0)
+				wr.write(nrc.getReader().tri);
+			
+			lt = nrc.getReader().tri;
 			
 			if (nrc.getReader().next())
 				hp.insert(nrc);
