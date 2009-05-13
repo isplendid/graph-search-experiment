@@ -16,8 +16,6 @@ import org.openrdf.rio.StatementHandlerException;
 import org.openrdf.rio.ntriples.NTriplesWriter;
 import org.openrdf.rio.rdfxml.RdfXmlParser;
 
-import sjtu.apex.gse.experiment.Experiment;
-
 public class NTripleConvert {
 	
 	private static String url = "http://sjtu.edu.cn";
