@@ -322,7 +322,7 @@ public class IterativeIndexer {
 		IterativeIndexer idx = new IterativeIndexer(new FileConfig(args[0]), 5000, 50000000);
 		
 		
-//		idx.loadKeyword(args[2]);
+		idx.loadKeyword(args[2]);
 		idx.indexComplexPatterns(args[1]);	
 		idx.close();
 	}
