@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import sjtu.apex.gse.hash.HashFunction;
+import sjtu.apex.gse.hash.ModHash;
 
 public class SubgraphMining {
 	
@@ -49,10 +50,12 @@ public class SubgraphMining {
 
 	/**
 	 * @param args
+	 * @throws IOException 
+	 * @throws NumberFormatException 
 	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		mine(new ModHash(Integer.parseInt(args[0])), args[1], args[2]);
+		
 	}
 
 }
