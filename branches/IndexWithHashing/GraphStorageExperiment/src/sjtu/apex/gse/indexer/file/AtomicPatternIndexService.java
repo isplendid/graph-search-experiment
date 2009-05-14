@@ -11,7 +11,6 @@ import sjtu.apex.gse.hash.ModHash;
 import sjtu.apex.gse.index.file.util.FileIndexer;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.InstanceKeywordRepository;
-import sjtu.apex.gse.indexer.LabelManager;
 import sjtu.apex.gse.indexer.RelationRepository;
 import sjtu.apex.gse.pattern.HashingPatternCodec;
 import sjtu.apex.gse.pattern.PatternCodec;
@@ -25,7 +24,7 @@ public class AtomicPatternIndexService {
 	private int maxSize;
 	private FileIndexer fidx;
 	private IDManager idman;
-	private LabelManager lblman;
+//	private LabelManager lblman;
 	private PatternCodec codec;
 	private ColumnNodeMap cnm;
 //	private Configuration config;
@@ -35,7 +34,7 @@ public class AtomicPatternIndexService {
 		maxSize = config.getIntegerSetting("PatternLength", 3);
 		fidx = new FileIndexer(maxSize, config);
 		idman = new SleepyCatIDManager(config);
-		lblman = new SleepyCatLabelManager(config);
+//		lblman = new SleepyCatLabelManager(config);
 		hash = new ModHash(config);
 		codec = new HashingPatternCodec(hash);
 		cnm = new HashLexicoColumnNodeMap(hash);
@@ -109,7 +108,7 @@ public class AtomicPatternIndexService {
 	public void close() {
 		fidx.close();
 		idman.close();
-		lblman.close();
+//		lblman.close();
 	}
 	
 	private void addPattern(QueryGraph graph, Map<QueryGraphNode, Integer> ins) {

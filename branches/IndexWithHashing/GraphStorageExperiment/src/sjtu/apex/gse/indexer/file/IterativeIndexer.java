@@ -20,6 +20,7 @@ import sjtu.apex.gse.index.file.util.FileIndexer;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.InstanceKeywordRepository;
 import sjtu.apex.gse.indexer.LabelManager;
+import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.pattern.HashingPatternCodec;
 import sjtu.apex.gse.storage.map.ColumnNodeMap;
@@ -84,11 +85,12 @@ public class IterativeIndexer {
 	 * @param sys
 	 */
 	private int extendConstraint(PatternPool pp, QuerySystem sys) {
-		int tc = 0, psize = pp.getPatternSize();
+		int tc = -1, psize = pp.getPatternSize();
 		QueryGraph g = pp.getQueryGraph();
 
     	for (int i = psize - 1; i >= 0; i--)
     		if (g.getNode(i).isGeneral()) {
+    			if (tc < 0) tc = 0;
     			System.out.println("Extending node constraints");
     			QueryGraphNode extNode = g.getNode(i);
     			
@@ -101,7 +103,7 @@ public class IterativeIndexer {
 				
     			while (s.next()) {
     				
-    				if ((++tmpcntr) % 1000 == 0)
+    				if ((++tmpcntr) % 50000 == 0)
     					System.out.println("\t" + tmpcntr + " entries checked, total " + tc + " entries.");
     				
     				int ni = s.getID(extNode);
@@ -189,8 +191,10 @@ public class IterativeIndexer {
 		
 		List<EdgeCountContainer> l = new ArrayList<EdgeCountContainer>();
 		for (int i = 0; i < psize; i++) {
-			for (Entry<Edge, Integer> e : list.get(i).entrySet())
-				l.add(new EdgeCountContainer(i, e.getKey(), (double)e.getValue() / sys.patternManager().getPatternInstanceCount("*[+" + e.getKey().getLabel() + "::*]", 1)));
+			for (Entry<Edge, Integer> e : list.get(i).entrySet()) {
+				int insCnt = sys.patternManager().getPatternInstanceCount("*[+" + e.getKey().getLabel() + "::*]", 2);
+				l.add(new EdgeCountContainer(i, e.getKey(), (double)e.getValue() / insCnt));
+			}
 		}
 			
 		Collections.sort(l);
@@ -200,9 +204,9 @@ public class IterativeIndexer {
 			int toExt = l.get(i).toExt;
 			
 			System.out.println("\t" + e.toString() + " added to node " + g.getNode(toExt) + ".");
-			QueryGraph nqs = GraphUtility.extendEdge(g, toExt, e.getLabel(), e.getDir());
+			QueryGraph nqs = GraphUtility.extendEdge(g, toExt, e.getLabel(), e.getDir(), true);
 
-			int t = batchAddPattern(pp.getExtendedSet(), nqs, sys, (int)coef * pp.getInstanceCount());
+			int t = batchAddPattern(pp.getExtendedSet(), nqs, sys, (int)(coef * pp.getInstanceCount()));
 			pp.push(sys.patternCodec().encodePattern(nqs), nqs, t);
 			tc += t;
 		}
@@ -239,12 +243,13 @@ public class IterativeIndexer {
         	//Check if any nodes can be added constraints
         	
         	int t = extendConstraint(pp, sys);
-        	tc += t;
         	
-        	//If no node gets extended on constraints, we extend edges
-        	
-        	if (extendEdge && t != 0 && psize < maxSize)
-        		tc += extendEdge(pp, sys, einfo);
+        	if (t != -1)
+        		tc += t;        	
+        	else
+        		//If no node gets extended on constraints, we extend edges
+        		if (extendEdge && psize < maxSize)
+        			tc += extendEdge(pp, sys, einfo);
         }
         
         sys.indexManager().close();
@@ -270,7 +275,8 @@ public class IterativeIndexer {
 			return 0;
 		extended.add(ps);
 
-		Scan ts = sys.queryPlanner().plan(getFullSchema(graph)).open();
+		Plan p = sys.queryPlanner().plan(getFullSchema(graph));
+		Scan ts = p.open();
 		ArrayList<int[]> list = new ArrayList<int[]>();
 		int nodeCnt = graph.nodeCount();
 		
@@ -306,17 +312,17 @@ public class IterativeIndexer {
 	}
 	
 	private QuerySchema getFullSchema(QueryGraph g) {
-		Set<QueryGraphNode> nset = new HashSet<QueryGraphNode>();
-		for (int j = g.nodeCount() - 1; j >= 0; j--)
-			nset.add(g.getNode(j));
-		return new QuerySchema(g, nset);
+//		Set<QueryGraphNode> nset = new HashSet<QueryGraphNode>();
+//		for (int j = g.nodeCount() - 1; j >= 0; j--)
+//			nset.add(g.getNode(j));
+		return new QuerySchema(g, g.getNodeSet());//nset);
 	}
 
 	static public void main(String[] args) {
 		IterativeIndexer idx = new IterativeIndexer(new FileConfig(args[0]), 5000, 50000000);
 		
 		
-		idx.loadKeyword(args[2]);
+//		idx.loadKeyword(args[2]);
 		idx.indexComplexPatterns(args[1]);	
 		idx.close();
 	}
