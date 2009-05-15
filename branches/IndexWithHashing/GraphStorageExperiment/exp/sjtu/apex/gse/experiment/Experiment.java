@@ -1,7 +1,9 @@
 package sjtu.apex.gse.experiment;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -25,6 +27,7 @@ import sjtu.apex.gse.system.QuerySystem;
  */
 public class Experiment {
 	
+	final static boolean breakRestart = true;
 	final static boolean logPlan = false;
 	final static boolean outResult = false;
 
@@ -33,14 +36,32 @@ public class Experiment {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
+		File bkf = new File("break");
 		Configuration config = new FileConfig(args[0]);
-		IDManager idman = null;
-		if (outResult) idman = new SleepyCatIDManager(config);
 		QuerySystem sys = new QuerySystem(config);
 		QueryReader rd = new FileQueryReader(args[1]);
-		BufferedWriter wr = new BufferedWriter(new FileWriter(args[2]));
+		BufferedWriter wr;
+		IDManager idman = null;
+		int startId = -1;
+		
+		if (breakRestart && bkf.exists()) {
+			BufferedReader bkr = new BufferedReader(new FileReader(bkf));
+
+			startId = Integer.parseInt(bkr.readLine());
+			bkr.close();
+			bkf.delete();
+			wr = new BufferedWriter(new FileWriter(args[2], true));
+			wr.append("#\n");
+		}
+		else
+			wr = new BufferedWriter(new FileWriter(args[2]));
+		
+		if (outResult) idman = new SleepyCatIDManager(config);
+		
 		int cnt = 0;
 		QuerySchema qs;
+		
+		while ((cnt ++) <= startId) rd.read();
 		
 		while ((qs = rd.read()) != null) {
 			System.out.println(++cnt);
@@ -50,6 +71,12 @@ public class Experiment {
 			if (logPlan) {
 				FileWriter lw = new FileWriter("plan.log");
 				lw.append(p.toString());
+				lw.close();
+			}
+			
+			if (breakRestart) {
+				FileWriter lw = new FileWriter("break");
+				lw.append(Integer.toString(cnt));
 				lw.close();
 			}
 			
@@ -68,14 +95,17 @@ public class Experiment {
 				count++;
 			}
 			scan.close();
-			wr.append((System.currentTimeMillis() - time) + "\t " + count + "\n");
 			
+			wr.append((System.currentTimeMillis() - time) + "\t " + count + "\n");
+			if (breakRestart) wr.flush();
 		}
 		
 		if (outResult) idman.close();
 		
 		File log = new File("plan.log");
 		log.delete();
+		
+		bkf.delete();
 		
 		wr.close();
 	}

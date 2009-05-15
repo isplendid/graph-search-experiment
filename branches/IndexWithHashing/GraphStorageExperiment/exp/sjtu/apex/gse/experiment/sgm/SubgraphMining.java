@@ -12,8 +12,8 @@ import sjtu.apex.gse.hash.ModHash;
 
 public class SubgraphMining {
 	
-	public static void mine(HashFunction hf, String srcPath, String tmpPath) throws IOException {
-		BufferedWriter wr = new BufferedWriter(new FileWriter(tmpPath + "/tmp"));
+	public static void mine(HashFunction hf, String srcPath, String dest) throws IOException {
+		BufferedWriter wr = new BufferedWriter(new FileWriter(dest));
 		File f = new File(srcPath);
 		File[] qFile = f.listFiles();
 		String temp;
