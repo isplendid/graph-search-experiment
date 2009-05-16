@@ -1,8 +1,6 @@
 package sjtu.apex.gse.experiment.querygen;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -41,7 +39,7 @@ public class ComplexQueryGenerator {
 	final int scanmax = 100;
 	final boolean logging = true;
 	
-	String elfn;
+//	String elfn;
 	String initfn;
 	String outfn;
 	LabelManager lm;
@@ -52,8 +50,8 @@ public class ComplexQueryGenerator {
 	static int errSerial = 0;
 	
 
-	public ComplexQueryGenerator(Configuration config, String elfn, String initfn, String outfn, String eip) {
-		this.elfn = elfn;
+	public ComplexQueryGenerator(Configuration config, /*String elfn,*/ String initfn, String outfn, String eip) {
+//		this.elfn = elfn;
 		this.initfn = initfn;
 		this.outfn = outfn;
 		sys = new QuerySystem(config);
@@ -94,7 +92,7 @@ public class ComplexQueryGenerator {
 		s.close();
 	}
 	
-	private void edgeExtend(QuerySchema qs, List<QuerySchema> qarr, List<String> elabels) {
+	private void edgeExtend(QuerySchema qs, List<QuerySchema> qarr) {//, List<String> elabels) {
 		if (Math.random() > pee) return; 
 		Set<String> existEdgeLabel = new HashSet<String>();
 		QueryGraph qg = qs.getQueryGraph();
@@ -142,16 +140,16 @@ public class ComplexQueryGenerator {
 
 	public void generate(int threshold, int mod) {
 		try {
-			BufferedReader rd = new BufferedReader(new FileReader(elfn));
+//			BufferedReader rd = new BufferedReader(new FileReader(elfn));
 			QueryWriter wr = new FileQueryWriter(outfn);
 			QueryReader qp = new FileQueryReader(initfn);
 			
-			ArrayList<String> elabels = new ArrayList<String>();
+//			ArrayList<String> elabels = new ArrayList<String>();
 			ArrayList<QuerySchema> qarr = new ArrayList<QuerySchema>();
-			String temp;
+//			String temp;
 			
-			while ((temp = rd.readLine()) != null)
-				elabels.add(temp.split("\t")[0]);
+//			while ((temp = rd.readLine()) != null)
+//				elabels.add(temp.split("\t")[0]);
 			
 			QuerySchema qs;
 			
@@ -166,7 +164,7 @@ public class ComplexQueryGenerator {
 				int pp = qarr.size();
 				System.out.println("CHECKING nodeid = " + head);
 				
-				if ((mod & 0x00000001) != 0) edgeExtend(qs, qarr, elabels);
+				if ((mod & 0x00000001) != 0) edgeExtend(qs, qarr);//, elabels);
 				if ((mod & 0x00000002) != 0) constraintExtend(qs, qarr);
 				
 				System.out.println((qarr.size() - orgsize) + "ADDED");
@@ -201,17 +199,17 @@ public class ComplexQueryGenerator {
 	 */
 	public static void main(String[] args) {
 		Configuration cf = new FileConfig(args[0]); 
-		String edgelabel = args[1];
+//		String edgelabel = args[1];
 		int t = 1000;
 		
-		File f = new File(args[2]);
+		File f = new File(args[1]);
 		File[] queries = f.listFiles();
 
 		for (File q : queries) {
 			String in = q.getAbsolutePath();
-			String out = args[3] + "/" + q.getName();
-			ComplexQueryGenerator qg = new ComplexQueryGenerator(cf, edgelabel, in, out, args[4]);
-			qg.generate(t, Integer.parseInt(args[5]));
+			String out = args[2] + "/" + q.getName();
+			ComplexQueryGenerator qg = new ComplexQueryGenerator(cf, in, out, args[3]);
+			qg.generate(t, Integer.parseInt(args[4]));
 			qg.close();
 		}
 		
