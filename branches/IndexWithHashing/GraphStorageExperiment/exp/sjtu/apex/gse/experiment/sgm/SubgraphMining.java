@@ -12,7 +12,9 @@ import sjtu.apex.gse.hash.ModHash;
 
 public class SubgraphMining {
 	
-	public static void mine(HashFunction hf, String srcPath, String dest) throws IOException {
+	public static void mine(int mod, String srcPath, String dest, String exec, int freq) throws IOException, InterruptedException {
+		WordDictionary wd = new WordDictionary();
+		HashFunction hf = new ModHash(mod);
 		BufferedWriter wr = new BufferedWriter(new FileWriter(dest));
 		File f = new File(srcPath);
 		File[] qFile = f.listFiles();
@@ -31,30 +33,73 @@ public class SubgraphMining {
 					temp = rd.readLine();
 					
 					if (temp.equals("*")) 
-						wr.append("v " + i + " *\n");
+						wr.append("v " + i + " 0\n");
 					else
-						wr.append("v " + i + " " + hf.hashStr(temp) + "\n");
+						wr.append("v " + i + " " + (hf.hashInt(temp) + mod) + "\n");
 				}
 				
 				for (int i = 0; i < ec; i++) {
 					t = rd.readLine().split("[ \t]+");
 					wr.append("e " + (Integer.parseInt(t[0]) - 1) + " " + (Integer.parseInt(t[1]) - 1) + " "
-							+ t[2] + "\n");
+							+ wd.getID(t[2]) + "\n");
 				}
 			}
 			rd.close();
 		}
 
 		wr.close();
+		
+		String[] cmd = new String[3];
+		cmd[0] = "sh";
+		cmd[1] = "-c";
+		cmd[2] = exec + " " + dest + " -s" + freq + " -o";
+		
+		Process p = Runtime.getRuntime().exec(cmd);
+		int exitCode = p.waitFor();
+		
+		File outf = new File(dest + ".fp");
+		
+		BufferedReader rd = new BufferedReader(new FileReader(outf));
+		wr = new BufferedWriter(new FileWriter(dest));
+		
+		while ((temp = rd.readLine()) != null && temp.length() != 0) {
+			StringBuffer sb = new StringBuffer();
+			int tfreq = Integer.parseInt(temp.split(" ")[4]);
+			int ec = 0, nc = 0;
+			while ((temp = rd.readLine()) != null && temp.length() != 0) {
+				String[] ts = temp.split(" ");
+				
+				if (ts.length == 3) {
+					ec ++;
+					sb.append(ts[1] + " ");
+					int hc = Integer.parseInt(ts[2]);
+					if (hc == 0)
+						sb.append("*\n");
+					else
+						sb.append((hc - mod) + "\n");
+				}
+				else {
+					nc ++;
+					sb.append(ts[1] + " " + ts[2] + " " + wd.getWord(Integer.parseInt(ts[3])) + "\n");
+				}
+			}
+			wr.append(nc + " " + ec + "\n");
+			wr.append(sb.toString());
+		}
+		
+		wr.close();
+		rd.close();
+		outf.delete();
 	}
 
 	/**
 	 * @param args
 	 * @throws IOException 
 	 * @throws NumberFormatException 
+	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args) throws NumberFormatException, IOException {
-		mine(new ModHash(Integer.parseInt(args[0])), args[1], args[2]);
+	public static void main(String[] args) throws NumberFormatException, IOException, InterruptedException {
+		mine(Integer.parseInt(args[0]), args[1], args[2], args[3], 5);
 		
 	}
 
