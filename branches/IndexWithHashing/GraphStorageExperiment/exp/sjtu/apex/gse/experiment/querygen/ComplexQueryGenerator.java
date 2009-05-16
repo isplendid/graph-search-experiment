@@ -71,10 +71,12 @@ public class ComplexQueryGenerator {
 	
 	private void constraintExtend(QuerySchema qs, List<QuerySchema> qarr) {
 		QueryGraph qg = qs.getQueryGraph();
+		int cnt = 0, maxscan = 3000;
 		
 		Plan p = sys.queryPlanner().plan(qs);
 		Scan s = p.open();
-		while (s.next()) {
+		while (s.next() && cnt < maxscan) {
+			cnt ++;
 			for (int i = qg.nodeCount() - 1; i >= 0; i--)
 				if (qg.getNode(i).isGeneral() && Math.random() < pec) {
 					QueryGraphNode extNode = qg.getNode(i);
