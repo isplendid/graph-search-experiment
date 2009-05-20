@@ -61,7 +61,7 @@ public class Experiment {
 		int cnt = 0;
 		QuerySchema qs;
 		
-		while (cnt <= startId) {
+		while (cnt < startId) {
 			rd.read();
 			cnt ++;
 		}
