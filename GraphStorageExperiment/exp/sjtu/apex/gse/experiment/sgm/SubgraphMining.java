@@ -12,6 +12,8 @@ import sjtu.apex.gse.hash.ModHash;
 
 public class SubgraphMining {
 	
+	final static double prop = 0.2;
+	
 	public static void mine(int mod, String srcPath, String dest, String exec, int freq) throws IOException, InterruptedException {
 		WordDictionary wd = new WordDictionary();
 		HashFunction hf = new ModHash(mod);
@@ -25,24 +27,32 @@ public class SubgraphMining {
 			BufferedReader rd = new BufferedReader(new FileReader(q));
 			
 			while ((temp = rd.readLine()) != null) {
-				wr.append("t # " + (cnt ++) + "\n");
+				boolean samp = (Math.random() < prop);
+				
+
+				if (samp) wr.append("t # " + (cnt ++) + "\n");
 				String[] t = temp.split("[ \t]+");
 				int nc = Integer.parseInt(t[0]), ec = Integer.parseInt(t[1]);
-				
+
 				for (int i = 0; i < nc; i++) {
 					temp = rd.readLine();
-					
-					if (temp.equals("*")) 
-						wr.append("v " + i + " 0\n");
-					else
-						wr.append("v " + i + " " + (hf.hashInt(temp) + mod) + "\n");
+
+					if (samp) {
+						if (temp.equals("*")) 
+							wr.append("v " + i + " 0\n");
+						else
+							wr.append("v " + i + " " + (hf.hashInt(temp) + mod) + "\n");
+					}
 				}
-				
+
 				for (int i = 0; i < ec; i++) {
 					t = rd.readLine().split("[ \t]+");
-					wr.append("e " + (Integer.parseInt(t[0]) - 1) + " " + (Integer.parseInt(t[1]) - 1) + " "
-							+ wd.getID(t[2]) + "\n");
+
+					if (samp)
+						wr.append("e " + (Integer.parseInt(t[0]) - 1) + " " + (Integer.parseInt(t[1]) - 1) + " "
+								+ wd.getID(t[2]) + "\n");
 				}
+
 			}
 			rd.close();
 		}
@@ -70,8 +80,8 @@ public class SubgraphMining {
 				String[] ts = temp.split(" ");
 				
 				if (ts.length == 3) {
-					ec ++;
-					sb.append(ts[1] + " ");
+					nc ++;
+//					sb.append(ts[1] + " ");
 					int hc = Integer.parseInt(ts[2]);
 					if (hc == 0)
 						sb.append("*\n");
@@ -79,8 +89,8 @@ public class SubgraphMining {
 						sb.append((hc - mod) + "\n");
 				}
 				else {
-					nc ++;
-					sb.append(ts[1] + " " + ts[2] + " " + wd.getWord(Integer.parseInt(ts[3])) + "\n");
+					ec ++;
+					sb.append((Integer.parseInt(ts[1]) + 1) + " " + (Integer.parseInt(ts[2]) + 1) + " " + wd.getWord(Integer.parseInt(ts[3])) + "\n");
 				}
 			}
 			wr.append(nc + " " + ec + "\n");
