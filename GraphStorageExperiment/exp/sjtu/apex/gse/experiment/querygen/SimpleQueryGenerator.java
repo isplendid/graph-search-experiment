@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
+import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.config.FileConfig;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.LabelManager;
@@ -27,13 +28,17 @@ import sjtu.apex.gse.system.QuerySystem;
  */
 public class SimpleQueryGenerator {
 	
-	static final double prob = 0.0001; 
+	static double prob = 0.0001;
+	static double base = 0.2;
 
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
+		Configuration config = new FileConfig(args[3]);
+		prob = config.getDoubleSetting("SimpleGenExt", 0.0001);
+		base = config.getDoubleSetting("SimpleGenBase", 0.2);
 		QuerySystem sys = new QuerySystem(new FileConfig(args[0]));
 		BufferedReader rd = new BufferedReader(new FileReader(args[1]));
 		
@@ -73,7 +78,7 @@ public class SimpleQueryGenerator {
 
 				for (String l : left) {
 					for (String r : right) 
-						if (!l.equals(r) && Math.random() < (prob + (wr == null? 0.2 : 0))){
+						if (!l.equals(r) && Math.random() < (prob + (wr == null? base : 0))){
 							if (wr == null) {
 								wr = new BufferedWriter(new FileWriter(args[2] + "." + count));
 								count++;
