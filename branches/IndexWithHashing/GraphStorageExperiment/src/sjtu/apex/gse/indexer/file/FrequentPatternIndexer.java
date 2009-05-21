@@ -67,9 +67,11 @@ public class FrequentPatternIndexer {
 		pr.close();
 		
 		indexSingle(ptlist[0], sys);
+		sys.indexManager().close();
 		fidx.flush(2);
 //		for (int i = 3; i <= maxsize; i++) {
 //			indexComplex(ptlist[i - 2], sys);
+//			sys.indexManager().close();
 //			fidx.flush(i);
 //		}
 	}
@@ -87,9 +89,9 @@ public class FrequentPatternIndexer {
 			ps.put(g, codec.encodePattern(g));
 		}
 		
-		if ((++cnt) % 100 == 0) System.out.println(cnt);
 		
 		for (String el : spc.getLabelSet()) {
+			System.out.println((++cnt) + " : " + el);
 			Scan s = new FileRepository(sys.indexManager(), storeFn, "*[+" + el + "::*]", 2);
 		
 			while (s.next()) {
