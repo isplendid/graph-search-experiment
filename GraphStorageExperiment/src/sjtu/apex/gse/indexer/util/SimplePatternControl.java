@@ -28,7 +28,7 @@ public class SimplePatternControl {
 			contain.put(elabel, ps);
 		}
 		
-		Pair np = new Pair(g.getEdge(0).getNodeFrom().getLabel(), g.getEdge(0).getNodeFrom().getLabel());
+		Pair np = new Pair(g.getEdge(0).getNodeFrom().getHashLabel(mod), g.getEdge(0).getNodeTo().getHashLabel(mod));
 		ps.put(np, g);
 	}
 	
@@ -50,21 +50,22 @@ public class SimplePatternControl {
 	
 	public List<QueryGraph> getAvailPatterns(String label, String[] sl, String[] ol) {
 		List<QueryGraph> res = new ArrayList<QueryGraph>();
-		boolean[] sbuck = new boolean[mod.getModulo() * 2];
-		boolean[] obuck = new boolean[mod.getModulo() * 2];
+		int modulo = mod.getModulo();
+		boolean[] sbuck = new boolean[modulo * 2];
+		boolean[] obuck = new boolean[modulo * 2];
 		
 		for (String s : sl) 
-			sbuck[mod.hashInt(s)] = true;
+			sbuck[mod.hashInt(s) + modulo] = true;
 		
 		for (String s : ol) 
-			obuck[mod.hashInt(s)] = true;
+			obuck[mod.hashInt(s) + modulo] = true;
 		
 		for (Entry<Pair, QueryGraph> e : contain.get(label).entrySet()) {
 			String ss = e.getKey().s;
 			String os = e.getKey().o;
 			
-			if ((ss.equals("*") || sbuck[Integer.parseInt(ss)]) &&
-					(os.equals("*") || obuck[Integer.parseInt(os)]))
+			if ((ss.equals("*") || sbuck[Integer.parseInt(ss) + modulo]) &&
+					(os.equals("*") || obuck[Integer.parseInt(os) + modulo]))
 				res.add(e.getValue());
 		}
 		return res;
