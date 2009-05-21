@@ -1,6 +1,7 @@
 package sjtu.apex.gse.indexer.file;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import sjtu.apex.gse.hash.ModHash;
 import sjtu.apex.gse.index.file.util.FileIndexer;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.LabelManager;
+import sjtu.apex.gse.indexer.util.SimplePatternControl;
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.pattern.HashingPatternCodec;
@@ -19,7 +21,6 @@ import sjtu.apex.gse.storage.file.FileRepository;
 import sjtu.apex.gse.storage.map.ColumnNodeMap;
 import sjtu.apex.gse.storage.map.HashLexicoColumnNodeMap;
 import sjtu.apex.gse.struct.QueryGraph;
-import sjtu.apex.gse.struct.QueryGraphEdge;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
 import sjtu.apex.gse.system.QuerySystem;
@@ -74,22 +75,23 @@ public class FrequentPatternIndexer {
 	}
 	
 	private void indexSingle(List<QueryGraph> list, QuerySystem sys) {
+		SimplePatternControl spc = new SimplePatternControl((ModHash)hash);
 		String storeFn = config.getStringSetting("DataFolder", null) + "/storage1";
 		int cnt = 0;
+		Map<QueryGraph, Map<QueryGraphNode, Integer>> map = new HashMap<QueryGraph, Map<QueryGraphNode, Integer>>();
+		Map<QueryGraph, String> ps = new HashMap<QueryGraph, String>();
 		
 		for (QueryGraph g : list) {
-			if ((++cnt) % 100 == 0) System.out.println(cnt);
-			String el = g.getEdge(0).getLabel();
+			spc.addPattern(g);
+			map.put(g, cnm.getMap(g));
+			ps.put(g, codec.encodePattern(g));
+		}
+		
+		if ((++cnt) % 100 == 0) System.out.println(cnt);
+		
+		for (String el : spc.getLabelSet()) {
 			Scan s = new FileRepository(sys.indexManager(), storeFn, "*[+" + el + "::*]", 2);
-			Map<QueryGraphNode, Integer> map = cnm.getMap(g);
-			String ps = codec.encodePattern(g);
-			QueryGraphEdge e = g.getEdge(0);
-			QueryGraphNode fromNode = e.getNodeFrom();
-			QueryGraphNode toNode = e.getNodeTo();
-			
-			String shash = fromNode.getLabel();
-			String ohash = toNode.getLabel();
-			
+		
 			while (s.next()) {
 				
 				int sub = s.getID(0);
@@ -100,26 +102,15 @@ public class FrequentPatternIndexer {
 				String[] slab = lblman.getLabel(idman.getURI(sub));
 				String[] olab = lblman.getLabel(idman.getURI(obj));
 				
+				List<QueryGraph> eg = spc.getAvailPatterns(el, slab, olab);
 				
-				if (!shash.equals("*")) {
-					boolean sat = false;
-					for (String str : slab)
-						if (shash.equals(hash.hashStr(str))) sat = true;
+				for (QueryGraph tg : eg) {
 					
-					if (!sat) continue;
+					int[] ins = new int[2];
+					ins[map.get(tg).get(tg.getEdge(0).getNodeFrom())] = sub;
+					ins[map.get(tg).get(tg.getEdge(0).getNodeTo())] = obj;
+					fidx.addEntry(ps.get(tg), 2, ins);
 				}
-				if (!ohash.equals("*")){
-					boolean sat = false;
-					for (String str : olab)
-						if (ohash.equals(hash.hashStr(str))) sat = true;
-					
-					if (!sat) continue;
-				}
-				
-				int[] ins = new int[2];
-				ins[map.get(fromNode)] = sub;
-				ins[map.get(toNode)] = obj;
-				fidx.addEntry(ps, 2, ins);
 			}
 		}
 	}
