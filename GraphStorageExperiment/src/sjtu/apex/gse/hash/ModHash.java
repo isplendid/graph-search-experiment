@@ -19,6 +19,10 @@ public class ModHash implements HashFunction {
 	public ModHash(int mod) {
 		this.mod = mod;
 	}
+	
+	public int getModulo() {
+		return mod;
+	}
 
 	@Override
 	public String hashStr(String str) {
