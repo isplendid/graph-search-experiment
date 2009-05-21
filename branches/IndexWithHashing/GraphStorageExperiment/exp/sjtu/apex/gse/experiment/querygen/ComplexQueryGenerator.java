@@ -33,10 +33,11 @@ import sjtu.apex.gse.system.QuerySystem;
  *
  */
 public class ComplexQueryGenerator {
-	final double pec = 0.01;
-	final double pee = 0.5;
-	final double pce = 0.03;
-	final int scanmax = 100;
+	double pec = 0.01;
+	double pee1 = 0.5;
+	double pee2 = 0.03;
+	int edgeScanMax = 100;
+	int conScanMax = 3000;
 	final boolean logging = true;
 	
 //	String elfn;
@@ -50,8 +51,14 @@ public class ComplexQueryGenerator {
 	static int errSerial = 0;
 	
 
-	public ComplexQueryGenerator(Configuration config, /*String elfn,*/ String initfn, String outfn, String eip) {
+	public ComplexQueryGenerator(Configuration config, /*String elfn,*/ String initfn, String outfn, String eip, Configuration prob) {
 //		this.elfn = elfn;
+		pec = prob.getDoubleSetting("ItrGenConExt", 0.01);
+		pee1 = prob.getDoubleSetting("ItrGenEdgeExt1", 0.5);
+		pee2 = prob.getDoubleSetting("ItrGenEdgeExt2", 0.03);
+		edgeScanMax = prob.getIntegerSetting("ItrGenConScan", 100);
+		conScanMax = prob.getIntegerSetting("ItrGenEdgeScan", 3000);
+		
 		this.initfn = initfn;
 		this.outfn = outfn;
 		sys = new QuerySystem(config);
@@ -69,11 +76,11 @@ public class ComplexQueryGenerator {
 	
 	private void constraintExtend(QuerySchema qs, List<QuerySchema> qarr) {
 		QueryGraph qg = qs.getQueryGraph();
-		int cnt = 0, maxscan = 3000;
+		int cnt = 0;
 		
 		Plan p = sys.queryPlanner().plan(qs);
 		Scan s = p.open();
-		while (s.next() && cnt < maxscan) {
+		while (s.next() && cnt < conScanMax) {
 			cnt ++;
 			for (int i = qg.nodeCount() - 1; i >= 0; i--)
 				if (qg.getNode(i).isGeneral() && Math.random() < pec) {
@@ -93,7 +100,7 @@ public class ComplexQueryGenerator {
 	}
 	
 	private void edgeExtend(QuerySchema qs, List<QuerySchema> qarr) {//, List<String> elabels) {
-		if (Math.random() > pee) return; 
+		if (Math.random() > pee1) return; 
 		Set<String> existEdgeLabel = new HashSet<String>();
 		QueryGraph qg = qs.getQueryGraph();
 		int nodeCount = qg.nodeCount();
@@ -110,7 +117,7 @@ public class ComplexQueryGenerator {
 		
 		Scan s = sys.queryPlanner().plan(qs).open();
 		
-		while (s.next() && cnt < scanmax) {
+		while (s.next() && cnt < edgeScanMax) {
 			cnt ++;
 			for (int i = 0; i < nodeCount; i++) {
 				QueryGraphNode qn = qg.getNode(i);
@@ -128,7 +135,7 @@ public class ComplexQueryGenerator {
 		for (int i = 0; i < nodeCount; i++) {
 			
 			for (Edge e : list.get(i))
-				if (!existEdgeLabel.contains(e.getLabel()) && Math.random() < pce) {
+				if (!existEdgeLabel.contains(e.getLabel()) && Math.random() < pee2) {
 					System.out.println("\t" + e.toString() + " added to node " + qg.getNode(i) + ".");
 					QuerySchema nqs = getFullSchema(GraphUtility.extendEdge(qg, i, e.getLabel(), e.getDir()));
 					
@@ -200,7 +207,7 @@ public class ComplexQueryGenerator {
 	public static void main(String[] args) {
 		Configuration cf = new FileConfig(args[0]); 
 //		String edgelabel = args[1];
-		int t = 1000;
+//		int t = 1000;
 		
 		File f = new File(args[1]);
 		File[] queries = f.listFiles();
@@ -208,8 +215,8 @@ public class ComplexQueryGenerator {
 		for (File q : queries) {
 			String in = q.getAbsolutePath();
 			String out = args[2] + "/" + q.getName();
-			ComplexQueryGenerator qg = new ComplexQueryGenerator(cf, in, out, args[3]);
-			qg.generate(t, Integer.parseInt(args[4]));
+			ComplexQueryGenerator qg = new ComplexQueryGenerator(cf, in, out, args[3], new FileConfig(args[5]));
+			qg.generate(Integer.parseInt(args[6]), Integer.parseInt(args[4]));
 			qg.close();
 		}
 		
