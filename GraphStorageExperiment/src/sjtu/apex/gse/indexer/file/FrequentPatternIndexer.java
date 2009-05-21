@@ -3,9 +3,9 @@ package sjtu.apex.gse.indexer.file;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import sjtu.apex.gse.config.Configuration;
+import sjtu.apex.gse.config.FileConfig;
 import sjtu.apex.gse.experiment.sgm.file.PatternFileReader;
 import sjtu.apex.gse.hash.HashFunction;
 import sjtu.apex.gse.hash.ModHash;
@@ -15,6 +15,7 @@ import sjtu.apex.gse.indexer.LabelManager;
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.pattern.HashingPatternCodec;
+import sjtu.apex.gse.storage.file.FileRepository;
 import sjtu.apex.gse.storage.map.ColumnNodeMap;
 import sjtu.apex.gse.storage.map.HashLexicoColumnNodeMap;
 import sjtu.apex.gse.struct.QueryGraph;
@@ -50,32 +51,36 @@ public class FrequentPatternIndexer {
 	public void indexFrequentPattern(String ptFile) {
 		QuerySystem sys = new QuerySystem(config);
 		PatternFileReader pr = new PatternFileReader(ptFile);
-		List<QueryGraph>[] ptlist = new List[maxsize]; 
+		List<QueryGraph>[] ptlist = new List[maxsize - 1]; 
 		QueryGraph g;
 		
-		for (int i = 0; i < maxsize; i++) ptlist[i] = new ArrayList<QueryGraph>();
+		for (int i = 0; i < maxsize - 1; i++) ptlist[i] = new ArrayList<QueryGraph>();
 		
 		while ((g = pr.read()) != null) {
 			int gsize = g.nodeCount();
 			
-			if (gsize < maxsize)
-				ptlist[gsize - 1].add(g);
+			if (gsize <= maxsize)
+				ptlist[gsize - 2].add(g);
 		}
 		
 		pr.close();
 		
 		indexSingle(ptlist[0], sys);
-		fidx.flush(1);
-		for (int i = 1; i < maxsize; i++) {
-			indexComplex(ptlist[i], sys);
-			fidx.flush(i + 1);
-		}
+		fidx.flush(2);
+//		for (int i = 3; i <= maxsize; i++) {
+//			indexComplex(ptlist[i - 2], sys);
+//			fidx.flush(i);
+//		}
 	}
 	
 	private void indexSingle(List<QueryGraph> list, QuerySystem sys) {
+		String storeFn = config.getStringSetting("DataFolder", null) + "/storage1";
+		int cnt = 0;
 		
 		for (QueryGraph g : list) {
-			Scan s = sys.queryPlanner().plan(new QuerySchema(g, g.getNodeSet())).open();
+			if ((++cnt) % 100 == 0) System.out.println(cnt);
+			String el = g.getEdge(0).getLabel();
+			Scan s = new FileRepository(sys.indexManager(), storeFn, "*[+" + el + "::*]", 2);
 			Map<QueryGraphNode, Integer> map = cnm.getMap(g);
 			String ps = codec.encodePattern(g);
 			QueryGraphEdge e = g.getEdge(0);
@@ -87,8 +92,10 @@ public class FrequentPatternIndexer {
 			
 			while (s.next()) {
 				
-				int sub = s.getID(fromNode);
-				int obj = s.getID(toNode);
+				int sub = s.getID(0);
+				int obj = s.getID(1);
+				
+//				System.out.println(idman.getURI(sub) + " " + idman.getURI(obj));
 				
 				String[] slab = lblman.getLabel(idman.getURI(sub));
 				String[] olab = lblman.getLabel(idman.getURI(obj));
@@ -165,6 +172,16 @@ public class FrequentPatternIndexer {
 	}
 	
 	public void close() {
+		lblman.close();
+		idman.close();
+		fidx.close();
+	}
+	
+	public static void main(String[] args) {
+		FrequentPatternIndexer fpi = new FrequentPatternIndexer(new FileConfig(args[0]));
 		
+		fpi.indexFrequentPattern(args[1]);
+		
+		fpi.close();
 	}
 }
