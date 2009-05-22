@@ -82,6 +82,8 @@ public class SubgraphMining {
 				if (ts.length == 3) {
 					nc ++;
 //					sb.append(ts[1] + " ");
+					if (Integer.parseInt(ts[1]) != (nc - 1))
+						System.out.println("error");
 					int hc = Integer.parseInt(ts[2]);
 					if (hc == 0)
 						sb.append("*\n");
@@ -99,7 +101,7 @@ public class SubgraphMining {
 		
 		wr.close();
 		rd.close();
-		outf.delete();
+//		outf.delete();
 	}
 
 	/**
