@@ -44,7 +44,6 @@ public class GeneralQueryGraphNode extends QueryGraphNode {
 
 	@Override
 	public String getHashLabel(HashFunction hash) {
-		// TODO Auto-generated method stub
 		return "*";
 	}
 
