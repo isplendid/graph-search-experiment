@@ -14,6 +14,7 @@ import sjtu.apex.gse.index.file.util.FileIndexer;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.LabelManager;
 import sjtu.apex.gse.indexer.util.SimplePatternControl;
+import sjtu.apex.gse.indexer.util.SimplePatternControl.Pair;
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.pattern.HashingPatternCodec;
@@ -21,6 +22,7 @@ import sjtu.apex.gse.storage.file.FileRepository;
 import sjtu.apex.gse.storage.map.ColumnNodeMap;
 import sjtu.apex.gse.storage.map.HashLexicoColumnNodeMap;
 import sjtu.apex.gse.struct.QueryGraph;
+import sjtu.apex.gse.struct.QueryGraphEdge;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
 import sjtu.apex.gse.system.QuerySystem;
@@ -66,30 +68,77 @@ public class FrequentPatternIndexer {
 		
 		pr.close();
 		
-		indexSingle(ptlist[0], sys);
-		sys.indexManager().close();
-		fidx.flush(2);
-//		for (int i = 3; i <= maxsize; i++) {
-//			indexComplex(ptlist[i - 2], sys);
-//			sys.indexManager().close();
-//			fidx.flush(i);
-//		}
+//		indexSingle(ptlist, sys);
+//		sys.indexManager().close();
+//		fidx.flush(2);
+		for (int i = 3; i <= maxsize; i++) {
+			indexComplex(ptlist[i - 2], sys);
+			sys.indexManager().close();
+			fidx.flush(i);
+		}
 	}
 	
-	private void indexSingle(List<QueryGraph> list, QuerySystem sys) {
+	private void indexSingle(List<QueryGraph>[] list, QuerySystem sys) {
 		SimplePatternControl spc = new SimplePatternControl((ModHash)hash);
 		String storeFn = config.getStringSetting("DataFolder", null) + "/storage1";
 		int cnt = 0;
 		Map<QueryGraph, Map<QueryGraphNode, Integer>> map = new HashMap<QueryGraph, Map<QueryGraphNode, Integer>>();
 		Map<QueryGraph, String> ps = new HashMap<QueryGraph, String>();
 		
-		for (QueryGraph g : list) {
+		for (QueryGraph g : list[0]) {
 			spc.addPattern(g);
 			map.put(g, cnm.getMap(g));
 			ps.put(g, codec.encodePattern(g));
 		}
 		
+		for (int i = 1; i < list.length; i++)
+			for (QueryGraph g : list[i]) 
+				for (int j = 0; j < g.edgeCount(); j++) {
+					QueryGraphEdge edge = g.getEdge(j);
+					
+					if (edge.getNodeFrom().isGeneral() && edge.getNodeTo().isGeneral()) continue;
+					
+					String elabel = edge.getLabel();
+					String shash = edge.getNodeFrom().getHashLabel(hash);
+					String ohash = edge.getNodeTo().getHashLabel(hash);
+					if (!spc.containsPattern(elabel, shash, ohash)) {
+						System.out.println(shash + "-[" + elabel + "]->" + ohash);
+						QueryGraph ng = new QueryGraph();
+						ng.addEdge(ng.addNode(shash, true), ng.addNode(ohash, true), elabel);
+						spc.addPattern(ng);
+						map.put(ng, cnm.getMap(ng));
+						ps.put(ng, codec.encodePattern(ng));
+					}
+				}
 		
+		for (String el : spc.getLabelSet()) 
+			for (Pair p : spc.getPairs(el)) {
+			String shash = p.getSub();
+			String ohash = p.getObj();
+			
+			if (!shash.equals("*") && !ohash.equals("*")) {
+				if (!spc.containsPattern(el, "*", ohash)) {
+					System.out.println("*-[" + el + "]->" + ohash);
+					QueryGraph ng = new QueryGraph();
+					ng.addEdge(ng.addNode(), ng.addNode(ohash, true), el);
+					spc.addPattern(ng);
+					map.put(ng, cnm.getMap(ng));
+					ps.put(ng, codec.encodePattern(ng));
+				}
+				if (!spc.containsPattern(el, shash, "*")) {
+					System.out.println(shash + "-[" + el + "]->*");
+					QueryGraph ng = new QueryGraph();
+					ng.addEdge(ng.addNode(shash, true), ng.addNode(), el);
+					spc.addPattern(ng);
+					map.put(ng, cnm.getMap(ng));
+					ps.put(ng, codec.encodePattern(ng));
+				}
+			}
+			
+		}
+		
+		
+//		return;
 		for (String el : spc.getLabelSet()) {
 			System.out.println((++cnt) + " : " + el);
 			Scan s = new FileRepository(sys.indexManager(), storeFn, "*[+" + el + "::*]", 2);
@@ -109,11 +158,15 @@ public class FrequentPatternIndexer {
 				for (QueryGraph tg : eg) {
 					
 					int[] ins = new int[2];
-					ins[map.get(tg).get(tg.getEdge(0).getNodeFrom())] = sub;
-					ins[map.get(tg).get(tg.getEdge(0).getNodeTo())] = obj;
+					Map<QueryGraphNode, Integer> tcnm = map.get(tg);
+					
+					ins[tcnm.get(tg.getEdge(0).getNodeFrom())] = sub;
+					ins[tcnm.get(tg.getEdge(0).getNodeTo())] = obj;
 					fidx.addEntry(ps.get(tg), 2, ins);
 				}
 			}
+			
+			s.close();
 		}
 	}
 	

@@ -2,6 +2,7 @@ package sjtu.apex.gse.indexer.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,11 +30,18 @@ public class SimplePatternControl {
 		}
 		
 		Pair np = new Pair(g.getEdge(0).getNodeFrom().getHashLabel(mod), g.getEdge(0).getNodeTo().getHashLabel(mod));
-		ps.put(np, g);
+		if (!ps.containsKey(np))
+			ps.put(np, g);
+		else
+			System.err.println("error");
 	}
 	
 	public Set<String> getLabelSet() {
-		return contain.keySet();
+		return new HashSet<String>(contain.keySet());
+	}
+	
+	public Set<Pair> getPairs(String label) {
+		return new HashSet<Pair>(contain.get(label).keySet());
 	}
 	
 	public boolean containsEdge(String label) {
@@ -71,7 +79,7 @@ public class SimplePatternControl {
 		return res;
 	}
 	
-	class Pair {
+	public class Pair {
 		String s, o;
 		
 		public Pair(String s, String o) {
@@ -81,6 +89,22 @@ public class SimplePatternControl {
 		
 		public int hashCode() {
 			return (s + "::" + o).hashCode();
+		}
+		
+		public boolean equals(Object o) {
+			if (o instanceof Pair)
+				
+				return (((Pair) o).s.equals(this.s) && ((Pair) o).o.equals(this.o));
+			else
+				return false;
+		}
+		
+		public String getSub() {
+			return s;
+		}
+		
+		public String getObj() {
+			return o;
 		}
 	}
 	
