@@ -68,9 +68,9 @@ public class FrequentPatternIndexer {
 		
 		pr.close();
 		
-//		indexSingle(ptlist, sys);
-//		sys.indexManager().close();
-//		fidx.flush(2);
+		indexSingle(ptlist, sys);
+		sys.indexManager().close();
+		fidx.flush(2);
 		for (int i = 3; i <= maxsize; i++) {
 			indexComplex(ptlist[i - 2], sys);
 			sys.indexManager().close();
