@@ -2,16 +2,20 @@ package sjtu.apex.gse.experiment.sgm;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import sjtu.apex.gse.experiment.sgm.file.PatternFileWriter;
 import sjtu.apex.gse.hash.ModHash;
 import sjtu.apex.gse.pattern.HashingPatternCodec;
 import sjtu.apex.gse.query.FileQueryReader;
-import sjtu.apex.gse.query.FileQueryWriter;
 import sjtu.apex.gse.query.QueryReader;
-import sjtu.apex.gse.query.QueryWriter;
+import sjtu.apex.gse.struct.Connectivity;
+import sjtu.apex.gse.struct.GraphUtility;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphEdge;
 import sjtu.apex.gse.struct.QueryGraphNode;
@@ -22,7 +26,33 @@ public class SubgraphMining {
 	
 	static final double sampleRate = 0.2;
 	
-	public static void mine(int mod, String srcPath, String dest, int freq) {
+	private static Map<QueryGraphNode, QueryGraphNode> getEdgeExtendedMap(QueryGraph ng, ExtendGroup eg) {
+		Map<QueryGraphNode, QueryGraphNode> nmap = new HashMap<QueryGraphNode, QueryGraphNode>();
+		
+		for (int j = ng.nodeCount() - 1; j >= 0; j--) {
+			QueryGraphNode on = ng.getNode(j);
+			QueryGraphNode tn = eg.getMap().get(on);
+			
+			if (tn == null) tn = eg.nn;
+			
+			nmap.put(on, tn);
+		}
+		
+		return nmap;
+	}
+	
+	private static Map<QueryGraphNode, QueryGraphNode> getNodeExtendedMap(QueryGraph ng, ExtendGroup eg) {
+		Map<QueryGraphNode, QueryGraphNode> nmap = new HashMap<QueryGraphNode, QueryGraphNode>();
+		
+		for (int j = ng.nodeCount() - 1; j >= 0; j--) {
+			QueryGraphNode on = ng.getNode(j);
+			nmap.put(on, eg.getMap().get(on));
+		}
+		
+		return nmap;
+	}
+	
+	public static void mine(int mod, String srcPath, String dest, int freq, int maxsize) {
 		ModHash hf = new ModHash(mod);
 		HashingPatternCodec codec = new HashingPatternCodec(hf);
 		
@@ -86,21 +116,98 @@ public class SubgraphMining {
 				}
 			}
 		
-		for (SubgraphInfo si : sc.getAllInfo())
-			if (si.getInstanceCount() > freq)
-				h.insert(si);
+		Set<String> extended = new HashSet<String>();
 		
-		QueryWriter wr = new FileQueryWriter(dest);
+		for (String s : sc.getAllPatterns()) {
+			SubgraphInfo si = sc.getSubgraphInfo(s);
+			
+			if (si.getInstanceCount() > freq) {
+				h.insert(si);
+				extended.add(s);
+			}
+		}
+		
+		PatternFileWriter wr = new PatternFileWriter(dest);
+		
+		int cnt = 0;
 		
 		while (h.size() != 0) {
-			SubgraphInfo si = (SubgraphInfo)h.remove();
+			System.out.println(++cnt);
 			
+			SubgraphInfo si = (SubgraphInfo)h.remove();
+			QueryGraph g = si.getPattern();
+			wr.write(g, hf);
+			
+			for (int i = g.nodeCount() - 1; i >= 0; i--) {
+				QueryGraphNode node = g.getNode(i);
+				if (g.nodeCount() < maxsize) {
+					ExtendList eel = new ExtendList();
+
+					for (Map<QueryGraphNode, QueryGraphNode> m : si.getMap()) {
+						Collection<QueryGraphNode> mappedNode = m.values();
+						
+						for (Connectivity con : m.get(node).getConnectivities())
+							if (!mappedNode.contains(con.getNode())) {
+								String tl = (con.isOutEdge() ? "+" + con.getEdge().getLabel() : "-" + con.getEdge().getLabel()); 
+								eel.add(tl, m, con.getNode());
+							}
+					}
+					
+					for (String s : eel.getAllLabel()) {
+						String label = s.substring(1);
+						boolean dir = s.startsWith("+");
+						QueryGraph ng = GraphUtility.extendEdge(g, i, label, dir, true);
+						
+						String ps = codec.encodePattern(ng);
+						
+						if (extended.contains(ps)) continue;
+						
+						
+						SubgraphInfo nsi = new SubgraphInfo(ng);
+						for (ExtendGroup eg : eel.getGroups(s))
+							nsi.addMap(getEdgeExtendedMap(ng, eg));
+						
+						if (nsi.getInstanceCount() > freq)
+							h.insert(nsi);
+						extended.add(ps);
+					}
+				}
+				
+				if (node.isGeneral()) {
+					ExtendList eel = new ExtendList();
+					
+					for (Map<QueryGraphNode, QueryGraphNode> m : si.getMap()) {
+						QueryGraphNode mappedNode = m.get(node);
+						if (!mappedNode.isGeneral())
+							eel.add(mappedNode.getHashLabel(hf), m, mappedNode);
+					}
+					
+					for (String s : eel.getAllLabel()) {
+						QueryGraph ng = GraphUtility.extendConstraint(g, i, s, true);
+						
+						String ps = codec.encodePattern(ng);
+						
+						if (extended.contains(ps)) continue;
+						
+						SubgraphInfo nsi = new SubgraphInfo(ng);
+						
+						for (ExtendGroup eg : eel.getGroups(s))
+							nsi.addMap(getNodeExtendedMap(ng, eg));
+						
+						if (nsi.getInstanceCount() > freq)
+							h.insert(nsi);
+						extended.add(ps);
+					}
+					
+				}
+			}
 			
 		}
+		wr.close();
 	}
 	
-	public void main(String[] args) {
-		
+	static public void main(String[] args) {
+		SubgraphMining.mine(Integer.parseInt(args[0]), args[1], args[2], Integer.parseInt(args[3]), 3);
 	}
 	
 }

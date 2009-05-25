@@ -3,6 +3,7 @@ package sjtu.apex.gse.experiment.sgm;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import sjtu.apex.gse.pattern.PatternCodec;
 import sjtu.apex.gse.struct.QueryGraph;
@@ -23,6 +24,14 @@ public class SubgraphControl {
 		}
 		
 		return si;
+	}
+	
+	public SubgraphInfo getSubgraphInfo(String ps) {
+		return maps.get(ps);
+	}
+	
+	public Set<String> getAllPatterns() {
+		return maps.keySet();
 	}
 	
 	public Collection<SubgraphInfo> getAllInfo() {
