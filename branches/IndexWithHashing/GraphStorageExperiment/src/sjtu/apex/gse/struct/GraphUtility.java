@@ -68,7 +68,7 @@ public class GraphUtility {
 			QueryGraphNode tn = g.getNode(i);
 			
 			if (tn.isGeneral())
-				map.put(tn, new GeneralQueryGraphNode(tn.serialNo, null));
+				map.put(tn, ng.addNode(new GeneralQueryGraphNode(tn.serialNo, null)));
 			else
 				map.put(tn, ng.addNode(getNewNode(tn.getLabel(), tn.serialNo, isHash)));
 		}

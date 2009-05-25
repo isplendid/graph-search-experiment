@@ -27,6 +27,10 @@ public class SubgraphInfo implements Comparable<Object> {
 	public void addMap(Map<QueryGraphNode, QueryGraphNode> nm) {
 		mapping.add(nm);
 	}
+	
+	public List<Map<QueryGraphNode, QueryGraphNode>> getMap() {
+		return mapping;
+	}
 
 	@Override
 	public int compareTo(Object arg0) {
