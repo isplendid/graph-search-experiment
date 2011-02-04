@@ -1,5 +1,7 @@
 package sjtu.apex.gse.operator;
 
+import java.util.Set;
+
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
 /**
@@ -39,6 +41,13 @@ public class SelectScan implements Scan {
 
 	public boolean hasNode(QueryGraphNode n) {
 		return sch.hasNode(n);
+	}
+
+
+	@Override
+	public Set<Integer> getSourceSet() {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 
 }

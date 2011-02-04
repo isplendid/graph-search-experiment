@@ -1,6 +1,8 @@
 package sjtu.apex.gse.operator;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
@@ -80,13 +82,13 @@ public class MergeJoinScan implements Scan {
 		return getID(sch.getSelectedNode(nodeID));
 	}
 	
-	public boolean equalJV(Scan src, List<Integer> n) {
+	private boolean equalJV(Scan src, List<Integer> n) {
 		for (int i = 0; i < n.size(); i++)
 			if (src.getID(n.get(i)) != joinVal[i]) return false;
 		return true;
 	}
 	
-	public void setJV(Scan src, List<Integer> n) {
+	private void setJV(Scan src, List<Integer> n) {
 		for (int i = 0; i < n.size(); i++)
 			joinVal[i] = src.getID(n.get(i));
 	}
@@ -103,6 +105,16 @@ public class MergeJoinScan implements Scan {
 
 	public boolean hasNode(QueryGraphNode n) {
 		return sch.hasNode(n);
+	}
+
+	@Override
+	public Set<Integer> getSourceSet() {
+		Set<Integer> ret = new HashSet<Integer>();
+		
+		ret.addAll(l.getSourceSet());
+		ret.addAll(r.getSourceSet());
+		
+		return ret;
 	}
 
 }
