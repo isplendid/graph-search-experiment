@@ -1,5 +1,7 @@
 package sjtu.apex.gse.operator;
 
+import java.util.Set;
+
 import sjtu.apex.gse.struct.QueryGraphNode;
 
 /**
@@ -31,6 +33,8 @@ public interface Scan {
 	 * @return Instance ID
 	 */
 	public int getID(QueryGraphNode n);
+	
+	public Set<Integer> getSourceSet();
 	
 	/**
 	 * Get the instance ID corresponding to the given node in the current entry

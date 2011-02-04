@@ -1,5 +1,7 @@
 package sjtu.apex.gse.operator;
 
+import java.util.Set;
+
 import sjtu.apex.gse.struct.QueryGraphNode;
 
 
@@ -33,6 +35,12 @@ public class HashJoinScan implements Scan {
 	public boolean hasNode(QueryGraphNode n) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public Set<Integer> getSourceSet() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

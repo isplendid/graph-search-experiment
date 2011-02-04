@@ -72,7 +72,7 @@ public class IndexSearchTest {
 		long time = System.currentTimeMillis();
 		
 		for (int i = 0; i < patterns.size(); i++) {
-			fr = new FileRepository(null, null, patterns.get(i), size.get(i));
+			fr = new FileRepository(null, null, patterns.get(i), size.get(i), null);
 			
 			System.out.println(patterns.get(i));
 			

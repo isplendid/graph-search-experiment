@@ -1,5 +1,8 @@
 package sjtu.apex.gse.storage;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import sjtu.apex.gse.operator.UpdateScan;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
@@ -18,6 +21,7 @@ import sjtu.apex.gse.struct.QuerySchema;
 public class RAMArrayRepository implements UpdateScan {
 	QuerySchema qs;
 	int[][] data;
+	Set<Integer> sources[];
 	int pointer, savedPosition = -1;
 	int entryCnt;
 	
@@ -29,6 +33,7 @@ public class RAMArrayRepository implements UpdateScan {
 		data = new int[qs.getSelectedNodeCount()][];
 		for (int i = 0; i < qs.getSelectedNodeCount(); i++)
 			data[i] = new int[initSize];
+		sources = new Set[initSize];
 		this.qs = qs;
 		pointer = -1;
 		entryCnt = 0;
@@ -49,15 +54,23 @@ public class RAMArrayRepository implements UpdateScan {
 		if (entryCnt > data[0].length) 
 			for (int i = 0; i < qs.getSelectedNodeCount(); i++){
 				int[] newData = new int[data[i].length * 2];
+				Set<Integer>[] newSource = new Set[sources.length * 2];
 				
 				System.arraycopy(data[i], 0, newData, 0, pointer + 1);
 				System.arraycopy(data[i], pointer + 1, newData, pointer + 2, entryCnt - 2 - pointer);
 				data[i] = newData;
+				
+				System.arraycopy(sources, 0, newSource, 0, pointer + 1);
+				System.arraycopy(sources, pointer + 1, newSource, pointer + 2, entryCnt - 2 - pointer);
+				sources = newSource;
 			}
 		else
-			if (pointer < entryCnt - 1)
+			if (pointer < entryCnt - 1) {
 				for (int i = 0; i < qs.getSelectedNodeCount(); i++)
 					System.arraycopy(data[i], pointer + 1, data[i], pointer + 2, entryCnt - 2 - pointer);
+				
+				System.arraycopy(sources, pointer + 1, sources, pointer + 1, entryCnt - 2 - pointer);
+			}
 		pointer ++;
 	}
 
@@ -105,6 +118,16 @@ public class RAMArrayRepository implements UpdateScan {
 
 	public boolean hasNode(QueryGraphNode n) {
 		return qs.hasNode(n);
+	}
+
+	@Override
+	public Set<Integer> getSourceSet() {
+		return sources[pointer];
+	}
+
+	@Override
+	public void setSourceSet(Set<Integer> set) {
+		sources[pointer] = set;
 	}
 
 }

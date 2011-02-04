@@ -1,5 +1,7 @@
 package sjtu.apex.gse.operator;
 
+import java.util.Set;
+
 import sjtu.apex.gse.struct.QueryGraphNode;
 
 /**
@@ -36,6 +38,12 @@ public interface UpdateScan extends Scan {
 	 * @param insID The new value
 	 */
 	public void setID(int nodeID, int insID);
+	
+	/**
+	 * Set the source list
+	 * @param set The set of relevant sources
+	 */
+	public void setSourceSet(Set<Integer> set);
 	
 	/**
 	 * Save the current position of cursor
