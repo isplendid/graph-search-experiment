@@ -6,7 +6,7 @@ import java.io.RandomAccessFile;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SourceHeap {
+public class SourceHeapReader {
 	final static int pageSize = 4096;
 	final static byte bitShift = 12;
 	
@@ -14,7 +14,7 @@ public class SourceHeap {
 	private int offset;
 	private RandomAccessFile file;
 	
-	public SourceHeap(String filename) {
+	public SourceHeapReader(String filename) {
 		try {
 			file = new RandomAccessFile(filename, "r");
 		} catch (FileNotFoundException e) {
