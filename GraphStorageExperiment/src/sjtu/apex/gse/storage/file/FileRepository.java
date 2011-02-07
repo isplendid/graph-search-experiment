@@ -22,9 +22,9 @@ public class FileRepository implements Scan {
 	RecordRange range;
 	int page = -1, offset = -1;
 	int recLen;
-	SourceHeap heapFile;
+	SourceHeapReader heapFile;
 
-	public FileRepository(IndexManager indexMan, String filename, String pattern, int size, SourceHeap heap) {
+	public FileRepository(IndexManager indexMan, String filename, String pattern, int size, SourceHeapReader heap) {
 		range = indexMan.seek(pattern, size);
 		recLen = 4 * (size + 2);
 		heapFile = heap;
