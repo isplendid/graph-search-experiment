@@ -1,16 +1,14 @@
 package sjtu.apex.gse.operator;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
@@ -19,7 +17,7 @@ public class HashJoinScan implements Scan {
 	
 	private Map<QueryGraphNode, Integer> leftMapping;
 	private Map<QueryGraphNode, Integer> rightMapping;
-	private TupleQueue outputQueue;
+	private BlockingQueue<Tuple> outputQueue;
 	private Tuple currentEntry;
 	private QuerySchema sch;
 	private ThreadCounter threadCnt = new ThreadCounter();
@@ -50,6 +48,8 @@ public class HashJoinScan implements Scan {
 		
 		for (Entry<QueryGraphNode, Integer> i : rightMapping.entrySet())
 			rightNodes[i.getValue()] = i.getKey();
+		
+		outputQueue = new LinkedBlockingQueue<Tuple>();
 		
 		ResultMerger leftMerger = new ResultMerger(outputQueue, sch, leftMapping);
 		ResultMerger rightMerger = new ResultMerger(outputQueue, sch, rightMapping);
@@ -169,13 +169,13 @@ public class HashJoinScan implements Scan {
 	
 	private class ResultMerger {
 		ResultMerger joining;
-		TupleQueue output;
+		BlockingQueue<Tuple> output;
 		Map<ArrayHashKey, List<Tuple>> map;
 		Map<QueryGraphNode, Integer> nmThis;
 		Map<QueryGraphNode, Integer> nmThat;
 		QuerySchema sch;
 		
-		public ResultMerger(TupleQueue output, QuerySchema schema, Map<QueryGraphNode, Integer> nodeMapping) {
+		public ResultMerger(BlockingQueue<Tuple> output, QuerySchema schema, Map<QueryGraphNode, Integer> nodeMapping) {
 			this.output = output;
 			map = new HashMap<ArrayHashKey, List<Tuple>>();
 			this.sch = schema;
@@ -274,161 +274,5 @@ public class HashJoinScan implements Scan {
 			
 			return ret;
 		}
-	}
-	
-	private class TupleQueue implements BlockingQueue<Tuple> {
-
-		@Override
-		public Tuple element() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Tuple peek() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Tuple poll() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Tuple remove() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public boolean addAll(Collection<? extends Tuple> c) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public void clear() {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public boolean containsAll(Collection<?> c) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public Iterator<Tuple> iterator() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public boolean removeAll(Collection<?> c) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public boolean retainAll(Collection<?> c) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public int size() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public Object[] toArray() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public <T> T[] toArray(T[] a) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public boolean add(Tuple e) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public boolean contains(Object o) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public int drainTo(Collection<? super Tuple> c) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public int drainTo(Collection<? super Tuple> c, int maxElements) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public boolean offer(Tuple e) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public boolean offer(Tuple e, long timeout, TimeUnit unit)
-				throws InterruptedException {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public Tuple poll(long timeout, TimeUnit unit)
-				throws InterruptedException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public void put(Tuple e) throws InterruptedException {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public int remainingCapacity() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public boolean remove(Object o) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public Tuple take() throws InterruptedException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-				
 	}
 }
