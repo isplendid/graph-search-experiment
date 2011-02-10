@@ -19,7 +19,7 @@ import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.pattern.HashingPatternCodec;
 import sjtu.apex.gse.storage.file.FileRepository;
-import sjtu.apex.gse.storage.file.SourceHeap;
+import sjtu.apex.gse.storage.file.SourceHeapReader;
 import sjtu.apex.gse.storage.map.ColumnNodeMap;
 import sjtu.apex.gse.storage.map.HashLexicoColumnNodeMap;
 import sjtu.apex.gse.struct.QueryGraph;
@@ -138,7 +138,7 @@ public class FrequentPatternIndexer {
 			
 		}
 		
-		SourceHeap heap = new SourceHeap(config.getStringSetting("DataFolder", null) + "/sources");
+		SourceHeapReader heap = new SourceHeapReader(config.getStringSetting("DataFolder", null) + "/sources");
 //		return;
 		for (String el : spc.getLabelSet()) {
 			System.out.println((++cnt) + " : " + el);
