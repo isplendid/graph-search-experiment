@@ -15,12 +15,12 @@ import sjtu.apex.gse.struct.QuerySchema;
  */
 public class MergeJoinScan implements Scan {
 	
-	private UpdateScan l, r;
+	private RestorableScan l, r;
 	List<Integer> lo, ro;
 	int[] joinVal;
 	QuerySchema sch;
 	
-	public MergeJoinScan(UpdateScan l, UpdateScan r, List<Integer> lo, List<Integer> ro, QuerySchema sch) {
+	public MergeJoinScan(RestorableScan l, RestorableScan r, List<Integer> lo, List<Integer> ro, QuerySchema sch) {
 		this.sch = sch;
 		this.l = l;
 		this.r = r;
