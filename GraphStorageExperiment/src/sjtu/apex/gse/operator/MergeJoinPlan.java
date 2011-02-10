@@ -37,7 +37,7 @@ public class MergeJoinPlan implements Plan {
 	}
 
 	public Scan open() {
-		return new MergeJoinScan((UpdateScan)l.open(), (UpdateScan)r.open(), li, ri, sch);
+		return new MergeJoinScan((RestorableScan)l.open(), (RestorableScan)r.open(), li, ri, sch);
 	}
 	
 	public void close() {

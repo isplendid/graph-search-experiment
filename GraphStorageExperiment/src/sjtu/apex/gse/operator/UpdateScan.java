@@ -9,7 +9,7 @@ import sjtu.apex.gse.struct.QueryGraphNode;
  * @author Tian Yuan
  *
  */
-public interface UpdateScan extends Scan {
+public interface UpdateScan extends RestorableScan {
 	
 	/**
 	 * Insert an entry before the entry currently pointed to
@@ -44,14 +44,4 @@ public interface UpdateScan extends Scan {
 	 * @param set The set of relevant sources
 	 */
 	public void setSourceSet(Set<Integer> set);
-	
-	/**
-	 * Save the current position of cursor
-	 */
-	public void savePosition();
-	
-	/**
-	 * Restore the cursor to the previously saved position
-	 */
-	public void restorePosition();
 }

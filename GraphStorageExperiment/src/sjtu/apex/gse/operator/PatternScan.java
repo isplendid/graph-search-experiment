@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import sjtu.apex.gse.storage.file.FileRepository;
-import sjtu.apex.gse.storage.file.SourceHeap;
+import sjtu.apex.gse.storage.file.SourceHeapReader;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
 import sjtu.apex.gse.system.QuerySystem;
@@ -21,7 +21,7 @@ public class PatternScan implements Scan{
 		this.sch = sch;
 		this.cmap = cmap;
 		int size = sch.getQueryGraph().nodeCount();
-		src = new FileRepository(qs.indexManager(), qs.workingDirectory()  + "/storage" + (size - 1), ps, size, new SourceHeap(qs.workingDirectory() + "/sources"));
+		src = new FileRepository(qs.indexManager(), qs.workingDirectory()  + "/storage" + (size - 1), ps, size, new SourceHeapReader(qs.workingDirectory() + "/sources"));
 		
 	}
 
