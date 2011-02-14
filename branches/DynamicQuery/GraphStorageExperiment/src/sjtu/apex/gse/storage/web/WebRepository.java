@@ -7,6 +7,14 @@ import sjtu.apex.gse.struct.QueryGraphNode;
 
 public class WebRepository implements Scan {
 
+	public void addKey(String sub, String pred, String obj) {
+		
+	}
+	
+	public void keyEnded() {
+		
+	}
+	
 	@Override
 	public void beforeFirst() {
 		// TODO Auto-generated method stub
@@ -37,6 +45,11 @@ public class WebRepository implements Scan {
 		return null;
 	}
 
+	/**
+	 * Get the binding of the given node in current entry.
+	 * 
+	 * @param nodeID 0 represents the subject node while 1 represents the object node.
+	 */
 	@Override
 	public int getID(int nodeID) {
 		// TODO Auto-generated method stub
