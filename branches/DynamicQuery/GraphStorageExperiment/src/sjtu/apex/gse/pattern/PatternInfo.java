@@ -21,6 +21,12 @@ public class PatternInfo {
 	private Set<QueryGraphNode> satisfiedNode;
 	private int insCnt;
 	
+	/**
+	 * Create a new PatternInfo
+	 * @param graph - The structure representation of the query graph
+	 * @param patternStr - The string representation of the query graph
+	 * @param insCnt - The number of bindings will possibly be returned
+	 */
 	public PatternInfo(QueryGraph graph, String patternStr, int insCnt) {
 		this.satisfiedNode = graph.getSatisfiedNodeSet();
 		this.graph = graph;
@@ -74,7 +80,8 @@ public class PatternInfo {
 	}
 	
 	/**
-	 * Get the number of instances under this pattern 
+	 * Get the number of bindings under this pattern 
+	 * @return The number of bindings if the pattern is in the index. Otherwise, -1.
 	 */
 	public int getInstanceCount() {
 		return insCnt;
