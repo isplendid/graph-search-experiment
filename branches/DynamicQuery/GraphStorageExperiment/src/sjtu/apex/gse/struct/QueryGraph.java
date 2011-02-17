@@ -27,9 +27,10 @@ public class QueryGraph {
 	
 	/**
 	 * Create an induced subgraph according to node constraints set and edge constraints set
-	 * @param ns Node set
-	 * @param es Edge set
-	 * @param toHash Nodes that are to be converted to hash nodes
+	 * @param ns - Node set
+	 * @param es - Edge set
+	 * @param toHash - Nodes that are to be converted to hash nodes
+	 * @param hf - The hash function
 	 * @return
 	 */
 	public QueryGraph getInducedSubgraph(Set<QueryGraphNode> ns, Set<QueryGraphEdge> es, Set<QueryGraphNode> toHash, HashFunction hf) {
