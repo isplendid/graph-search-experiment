@@ -1,4 +1,4 @@
-package sjtu.apex.gse.search.test;
+package sjtu.apex.gse.operator.test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,10 +7,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import sjtu.apex.gse.operator.MergeJoinPlan;
 import sjtu.apex.gse.operator.PatternPlan;
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
+import sjtu.apex.gse.operator.join.MergeJoinPlan;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
