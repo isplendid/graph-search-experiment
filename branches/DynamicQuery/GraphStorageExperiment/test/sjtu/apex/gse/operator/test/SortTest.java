@@ -1,4 +1,4 @@
-package sjtu.apex.gse.search.test;
+package sjtu.apex.gse.operator.test;
 
 import java.util.ArrayList;
 import java.util.List;
