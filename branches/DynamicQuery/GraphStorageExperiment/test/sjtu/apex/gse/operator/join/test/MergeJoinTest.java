@@ -1,4 +1,4 @@
-package sjtu.apex.gse.operator.test;
+package sjtu.apex.gse.operator.join.test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
