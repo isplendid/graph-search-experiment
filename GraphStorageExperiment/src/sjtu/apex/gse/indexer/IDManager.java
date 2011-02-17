@@ -16,21 +16,21 @@ public interface IDManager {
     
     /** 
      * Return the uri of the resource given the id
-     * @param id The id of the resource
+     * @param id - The id of the resource
      * @return the uri of the resource
      */
     public String getURI(int id);
     
     /**
      * Return the id of the resource given the uri
-     * @param uri The uri of the resource
-     * @return The id of the resource
+     * @param uri - The uri of the resource
+     * @return The id of the resource. If the URI does not exist in the dictionary, return -1.
      */
     public int getID(String uri);
     
     /**
      * Add a new uri using a subsequent id
-     * @param uri The uri to be added
+     * @param uri - The uri to be added
      * @return The id of the new uri
      */
     public int addURI(String uri);
