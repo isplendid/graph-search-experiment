@@ -16,7 +16,7 @@ import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.SourceManager;
 import sjtu.apex.gse.indexer.file.SleepyCatIDManager;
 import sjtu.apex.gse.indexer.file.SleepyCatSourceManager;
-import sjtu.apex.gse.storage.web.WebRepository;
+import sjtu.apex.gse.operator.web.WebPatternScan;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
@@ -59,7 +59,7 @@ public class WebRepositoryTest {
 			QuerySchema qs = list.get(i);
 			String uri = bind.get(i);
 			
-			WebRepository webrepos = new WebRepository(qs, idman, srcman);
+			WebPatternScan webrepos = new WebPatternScan(qs, idman, srcman);
 			
 			webrepos.addKey(idman.getID(uri), -1, new HashSet<Integer>());
 			Set<QueryGraphNode> ns = qs.getSelectedNodeSet();
