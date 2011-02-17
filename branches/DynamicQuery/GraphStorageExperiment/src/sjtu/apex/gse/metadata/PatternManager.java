@@ -66,8 +66,8 @@ public class PatternManager {
 	}
 
 	/**
-	 * Get all legal sub-patterns of the given pattern BFS search algorithm is applied here
-	 * @param graph The given pattern
+	 * Get all legal sub-patterns of a given pattern. BFS search algorithm is applied here
+	 * @param graph - The given pattern
 	 * @return A set of legal sub-patterns
 	 */
 	public List<PatternInfo> getSubPatterns(QueryGraph graph) {
