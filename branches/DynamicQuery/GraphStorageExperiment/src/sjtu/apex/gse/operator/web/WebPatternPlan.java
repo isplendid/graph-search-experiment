@@ -1,20 +1,29 @@
 package sjtu.apex.gse.operator.web;
 
+import java.util.HashSet;
+
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.struct.QuerySchema;
 import sjtu.apex.gse.system.QuerySystem;
 
 public class WebPatternPlan implements Plan {
+	QuerySystem qs;
+	QuerySchema sch;
 	
-	public WebPatternPlan(QuerySchema sch, QuerySystem qs, String patternStr) {
-		
+	public WebPatternPlan(QuerySchema sch, QuerySystem qs) {
+		this.sch = sch;
+		this.qs = qs;
 	}
 
 	@Override
 	public Scan open() {
-		// TODO Auto-generated method stub
-		return null;
+		WebPatternScan wps = new WebPatternScan(sch, qs.idManager(), qs.sourceManager());
+		
+		wps.addKey(-1, -1, new HashSet<Integer>());
+		wps.keyEnded();
+		
+		return wps;
 	}
 
 	@Override
@@ -25,8 +34,7 @@ public class WebPatternPlan implements Plan {
 
 	@Override
 	public QuerySchema getSchema() {
-		// TODO Auto-generated method stub
-		return null;
+		return sch;
 	}
 
 	@Override
