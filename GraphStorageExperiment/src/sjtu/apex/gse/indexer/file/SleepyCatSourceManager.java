@@ -25,7 +25,7 @@ public class SleepyCatSourceManager implements SourceManager {
 	Environment env;
 	
 	public SleepyCatSourceManager(Configuration config) {
-		
+		this(config.getStringSetting("SourceMappingFolder", null));
 	}
 	
 	public SleepyCatSourceManager(String srcDir) {
