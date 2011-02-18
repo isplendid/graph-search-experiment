@@ -70,7 +70,8 @@ public class WebPatternScan implements Scan {
 	}
 	
 	protected void systemIdled() {
-		if (keyEnded && src.idle() && output.size() <= 0) output.add(new Tuple());
+		if (keyEnded && src.idle() && output.size() <= 0)
+			output.add(new Tuple());
 	}
 	
 	protected void addResult(Tuple t) {
