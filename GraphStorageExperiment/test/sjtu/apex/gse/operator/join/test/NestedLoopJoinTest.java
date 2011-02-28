@@ -82,11 +82,11 @@ public class NestedLoopJoinTest {
 		QueryGraphEdge e1, e2;
 		
 		List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
-		na = g.addNode("http://harth.org/andreas/foaf#ah");
+		na = g.addNode(sys.idManager().addGetID("http://harth.org/andreas/foaf#ah"));
 		nb = g.addNode();
 		nc = g.addNode();
-		e1 = g.addEdge(na, nb, "http://xmlns.com/foaf/0.1/knows");
-		e2 = g.addEdge(nb, nc, "http://xmlns.com/foaf/0.1/name");
+		e1 = g.addEdge(na, nb, sys.idManager().addGetID("http://xmlns.com/foaf/0.1/knows"));
+		e2 = g.addEdge(nb, nc, sys.idManager().addGetID("http://xmlns.com/foaf/0.1/name"));
 		seln.add(nb);
 		seln.add(nc);
 		qsAll.add(new QuerySchema(g, seln));
@@ -143,5 +143,6 @@ public class NestedLoopJoinTest {
 		}
 		
 		System.out.println(System.currentTimeMillis() - time);
+		sys.webRepository().shutdown();
 	}
 }

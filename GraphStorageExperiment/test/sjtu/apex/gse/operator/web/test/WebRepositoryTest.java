@@ -40,7 +40,7 @@ public class WebRepositoryTest {
 		QueryGraph graph = new QueryGraph();
 		QueryGraphNode from = graph.addNode();
 		QueryGraphNode to = graph.addNode();
-		graph.addEdge(from, to, "http://xmlns.com/foaf/0.1/knows");
+		graph.addEdge(from, to, idman.addGetID("http://xmlns.com/foaf/0.1/knows"));
 		List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
 		seln.add(to);
 		
@@ -59,7 +59,7 @@ public class WebRepositoryTest {
 			QuerySchema qs = list.get(i);
 			String uri = bind.get(i);
 			
-			WebPatternScan webrepos = new WebPatternScan(qs, idman, srcman);
+			WebPatternScan webrepos = new WebPatternScan(qs, idman, srcman, null);
 			
 			webrepos.addKey(idman.getID(uri), -1, new HashSet<Integer>());
 			Set<QueryGraphNode> ns = qs.getSelectedNodeSet();
