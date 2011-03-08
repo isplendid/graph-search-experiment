@@ -100,6 +100,8 @@ class OptimalArray {
 	void update(OptimalArrayElem value) {
 		int enc = encodeElem(value);
 		
+		System.out.println(value.getPlan() + " : " + value.getPlan().executionCost());
+		
 		if (encode[enc] == null || eval.evaluate(value) < eval.evaluate(encode[enc])) {
 			pending[value.getCoveredEdges().size() + value.getSatisfiedNodes().size()].remove(encode[enc]);
 			pending[value.getCoveredEdges().size() + value.getSatisfiedNodes().size()].add(value);

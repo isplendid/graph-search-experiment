@@ -22,6 +22,13 @@ public class OptimalArrayElem {
 	private Set<PatternInfo> patterns;
 	private Plan plan;
 	
+	/**
+	 * 
+	 * @param plan
+	 * @param contained
+	 * @param lastSatisfied
+	 * @param joinedPattern
+	 */
 	public OptimalArrayElem(Plan plan, Set<PatternInfo> contained, Set<QueryGraphNode> lastSatisfied, PatternInfo joinedPattern) {
 		
 		if (lastSatisfied != null)
@@ -42,18 +49,38 @@ public class OptimalArrayElem {
 		this.plan = plan;
 	}
 	
+	/**
+	 * Get the set of edges covered in the current DP state
+	 * 
+	 * @return The set of edges
+	 */
 	public Set<QueryGraphEdge> getCoveredEdges() {
 		return edges;
 	}
 	
+	/**
+	 * Get the set of nodes covered in the current DP state
+	 * 
+	 * @return The set of nodes
+	 */
 	public Set<QueryGraphNode> getCoveredNodes() {
 		return nodes;
 	}
 	
+	/**
+	 * Get the set of patterns that are used to answer the pattern of this node
+	 * 
+	 * @return The set of patterns.
+	 */
 	public Set<PatternInfo> getContainedPatterns() {
 		return patterns;
 	}
 	
+	/**
+	 * Get the set of nodes whose conditions are compeletely satisfied
+	 * 
+	 * @return The set of nodes
+	 */
 	public Set<QueryGraphNode> getSatisfiedNodes() {
 		return satisfied;
 	}
