@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import sjtu.apex.gse.operator.Plan;
-import sjtu.apex.gse.operator.join.HashJoinPlan;
-import sjtu.apex.gse.operator.join.NestedLoopJoinPlan;
+import sjtu.apex.gse.operator.factory.OperatorFactory;
 import sjtu.apex.gse.operator.web.WebPatternPlan;
 import sjtu.apex.gse.pattern.PatternInfo;
 import sjtu.apex.gse.planner.Planner;
@@ -27,9 +26,11 @@ import sjtu.apex.gse.system.QuerySystem;
 public class DynamicProgrammingPlanner implements Planner {
 	
 	private QuerySystem qs;
+	private OperatorFactory opFac;
 	
-	public DynamicProgrammingPlanner(QuerySystem querySystem) {
+	public DynamicProgrammingPlanner(QuerySystem querySystem, OperatorFactory opFac) {
 		this.qs = querySystem;
+		this.opFac = opFac;
 	}
 
 	@Override
@@ -41,7 +42,7 @@ public class DynamicProgrammingPlanner implements Planner {
 		for (PatternInfo pi : sbp) {
 			Set<PatternInfo> pis = new HashSet<PatternInfo>();
 			
-			Plan p = new WebPatternPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()), qs);
+			Plan p = opFac.getAtomicPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()), qs);
 
 			pis.add(pi);
 			optArr.setInitValue(new OptimalArrayElem(p, pis, null, pi));
@@ -83,7 +84,7 @@ public class DynamicProgrammingPlanner implements Planner {
 		Set<QueryGraphNode> ons = new HashSet<QueryGraphNode>(elem.getSatisfiedNodes());
 		Set<QueryGraphNode> notSat = getPlanSelectedNode(g, p.getCoveredNodes(), oes);
 
-		Plan pp = new WebPatternPlan(new QuerySchema(p.getPattern(), notSat), qs);
+		Plan pp = opFac.getAtomicPlan(new QuerySchema(p.getPattern(), notSat), qs, p.getPatternString());
 
 		List<QueryGraphNode> joinNode = new ArrayList<QueryGraphNode>();
 		for (int i = 0; i < p.getPattern().nodeCount(); i++) {
@@ -97,12 +98,7 @@ public class DynamicProgrammingPlanner implements Planner {
 		QueryGraph ng = g.getQueryGraph().getInducedSubgraph(ons, oes, null, null);
 		notSat = getPlanSelectedNode(g, ng.getNodeSet(), oes);
 
-		if (p.getInstanceCount() == -1) {
-			pp = new NestedLoopJoinPlan(plan, pp, joinNode, new QuerySchema(ng, notSat), qs);
-		}
-		else {
-			pp = new HashJoinPlan(plan, pp, joinNode, new QuerySchema(ng, notSat));
-		}
+		pp = opFac.getJoinPlan(plan, pp, joinNode, new QuerySchema(ng, notSat), qs, (p.getInstanceCount() == -1));
 
 		return pp;
 	}
