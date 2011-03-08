@@ -3,6 +3,9 @@ package sjtu.apex.gse.temp.file;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import sjtu.apex.gse.storage.file.RID;
+import sjtu.apex.gse.storage.file.SourceHeapRange;
+
 
 public class TempRepositoryFileReader {
 	
@@ -18,7 +21,7 @@ public class TempRepositoryFileReader {
 			this.strSize = strSize;
 			this.size = size;
 			file = new RandomAccessFile(filename, "r");
-			recLen = lenSize + strSize + size * 4;
+			recLen = lenSize + strSize + size * 4 + 16;
 			file.read(buf);
 			page = 0;
 			offset = 0;
@@ -58,8 +61,17 @@ public class TempRepositoryFileReader {
 			res[i] = ((0x00FF & buf[numPos]) << 24) | ((0x00FF & buf[numPos + 1]) << 16) + ((0x00FF & buf[numPos + 2]) << 8) + (0x00FF & buf[numPos + 3]);
 		}
 		
+		int srcptr[] = new int[4];
+		
+		for (int i = 0; i < 4; i++) {
+			int numPos = offset + strSize + lenSize + size * 4 + i * 4;
+			
+			srcptr[i] = ((0x00FF & buf[numPos]) << 24) | ((0x00FF & buf[numPos + 1]) << 16) + ((0x00FF & buf[numPos + 2]) << 8) + (0x00FF & buf[numPos + 3]);
+		}
+		
 		offset += recLen;
-		return new TempFileEntry(pattern, res);
+		
+		return new TempFileEntry(pattern, res, new SourceHeapRange(new RID(srcptr[0], srcptr[1]), new RID(srcptr[2], srcptr[3])));
 	}
 	
 	public void close() {
