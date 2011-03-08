@@ -15,11 +15,11 @@ public class HashUnique {
 		this.hf = hf;
 	}
 	
-	public String[] unique(String[] in) {
+	public Integer[] unique(int[] in) {
 		HashSet<Integer> hm = new HashSet<Integer>();
-		ArrayList<String> ret = new ArrayList<String>();
+		ArrayList<Integer> ret = new ArrayList<Integer>();
 		
-		for (String s : in) {
+		for (int s : in) {
 			Integer hashCode = hf.hashInt(s);
 			
 			if (!hm.contains(hashCode)) {
@@ -29,7 +29,7 @@ public class HashUnique {
 		}
 		
 		Object[] o = ret.toArray();
-		String[] s = new String[ret.size()];
+		Integer[] s = new Integer[ret.size()];
 		
 		System.arraycopy(o, 0, s, 0, o.length);
 		return s;
