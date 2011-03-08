@@ -6,7 +6,6 @@ import java.io.RandomAccessFile;
 
 import sjtu.apex.gse.storage.file.RID;
 import sjtu.apex.gse.storage.file.RecordRange;
-import sjtu.apex.gse.system.QuerySystem;
 
 
 public class FileIndexReader {
@@ -23,7 +22,7 @@ public class FileIndexReader {
 		try {
 			file = new RandomAccessFile(filename, "r");
 			recLen = strSize + lenSize + intSize * 4;
-			entLen = intSize * size;
+			entLen = intSize * size + intSize * 4;
 			pointer = -recLen;
 			this.strSize = strSize;
 		} catch (FileNotFoundException e) {
