@@ -1,10 +1,14 @@
 package sjtu.apex.gse.index.file.util;
 
+import java.util.Set;
+
 import sjtu.apex.gse.filesystem.FilesystemUtility;
 import sjtu.apex.gse.index.file.FileIndexWriter;
 import sjtu.apex.gse.storage.file.FileRepositoryWriter;
 import sjtu.apex.gse.storage.file.RID;
 import sjtu.apex.gse.storage.file.RecordRange;
+import sjtu.apex.gse.storage.file.SourceHeapRange;
+import sjtu.apex.gse.storage.file.SourceHeapWriter;
 import sjtu.apex.gse.temp.file.TempFileEntry;
 import sjtu.apex.gse.temp.file.TempRepositoryFileReader;
 import sjtu.apex.gse.temp.file.TempRepositoryFileWriter;
@@ -19,9 +23,19 @@ import sjtu.apex.gse.temp.file.util.TempRepositorySorter;
 public class FileIndexThreads {
 
 	private TempRepositoryFileWriter tw;
-	private String dtfldr, trfn, tsfn, tmpfldr, strgfn, idxfn;
+	private SourceHeapWriter sw;
+	private String dtfldr, trfn, tsfn, tmpfldr, strgfn, idxfn, shfn;
 	private int ec, mec, mtc, tc, size, strSize;
 
+	/**
+	 * 
+	 * @param size
+	 * @param strSize
+	 * @param maxEntryCount
+	 * @param maxThreadCount
+	 * @param dataFolder
+	 * @param tempFolder
+	 */
 	public FileIndexThreads(int size, int strSize, int maxEntryCount, int maxThreadCount, String dataFolder, String tempFolder) {
 		this.size = size;
 		this.strSize = strSize;
@@ -31,15 +45,19 @@ public class FileIndexThreads {
 		tmpfldr = tempFolder + "/SortTmp";
 		strgfn = dataFolder + "/storage" + (size - 1);
 		idxfn = dataFolder + "/index" + (size - 1);
+		shfn = dataFolder + "/srcheap";
 		tw = new TempRepositoryFileWriter(trfn, size, strSize);
+		sw = new SourceHeapWriter(shfn);
 		ec = 0;
 		tc = 0;
 		mec = maxEntryCount;
 		mtc = maxThreadCount;
 	}
 
-	public void addEntry(String pattern, int[] ins) {
-		tw.writeRecord(new TempFileEntry(pattern, ins));
+	public void addEntry(String pattern, int[] ins, Set<Integer> src) {
+		SourceHeapRange shr = sw.writeSet(src);
+		
+		tw.writeRecord(new TempFileEntry(pattern, ins, shr));
 		ec++;
 
 		if (ec > mec) buildIndex();
@@ -135,7 +153,7 @@ public class FileIndexThreads {
 			}
 
 			last = dwr.getRID();
-			dwr.writeEntry(tfe.ins);
+			dwr.writeEntry(tfe.ins, tfe.src);
 		}
 
 		if (currentPat != null) iwr.writeEntry(currentPat, new RecordRange(start, last));

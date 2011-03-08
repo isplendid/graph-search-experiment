@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import sjtu.apex.gse.storage.file.RecordRange;
-import sjtu.apex.gse.system.QuerySystem;
 
 
 /**

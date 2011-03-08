@@ -1,5 +1,7 @@
 package sjtu.apex.gse.index.file.util;
 
+import java.util.Set;
+
 import sjtu.apex.gse.config.Configuration;
 
 
@@ -31,8 +33,8 @@ public class FileIndexer {
 	 * @param size
 	 * @param ins
 	 */
-	public void addEntry(String pattern, int size, int[] ins) {
-		threads[size - 1].addEntry(pattern, ins);
+	public void addEntry(String pattern, int size, int[] ins, Set<Integer> src) {
+		threads[size - 1].addEntry(pattern, ins, src);
 	}
 	
 	/**

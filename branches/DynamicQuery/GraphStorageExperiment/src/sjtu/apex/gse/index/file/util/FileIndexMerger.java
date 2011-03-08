@@ -3,6 +3,7 @@ package sjtu.apex.gse.index.file.util;
 import sjtu.apex.gse.index.file.FileIndexEntry;
 import sjtu.apex.gse.index.file.FileIndexReader;
 import sjtu.apex.gse.index.file.FileIndexWriter;
+import sjtu.apex.gse.storage.file.FileRepositoryEntry;
 import sjtu.apex.gse.storage.file.FileRepositoryReader;
 import sjtu.apex.gse.storage.file.FileRepositoryWriter;
 import sjtu.apex.gse.storage.file.RID;
@@ -70,7 +71,7 @@ public class FileIndexMerger {
 			}
 			
 			FileRepositoryReader frr = new FileRepositoryReader(hc.repFilename, size, hc.fie.range);
-			int[] tmp;
+			FileRepositoryEntry tmp;
 			while ((tmp = frr.readEntry()) != null) {
 				end = frw.getRID();
 				frw.writeEntry(tmp);
