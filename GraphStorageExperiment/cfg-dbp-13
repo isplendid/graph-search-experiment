@@ -1,8 +1,0 @@
-TempFolder = d:/tien/barn/data/dbpedia.13/tmp
-DataFolder = d:/tien/barn/data/dbpedia.13
-IDMappingFolder = d:/tien/barn/data/dbpedia.13/id
-LabelRepository = d:/tien/barn/data/dbpedia.13/label
-HashMod = 13
-PatternLength = 3
-PatternStrSize = 128
-IndexComplex = 0
