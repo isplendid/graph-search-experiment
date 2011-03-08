@@ -26,6 +26,8 @@ public class SourceHeapWriter {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		pageStart = fileSize & ~(pageSize - 1);
+		pointer = fileSize;
 	}
 	
 	public void close() {
@@ -53,13 +55,13 @@ public class SourceHeapWriter {
 				e.printStackTrace();
 			}
 			
-			pageStart = pointer >> bitShift;
-			int offset = (int)pointer & pageSize;
-			buf[offset + 3] = (byte) (value & 0x00FF);
-			buf[offset + 2] = (byte) ((value >> 8) & 0x000000FF);
-			buf[offset + 1] = (byte) ((value >> 16) & 0x000000FF);
-			buf[offset] = (byte) ((value >> 24) & 0x000000FF);
+			pageStart = pointer & ~(pageSize - 1);
 		}
+		int offset = (int)(pointer & (pageSize - 1));
+		buf[offset + 3] = (byte) (value & 0x00FF);
+		buf[offset + 2] = (byte) ((value >> 8) & 0x000000FF);
+		buf[offset + 1] = (byte) ((value >> 16) & 0x000000FF);
+		buf[offset] = (byte) ((value >> 24) & 0x000000FF);
 		pointer += 4;
 	}
 	
@@ -70,7 +72,7 @@ public class SourceHeapWriter {
 		for (int i : value) writeInt(i);
 		endIdx = pointer;
 		
-		return new SourceHeapRange(startIdx, endIdx);
+		return new SourceHeapRange(new RID((int)(startIdx >> bitShift), (int)(startIdx & pageSize)), new RID((int)(endIdx >> bitShift), (int)(endIdx & pageSize)));
 	}
 	 
 }

@@ -1,18 +1,18 @@
 package sjtu.apex.gse.storage.file;
 
 public class SourceHeapRange {
-	long startIdx, endIdx;
+	RID startIdx, endIdx;
 	
-	public SourceHeapRange(long startIdx, long endIdx) {
+	public SourceHeapRange(RID startIdx, RID endIdx) {
 		this.startIdx = startIdx;
 		this.endIdx = endIdx;
 	}
 	
-	public long getStartIndex() {
+	public RID getStartIndex() {
 		return startIdx;
 	}
 	
-	public long getEndIndex() {
+	public RID getEndIndex() {
 		return endIdx;
 	}
 }
