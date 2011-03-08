@@ -49,7 +49,7 @@ public class HashLexicoColumnNodeMap implements ColumnNodeMap {
 		@Override
 		public int compare(QueryGraphNode arg0, QueryGraphNode arg1) {
 			int cmp;
-			if ((cmp = arg0.getHashLabel(func).compareTo(arg1.getHashLabel(func))) != 0)
+			if ((cmp = arg0.getHashLabel(func) - arg1.getHashLabel(func)) != 0)
 				return cmp;
 			else if ((cmp = arg1.getOutDegree() - arg0.getOutDegree()) != 0)
 				return cmp;
