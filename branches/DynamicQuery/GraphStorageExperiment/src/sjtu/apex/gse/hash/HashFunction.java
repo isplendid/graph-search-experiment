@@ -10,10 +10,10 @@ public interface HashFunction {
 	/**
 	 * Maps the input string to the output string
 	 */
-	public String hashStr(String str);
+	public String hashStr(int str);
 	
 	/**
 	 * Maps the input string to the output integer
 	 */
-	public Integer hashInt(String str);
+	public Integer hashInt(int str);
 }

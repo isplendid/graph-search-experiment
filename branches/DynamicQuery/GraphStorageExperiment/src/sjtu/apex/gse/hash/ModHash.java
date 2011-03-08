@@ -10,7 +10,8 @@ import sjtu.apex.gse.config.Configuration;
  */
 public class ModHash implements HashFunction {
 	int mod;
-	final String wildcat = "*";
+	final int wildcard = -1;
+	final String wildcardStr = "*";
 	
 	public ModHash(Configuration conf) {
 		mod = conf.getIntegerSetting("HashMod", 13);
@@ -25,16 +26,16 @@ public class ModHash implements HashFunction {
 	}
 
 	@Override
-	public String hashStr(String str) {
-		if (str.equals(wildcat))
-			return str;
+	public String hashStr(int str) {
+		if (str == wildcard)
+			return wildcardStr;
 		else
-			return Integer.toString(str.hashCode() % mod);
+			return Integer.toString(str % mod);
 	}
 
 	@Override
-	public Integer hashInt(String str) {
-		return str.hashCode() % mod;
+	public Integer hashInt(int str) {
+		return str % mod;
 	}
 
 }
