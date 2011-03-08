@@ -19,7 +19,7 @@ public class TempRepositoryFileWriter {
 			this.strSize = strSize;
 			this.size = size;
 			file = new RandomAccessFile(filename, "rw");
-			recLen = lenSize + strSize + size * 4;
+			recLen = lenSize + strSize + size * 4 + 16;
 			page = 0;
 			offset = 0;
 		} catch (FileNotFoundException e) {
@@ -66,6 +66,13 @@ public class TempRepositoryFileWriter {
 //			buf[numPos + 2] = (byte)((byte)(-1) & (e.ins[i] >> 8));
 //			buf[numPos + 3] = (byte)((byte)(-1) & e.ins[i]);
 		}
+		
+		int srcStartIdx = offset + lenSize + strSize + size * 4;
+		
+		System.arraycopy(intToByteArray(e.src.getStartIndex().getPageID()), 0, buf, srcStartIdx, 4);
+		System.arraycopy(intToByteArray(e.src.getStartIndex().getOffset()), 0, buf, srcStartIdx + 4, 4);
+		System.arraycopy(intToByteArray(e.src.getEndIndex().getPageID()), 0, buf, srcStartIdx + 8, 4);
+		System.arraycopy(intToByteArray(e.src.getEndIndex().getOffset()), 0, buf, srcStartIdx + 12, 4);
 		
 		offset += recLen;
 	}
