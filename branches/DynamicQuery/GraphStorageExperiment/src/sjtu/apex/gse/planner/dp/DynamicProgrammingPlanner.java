@@ -5,9 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import sjtu.apex.gse.operator.MergeJoinPlan;
-import sjtu.apex.gse.operator.PatternPlan;
 import sjtu.apex.gse.operator.Plan;
+import sjtu.apex.gse.operator.join.HashJoinPlan;
+import sjtu.apex.gse.operator.join.NestedLoopJoinPlan;
+import sjtu.apex.gse.operator.web.WebPatternPlan;
 import sjtu.apex.gse.pattern.PatternInfo;
 import sjtu.apex.gse.planner.Planner;
 import sjtu.apex.gse.struct.Connectivity;
@@ -34,13 +35,13 @@ public class DynamicProgrammingPlanner implements Planner {
 	@Override
 	public Plan plan(QuerySchema g) {
 		QueryGraph graph = g.getQueryGraph();
-		OptimalArray optArr = new OptimalArray(graph);
+		OptimalArray optArr = new OptimalArray(graph);	
 		List<PatternInfo> sbp = qs.patternManager().getSubPatterns(graph); 
 
 		for (PatternInfo pi : sbp) {
 			Set<PatternInfo> pis = new HashSet<PatternInfo>();
 			
-			Plan p = new PatternPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()), qs);
+			Plan p = new WebPatternPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()), qs);
 
 			pis.add(pi);
 			optArr.setInitValue(new OptimalArrayElem(p, pis, null, pi));
@@ -82,7 +83,7 @@ public class DynamicProgrammingPlanner implements Planner {
 		Set<QueryGraphNode> ons = new HashSet<QueryGraphNode>(elem.getSatisfiedNodes());
 		Set<QueryGraphNode> notSat = getPlanSelectedNode(g, p.getCoveredNodes(), oes);
 
-		Plan pp = new PatternPlan(new QuerySchema(p.getPattern(), notSat), qs, p.getPatternString());
+		Plan pp = new WebPatternPlan(new QuerySchema(p.getPattern(), notSat), qs);
 
 		List<QueryGraphNode> joinNode = new ArrayList<QueryGraphNode>();
 		for (int i = 0; i < p.getPattern().nodeCount(); i++) {
@@ -96,7 +97,12 @@ public class DynamicProgrammingPlanner implements Planner {
 		QueryGraph ng = g.getQueryGraph().getInducedSubgraph(ons, oes, null, null);
 		notSat = getPlanSelectedNode(g, ng.getNodeSet(), oes);
 
-		pp = new MergeJoinPlan(pp, plan, joinNode, new QuerySchema(ng, notSat));
+		if (p.getInstanceCount() == -1) {
+			pp = new NestedLoopJoinPlan(plan, pp, joinNode, new QuerySchema(ng, notSat), qs);
+		}
+		else {
+			pp = new HashJoinPlan(plan, pp, joinNode, new QuerySchema(ng, notSat));
+		}
 
 		return pp;
 	}
@@ -104,8 +110,8 @@ public class DynamicProgrammingPlanner implements Planner {
 	/**
 	 * Check whether a sub-pattern extends an existing query graph coverage and the extended
 	 * coverage remains connected
-	 * @param subpattern The target sub-pattern
-	 * @param coverage Edges contained within the coverage
+	 * @param subpattern - The target sub-pattern
+	 * @param coverage - Edges contained within the coverage
 	 */
 	private boolean isExtendAndConnected(PatternInfo subpattern, OptimalArrayElem coverage) {
 		Set<QueryGraphEdge> coveredEdge = coverage.getCoveredEdges();

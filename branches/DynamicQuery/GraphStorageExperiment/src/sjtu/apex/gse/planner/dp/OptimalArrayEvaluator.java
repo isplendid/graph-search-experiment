@@ -7,7 +7,7 @@ package sjtu.apex.gse.planner.dp;
  */
 public class OptimalArrayEvaluator {
 	public int evaluate(OptimalArrayElem e) {
-//		System.out.println(e.getPlan().diskIO());
-		return e.getPlan().diskIO();
+//		System.out.println(e.getPlan() + " : " + e.getPlan().executionCost());
+		return e.getPlan().executionCost();
 	}
 }
