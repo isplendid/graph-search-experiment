@@ -11,14 +11,14 @@ public class QueryGraphEdge {
 	static int serialCnt = 0;
 	
 	QueryGraphNode from, to;
-	String label;
+	int label;
 	int serialNo = 0;
 	
-	QueryGraphEdge(QueryGraphNode from, QueryGraphNode to, String label) {
+	QueryGraphEdge(QueryGraphNode from, QueryGraphNode to, int label) {
 		this(from, to, label, serialCnt++);
 	}
 	
-	QueryGraphEdge(QueryGraphNode from, QueryGraphNode to, String label, int sn) {
+	QueryGraphEdge(QueryGraphNode from, QueryGraphNode to, int label, int sn) {
 		this.from = from;
 		this.to = to;
 		this.label = label;
@@ -30,7 +30,7 @@ public class QueryGraphEdge {
 	/**
 	 * Get the label of this edge
 	 */
-	public String getLabel() {
+	public int getLabel() {
 		return label;
 	}
 	

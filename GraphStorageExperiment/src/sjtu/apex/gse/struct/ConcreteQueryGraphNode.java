@@ -10,13 +10,13 @@ import sjtu.apex.gse.hash.HashFunction;
  */
 public class ConcreteQueryGraphNode extends QueryGraphNode {
 	
-	String label;
+	int label;
 	
 	/**
 	 * Create a node with the specified label
 	 * @param label
 	 */
-	public ConcreteQueryGraphNode(String label) {
+	public ConcreteQueryGraphNode(int label) {
 		this(label, serialCounter ++, null);
 	}
 	
@@ -27,7 +27,7 @@ public class ConcreteQueryGraphNode extends QueryGraphNode {
 	 *   distinguish one node from another. Two instances with the same
 	 *   serial number are viewed as the same node.  
 	 */
-	ConcreteQueryGraphNode(String label, int serialNo, QueryGraphNode ancestor) {
+	ConcreteQueryGraphNode(int label, int serialNo, QueryGraphNode ancestor) {
 		super(serialNo, ancestor);
 		this.label = label;
 	}
@@ -35,7 +35,7 @@ public class ConcreteQueryGraphNode extends QueryGraphNode {
 	/**
 	 * Get the label of this node 
 	 */
-	public String getLabel() {
+	public int getLabel() {
 		return label;
 	}
 	
@@ -60,8 +60,8 @@ public class ConcreteQueryGraphNode extends QueryGraphNode {
 	}
 
 	@Override
-	public String getHashLabel(HashFunction hash) {
-		return hash.hashStr(label);
+	public int getHashLabel(HashFunction hash) {
+		return hash.hashInt(label);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class ConcreteQueryGraphNode extends QueryGraphNode {
 
 	@Override
 	QueryGraphNode getHashClone(HashFunction hf) {
-		return new HashQueryGraphNode(serialNo, this.getAncestor(), hf.hashStr(label));
+		return new HashQueryGraphNode(serialNo, this.getAncestor(), hf.hashInt(label));
 	}
 	
 	public String toString() {

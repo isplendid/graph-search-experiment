@@ -18,8 +18,8 @@ public class GeneralQueryGraphNode extends QueryGraphNode {
 	}
 
 	@Override
-	public String getLabel() {
-		return "*";
+	public int getLabel() {
+		return -1;
 	}
 	
 	/**
@@ -43,8 +43,8 @@ public class GeneralQueryGraphNode extends QueryGraphNode {
 	}
 
 	@Override
-	public String getHashLabel(HashFunction hash) {
-		return "*";
+	public int getHashLabel(HashFunction hash) {
+		return -1;
 	}
 
 	@Override
