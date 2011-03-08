@@ -26,7 +26,7 @@ public class FileRepositoryReader {
 	public FileRepositoryReader(String filename, int size, RecordRange range) {
 		this.range = range;
 		this.size = size;
-		recLen = 4 * size;
+		recLen = 4 * size + 16;
 		try {
 			file = new RandomAccessFile(filename, "r");
 		} catch (FileNotFoundException e) {
@@ -54,6 +54,23 @@ public class FileRepositoryReader {
 			System.out.println(nodeID + " , " + numPos);
 			return ((0x00FF & buf[numPos]) << 24) | ((0x00FF & buf[numPos + 1]) << 16) + ((0x00FF & buf[numPos + 2]) << 8) + (0x00FF & buf[numPos + 3]);
 		}
+	}
+	
+	private SourceHeapRange getSourceRange() {
+		int numPos = offset + 4 * size;
+		
+		int sIdxPg = ((0x00FF & buf[numPos]) << 24) | ((0x00FF & buf[numPos + 1]) << 16) + ((0x00FF & buf[numPos + 2]) << 8) + (0x00FF & buf[numPos + 3]);
+		
+		numPos += 4;
+		int sIdxOffst = ((0x00FF & buf[numPos]) << 24) | ((0x00FF & buf[numPos + 1]) << 16) + ((0x00FF & buf[numPos + 2]) << 8) + (0x00FF & buf[numPos + 3]);
+		
+		numPos += 4;
+		int eIdxPg = ((0x00FF & buf[numPos]) << 24) | ((0x00FF & buf[numPos + 1]) << 16) + ((0x00FF & buf[numPos + 2]) << 8) + (0x00FF & buf[numPos + 3]);
+		
+		numPos += 4;
+		int eIdxOffst = ((0x00FF & buf[numPos]) << 24) | ((0x00FF & buf[numPos + 1]) << 16) + ((0x00FF & buf[numPos + 2]) << 8) + (0x00FF & buf[numPos + 3]);
+		
+		return new SourceHeapRange(new RID(sIdxPg, sIdxOffst), new RID(eIdxPg, eIdxOffst));
 	}
 	
 	private boolean next() {
@@ -85,14 +102,14 @@ public class FileRepositoryReader {
 	 * Read the next entry from the file
 	 * @return The entry read. NULL if no more entry is present.
 	 */
-	public int[] readEntry() {
+	public FileRepositoryEntry readEntry() {
 		if (next()) {
 			int[] result = new int[size];
 			
 			for (int i = 0; i < size; i++)
 				result[i] = getID(i);
 			
-			return result;
+			return new FileRepositoryEntry(result, getSourceRange());
 		}
 		else
 			return null;

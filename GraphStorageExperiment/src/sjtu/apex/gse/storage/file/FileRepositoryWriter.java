@@ -20,7 +20,7 @@ public class FileRepositoryWriter {
 	
 	public FileRepositoryWriter(String filename, int size) {
 		this.size = size;
-		recLen = 4 * size;
+		recLen = 4 * size + 16;
 		try {
 			file = new RandomAccessFile(filename, "rw");
 			page = 0; offset = 0;
@@ -38,7 +38,11 @@ public class FileRepositoryWriter {
 		return dword;
 	}
 	
-	public void writeEntry(int[] data) {
+	public void writeEntry(FileRepositoryEntry fre) {
+		writeEntry(fre.bindings, fre.sourceHeapRange);
+	}
+	
+	public void writeEntry(int[] data, SourceHeapRange shr) {
 		if (offset + recLen > 4096) {
 			try {
 				file.setLength(((long)page + 1) * 4096);
@@ -50,8 +54,9 @@ public class FileRepositoryWriter {
 			}
 		}
 		
+		int numPos = offset;
+		
 		for (int i = 0; i < size; i++) {
-			int numPos = offset + i * 4;
 			
 			System.arraycopy(intToByteArray(data[i]), 0, buf, numPos, 4);
 			
@@ -59,7 +64,14 @@ public class FileRepositoryWriter {
 //			buf[numPos + 1] = (byte)(255 & (data[i] >> 16));
 //			buf[numPos + 2] = (byte)(255 & (data[i] >> 8));
 //			buf[numPos + 3] = (byte)(255 & data[i]);
+			numPos += 4;
 		}
+		
+		
+		System.arraycopy(intToByteArray(shr.getStartIndex().getPageID()), 0, buf, numPos, 4);
+		System.arraycopy(intToByteArray(shr.getStartIndex().getOffset()), 0, buf, numPos, 4);
+		System.arraycopy(intToByteArray(shr.getEndIndex().getPageID()), 0, buf, numPos, 4);
+		System.arraycopy(intToByteArray(shr.getEndIndex().getOffset()), 0, buf, numPos, 4);
 		
 		offset += recLen;
 	}
