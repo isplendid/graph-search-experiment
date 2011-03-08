@@ -30,7 +30,7 @@ public class QueryGraph {
 	 * @param ns - Node set
 	 * @param es - Edge set
 	 * @param toHash - Nodes that are to be converted to hash nodes
-	 * @param hf - The hash function
+	 * @param hf - The hash function. If this is set to be null, no hash transformation will be made on the induced subgraph.
 	 * @return
 	 */
 	public QueryGraph getInducedSubgraph(Set<QueryGraphNode> ns, Set<QueryGraphEdge> es, Set<QueryGraphNode> toHash, HashFunction hf) {
@@ -149,7 +149,7 @@ public class QueryGraph {
 		return node;
 	}
 	
-	public QueryGraphNode addNode(String label) {
+	public QueryGraphNode addNode(int label) {
 		return addNode(label, false);
 	}
 	
@@ -159,7 +159,7 @@ public class QueryGraph {
 	 * @param isHash indicates whether to add an hash node
 	 * @return The node generated
 	 */
-	public QueryGraphNode addNode(String label, boolean isHash) {
+	public QueryGraphNode addNode(int label, boolean isHash) {
 		QueryGraphNode node;
 		
 		if (isHash)
@@ -210,7 +210,7 @@ public class QueryGraph {
 	 * @param label The label of the edge
 	 * @return The edge generated
 	 */
-	public QueryGraphEdge addEdge(QueryGraphNode from, QueryGraphNode to, String label) {
+	public QueryGraphEdge addEdge(QueryGraphNode from, QueryGraphNode to, int label) {
 		QueryGraphEdge edge = new QueryGraphEdge(from, to, label);
 		
 		edges.add(edge);

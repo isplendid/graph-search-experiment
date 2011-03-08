@@ -3,13 +3,13 @@ package sjtu.apex.gse.struct;
 import sjtu.apex.gse.hash.HashFunction;
 
 public class HashQueryGraphNode extends QueryGraphNode {
-	String label;
+	int label;
 	
-	public HashQueryGraphNode(String label) {
+	public HashQueryGraphNode(int label) {
 		this(serialCounter++, null, label);
 	}
 
-	HashQueryGraphNode(int serialNo, QueryGraphNode ancestor, String label) {
+	HashQueryGraphNode(int serialNo, QueryGraphNode ancestor, int label) {
 		super(serialNo, ancestor);
 		this.label = label;
 	}
@@ -25,7 +25,7 @@ public class HashQueryGraphNode extends QueryGraphNode {
 	}
 
 	@Override
-	public String getLabel() {
+	public int getLabel() {
 		return label;
 	}
 
@@ -35,7 +35,7 @@ public class HashQueryGraphNode extends QueryGraphNode {
 	}
 
 	@Override
-	public String getHashLabel(HashFunction hash) {
+	public int getHashLabel(HashFunction hash) {
 		return label;
 	}
 

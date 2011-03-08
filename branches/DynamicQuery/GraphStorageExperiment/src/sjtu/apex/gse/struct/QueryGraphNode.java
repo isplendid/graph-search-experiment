@@ -25,13 +25,13 @@ public abstract class QueryGraphNode {
 	/**
 	 * Get the label of this node 
 	 */
-	abstract public String getLabel();
+	abstract public int getLabel();
 	
 	/**
 	 * Get the hashed label
 	 * @return
 	 */
-	abstract public String getHashLabel(HashFunction hash);
+	abstract public int getHashLabel(HashFunction hash);
 	
 	/**
 	 * Get the in-degree of this node 

@@ -10,15 +10,15 @@ import java.util.HashMap;
  */
 public class GraphUtility {
 	
-	public static QueryGraph extendConstraint(QueryGraph g, int toExt, String con) {
+	public static QueryGraph extendConstraint(QueryGraph g, int toExt, int con) {
 		return extendConstraint(g, toExt, con, false);
 	}
 	
-	public static QueryGraph extendEdge(QueryGraph g, int toExt, String e, boolean dir) {
+	public static QueryGraph extendEdge(QueryGraph g, int toExt, int e, boolean dir) {
 		return extendEdge(g, toExt, e, dir, false);
 	}
 	
-	private static QueryGraphNode getNewNode(String lbl, int sn, boolean isHash) {
+	private static QueryGraphNode getNewNode(int lbl, int sn, boolean isHash) {
 		if (isHash)
 			return new HashQueryGraphNode(sn, null, lbl);
 		else
@@ -32,7 +32,7 @@ public class GraphUtility {
 	 * @param con The label of the constraint	
 	 * @return The graph generated
 	 */
-	public static QueryGraph extendConstraint(QueryGraph g, int toExt, String con, boolean isHash) {
+	public static QueryGraph extendConstraint(QueryGraph g, int toExt, int con, boolean isHash) {
 		QueryGraph ng = new QueryGraph();
 		HashMap<QueryGraphNode, QueryGraphNode> map = new HashMap<QueryGraphNode, QueryGraphNode>();
 		
@@ -60,7 +60,7 @@ public class GraphUtility {
 		return ng;
 	}
 	
-	public static QueryGraph extendEdge(QueryGraph g, int toExt, String e, boolean dir, boolean isHash) {
+	public static QueryGraph extendEdge(QueryGraph g, int toExt, int e, boolean dir, boolean isHash) {
 		QueryGraph ng = new QueryGraph();
 		HashMap<QueryGraphNode, QueryGraphNode> map = new HashMap<QueryGraphNode, QueryGraphNode>();
 		
