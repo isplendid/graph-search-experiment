@@ -107,7 +107,10 @@ public class IterativeIndexer {
     					System.out.println("\t" + tmpcntr + " entries checked, total " + tc + " entries.");
     				
     				int ni = s.getID(extNode);
-    				String[] sl = lblman.getLabel(idman.getURI(ni));
+    				String[] sls = lblman.getLabel(idman.getURI(ni));
+    				int[] sl = new int[sls.length];
+    				
+    				for (int j = 0; j < sls.length; j++) sl[j] = idman.getID(sls[j]);
     				
     				if (sl != null) {
     					Set<Integer> visited = new HashSet<Integer>();
@@ -122,7 +125,7 @@ public class IterativeIndexer {
     						HashCatContainer hcc;
     						
     						if ((hcc = nps.get(lb)) == null) {
-    							QueryGraph ng = GraphUtility.extendConstraint(g, i, Integer.toString(lb), true);
+    							QueryGraph ng = GraphUtility.extendConstraint(g, i, lb, true);
     							hcc = new HashCatContainer(ng, pp.getExtendedSet());
     							
     							nps.put(lb, hcc);
@@ -204,7 +207,7 @@ public class IterativeIndexer {
 			int toExt = l.get(i).toExt;
 			
 			System.out.println("\t" + e.toString() + " added to node " + g.getNode(toExt) + ".");
-			QueryGraph nqs = GraphUtility.extendEdge(g, toExt, e.getLabel(), e.getDir(), true);
+			QueryGraph nqs = GraphUtility.extendEdge(g, toExt, idman.addGetID(e.getLabel()), e.getDir(), true);
 
 			int t = batchAddPattern(pp.getExtendedSet(), nqs, sys, (int)(coef * pp.getInstanceCount()));
 			pp.push(sys.patternCodec().encodePattern(nqs), nqs, t);

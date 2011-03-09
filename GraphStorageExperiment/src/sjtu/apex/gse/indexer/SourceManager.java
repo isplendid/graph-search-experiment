@@ -22,6 +22,13 @@ public interface SourceManager {
     public int getID(String source);
     
     /**
+     * Add the source if it does not exist and return the id of the source given the uri
+     * @param source - The uri of the source
+     * @return The id of the resource.
+     */
+    public int addGetID(String source);
+    
+    /**
      * Add a new uri using a subsequent id
      * @param uri - The uri to the source to be added
      * @return The id of the new uri
