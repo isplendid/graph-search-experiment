@@ -123,4 +123,13 @@ public class SleepyCatSourceManager implements SourceManager {
 		}
 	}
 
+	@Override
+	public int addGetID(String source) {
+		int ret = -1;
+		if ((ret = getID(source)) < 0)
+			ret = addSource(source);
+		
+		return ret;
+	}
+
 }
