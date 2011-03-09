@@ -56,6 +56,16 @@ public class SleepyCatIDManager implements IDManager {
 			uri2id = null;
 		}
 	}
+	
+	public int addGetID(String uri) {
+		int ret = 0;
+		
+		if ((ret = this.getID(uri)) < 0) {
+			ret = this.addURI(uri);
+		}
+		
+		return ret;
+	}
 
 	@Override
 	public int addURI(String uri) {
