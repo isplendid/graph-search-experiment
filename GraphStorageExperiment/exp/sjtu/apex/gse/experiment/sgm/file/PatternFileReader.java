@@ -5,13 +5,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphNode;
 
 public class PatternFileReader {
 	BufferedReader rd = null;
+	IDManager idman;
 
-	public PatternFileReader(String filename) {
+	public PatternFileReader(String filename, IDManager idman) {
 		try {
 			rd =  new BufferedReader(new FileReader(filename));
 		} catch (FileNotFoundException e) {
@@ -38,7 +40,7 @@ public class PatternFileReader {
 				if (temp.length() == 0 || temp.equals("*"))
 					nodes[i] = graph.addNode();
 				else
-					nodes[i] = graph.addNode(temp, true);
+					nodes[i] = graph.addNode(idman.addGetID(temp), true);
 
 			}
 
@@ -47,7 +49,7 @@ public class PatternFileReader {
 				ts = temp.split(" ");
 				int a = Integer.parseInt(ts[0]), b = Integer.parseInt(ts[1]);
 
-				graph.addEdge(nodes[a - 1], nodes[b - 1], ts[2]);
+				graph.addEdge(nodes[a - 1], nodes[b - 1], idman.addGetID(ts[2]));
 			}
 
 			return graph;

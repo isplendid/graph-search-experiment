@@ -39,7 +39,7 @@ public class Experiment {
 		File bkf = new File("break");
 		Configuration config = new FileConfig(args[0]);
 		QuerySystem sys = new QuerySystem(config);
-		QueryReader rd = new FileQueryReader(args[1]);
+		QueryReader rd = new FileQueryReader(args[1], sys.idManager());
 		BufferedWriter wr;
 		IDManager idman = null;
 		int startId = -1;
