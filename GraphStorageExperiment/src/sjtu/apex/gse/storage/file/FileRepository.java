@@ -26,7 +26,7 @@ public class FileRepository implements Scan {
 
 	public FileRepository(IndexManager indexMan, String filename, String pattern, int size, SourceHeapReader heap) {
 		range = indexMan.seek(pattern, size);
-		recLen = 4 * (size + 2);
+		recLen = 4 * (size + 4);
 		heapFile = heap;
 		try {
 			file = new RandomAccessFile(filename, "r");
