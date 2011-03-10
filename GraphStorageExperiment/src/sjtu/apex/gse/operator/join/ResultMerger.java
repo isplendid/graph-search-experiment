@@ -71,7 +71,13 @@ public class ResultMerger {
 	}
 	
 	public synchronized List<Tuple> getTuples(ArrayHashKey key) {
-		return new ArrayList<Tuple>(map.get(key));
+		List<Tuple> ret = map.get(key);
+		if (ret == null)
+			ret = new ArrayList<Tuple>();
+		else
+			ret = new ArrayList<Tuple>(ret);
+		
+		return ret;
 	}
 	
 	public Map<QueryGraphNode, Integer> getNodeMapping() {

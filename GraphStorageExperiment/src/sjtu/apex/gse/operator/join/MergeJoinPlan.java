@@ -71,4 +71,14 @@ public class MergeJoinPlan implements Plan {
 		return "MergeJoin(" + r.toString() + "," + l.toString() + ")";
 	}
 
+	@Override
+	public int executionCost() {
+		return diskIO() + webAccess() * 100;
+	}
+
+	@Override
+	public int webAccess() {
+		return l.webAccess() + r.webAccess();
+	}
+
 }
