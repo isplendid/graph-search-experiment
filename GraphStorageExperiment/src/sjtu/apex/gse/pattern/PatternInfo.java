@@ -8,6 +8,7 @@ import sjtu.apex.gse.struct.QueryGraphNode;
 
 
 /**
+ * A wrapper of cached information about a query pattern
  * 
  * @author Tian Yuan
  * 
@@ -27,14 +28,17 @@ public class PatternInfo {
 	 * @param patternStr - The string representation of the query graph
 	 * @param insCnt - The number of bindings will possibly be returned
 	 */
-	public PatternInfo(QueryGraph graph, String patternStr, int insCnt) {
+	public PatternInfo(QueryGraph graph, String patternStr, Integer insCnt) {
 		this.satisfiedNode = graph.getSatisfiedNodeSet();
 		this.graph = graph;
 		this.patternStr = patternStr;
 		this.usedEdge = graph.getEdgeSet();
 		this.usedNode = graph.getNodeSet();
 		this.constrainedNode = graph.getConstrainedNodeSet();
-		this.insCnt = insCnt;
+		if (insCnt == null)
+			this.insCnt = -1;
+		else
+			this.insCnt = insCnt;
 	}
 	
 	/**
