@@ -18,6 +18,9 @@ import sjtu.apex.gse.struct.QuerySchema;
  *
  */
 public class RAMArrayRepository implements UpdateScan {
+	
+	final static int maximumDoubleExt = 65536;
+	
 	QuerySchema qs;
 	int[][] data;
 	Set<Integer> sources[];
@@ -54,10 +57,10 @@ public class RAMArrayRepository implements UpdateScan {
 			for (int i = 0; i < qs.getSelectedNodeCount(); i++){
 				int newSize;
 				
-				if (data[i].length > 32767)
-					newSize = data[i].length + 32768;
-				else
+				if (data[i].length < maximumDoubleExt)
 					newSize = data[i].length * 2;
+				else
+					newSize = data[i].length + 32768;
 				
 				int[] newData = new int[newSize];
 				Set<Integer>[] newSource = new Set[newSize];
