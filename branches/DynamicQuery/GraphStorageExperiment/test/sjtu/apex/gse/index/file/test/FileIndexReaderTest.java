@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import sjtu.apex.gse.config.Configuration;
+import sjtu.apex.gse.config.FileConfig;
 import sjtu.apex.gse.index.file.FileIndexReader;
 
 
@@ -19,7 +20,7 @@ public class FileIndexReaderTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Configuration config = null;
+		Configuration config = new FileConfig("cfg-test");
 		rd = new FileIndexReader(config.getStringSetting("DataFolder", null) + "/index" + (size - 1), size, 128);
 	}
 
