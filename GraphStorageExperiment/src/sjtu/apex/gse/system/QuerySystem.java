@@ -58,7 +58,15 @@ public class QuerySystem {
 		
 		sourceMan = new SleepyCatSourceManager(config);
 		idMan = new SleepyCatIDManager(config);
-		webRepos = new ie.deri.urq.lidaq.repos.WebRepository(null, null);
+		
+		webReposInit();
+	}
+	
+	private void webReposInit() {
+		if (config.getIntegerSetting("", 0) > 0) {
+			webRepos = new ie.deri.urq.lidaq.repos.WebRepository(null, null);
+		}
+		
 	}
 	
 	private void paramsInit() {
@@ -149,7 +157,8 @@ public class QuerySystem {
 	public void close() {
 		sourceMan.close();
 		idMan.close();
-		webRepos.shutdown();
+		if (webRepos != null)
+			webRepos.shutdown();
 	}
 	
 }
