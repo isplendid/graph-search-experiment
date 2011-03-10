@@ -29,14 +29,22 @@ public interface Plan {
 	public QuerySchema getSchema();
 	
 	/**
-	 * Return the number of IO operations occurred by this node
-	 * @return
+	 * @return The number of IO operations occurred by this node
 	 */
 	public int diskIO();
 	
 	/**
-	 * Return the number of instances of the schema
-	 * @return
+	 * @return The number of instances of the schema
 	 */
 	public int resultCount();
+	
+	/**
+	 * @return The number of web accesses to the sources
+	 */
+	public int webAccess();
+	
+	/**
+	 * @return The cost of this plan including the descendant plans
+	 */
+	public int executionCost();
 }
