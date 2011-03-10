@@ -1,23 +1,23 @@
 package sjtu.apex.gse.experiment.edge;
 
 public class Edge {
-	private String label;
+	private int label;
 	private String str;
 	private boolean dir;
 	
 	public Edge(String tmp) {
-		str = tmp;
-		label = tmp.substring(1);
+		label = Integer.parseInt(tmp.substring(1));
 		dir = tmp.startsWith("+");
+		str = tmp;
 	}
 	
-	public Edge(String label, boolean dir) {
+	public Edge(int label, boolean dir) {
 		this.label = label;
 		this.dir = dir;
-		this.str = ((dir ? "+" : "-") + label);
+		this.str = ((dir ? "+" : "-") + Integer.toString(label));
 	}
 	
-	public String getLabel() {
+	public int getLabel() {
 		return label;
 	}
 	

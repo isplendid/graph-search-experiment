@@ -1,11 +1,17 @@
 package sjtu.apex.gse.experiment.edge;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
+
+import org.semanticweb.yars.nx.parser.NxParser;
+import org.semanticweb.yars.nx.parser.ParseException;
 
 import sjtu.apex.gse.filesystem.FilesystemUtility;
 import sjtu.apex.gse.indexer.IDManager;
-import sjtu.apex.gse.indexer.RelationRepository;
 import sjtu.apex.gse.indexer.file.SleepyCatIDManager;
 import sjtu.apex.gse.util.Heap;
 
@@ -73,37 +79,50 @@ public class EdgeLoad {
 		wr.close();
 		
 		FilesystemUtility.deleteDir(tmpDir);
-		
 	}
 	
-	public static void load(String src, String dest, String idDB) {
-		EdgeFileWriter wr = new EdgeFileWriter(dest + "/edgeTmp");
-		
-		IDManager lbman = new SleepyCatIDManager(idDB);
-		RelationRepository rd = new RelationRepository(src);
+	private static void extractEdges(String src, String dest, String idDB) {
+		EdgeFileWriter wr = new EdgeFileWriter(dest);
+		IDManager idman = new SleepyCatIDManager(idDB);
+		InputStream ins;
+		NxParser nxp;
 		int cnt = 0;
+		org.semanticweb.yars.nx.Node[] stmt = null;
 		
-		while (rd.next()) {
+		try {
+			ins = new FileInputStream(src);
+			if (src.toLowerCase().endsWith(".gz")) ins = new GZIPInputStream(ins);
+			nxp = new NxParser(ins);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		while (nxp.hasNext()) {
+			stmt = nxp.next();
+			
 			if ((++cnt) % 5000 == 0)
 				System.out.println(cnt);
 			
-			int sid = lbman.getID(rd.getSubject());
-			int oid = lbman.getID(rd.getObject());
+			int sid = idman.addGetID(stmt[0].toString());
+			int oid = idman.addGetID(stmt[2].toString());
 			
 			if (sid == -1 || oid == -1) continue;
 			
-			String pred = rd.getPredicate();
+			int pred = idman.addGetID(stmt[1].toString());
 			
 			wr.append(sid, new Edge(pred, true));
 			wr.append(oid, new Edge(pred, false));
 		}
 		wr.close();
-		rd.close();
-		
-		sort(dest + "/edgeTmp", dest + "/tmp");
-		
+	}
+	
+	private static void loadToEdgeDB(String src, String dest) {
 		EdgeInfo ei = new EdgeInfo(dest);
-		EdgeFileReader erd = new EdgeFileReader(dest + "/edgeTmp");
+		EdgeFileReader erd = new EdgeFileReader(src);
 		Integer prev = null;
 		List<Edge> tlist = new ArrayList<Edge>();
 		Edge ep = null;
@@ -126,10 +145,25 @@ public class EdgeLoad {
 		erd.close();
 		ei.addEdge(prev, tlist);
 		ei.close();
-		
+	}
+	
+	/**
+	 * Load the edge
+	 * @param src
+	 * @param dest
+	 * @param idDB
+	 */
+	public static void load(String src, String dest, String idDB) {
+		extractEdges(src, dest + "/edgeTmp", idDB);
+		sort(dest + "/edgeTmp", dest + "/tmp");
+		loadToEdgeDB(dest + "/edgeTmp", dest);
 		FilesystemUtility.deleteFile(dest + "/edgeTmp");
 	}
 	
+	/**
+	 * 
+	 * @param args - 
+	 */
 	public static void main(String[] args) {
 		EdgeLoad.load(args[0], args[1], args[2]);
 	}
