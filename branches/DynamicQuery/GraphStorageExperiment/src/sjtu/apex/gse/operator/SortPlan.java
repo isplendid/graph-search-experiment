@@ -62,4 +62,14 @@ public class SortPlan implements Plan {
 	public String toString() {
 		return "SortPlan(" + src.toString() + ")";
 	}
+
+	@Override
+	public int executionCost() {
+		return diskIO();
+	}
+
+	@Override
+	public int webAccess() {
+		return 0;
+	}
 }

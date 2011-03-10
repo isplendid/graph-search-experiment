@@ -58,4 +58,14 @@ public class PatternPlan implements Plan {
 		return "PatternPlan(" + ps + ")";
 	}
 
+	@Override
+	public int executionCost() {
+		return diskIO();
+	}
+
+	@Override
+	public int webAccess() {
+		return 0;
+	}
+
 }

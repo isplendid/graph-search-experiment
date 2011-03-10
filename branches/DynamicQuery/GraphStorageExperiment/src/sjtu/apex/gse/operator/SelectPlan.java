@@ -43,5 +43,17 @@ public class SelectPlan implements Plan {
 		return src.resultCount();
 	}
 
+	@Override
+	public int executionCost() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int webAccess() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 
 }
