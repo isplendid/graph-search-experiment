@@ -70,11 +70,11 @@ public class HashingPatternCodec implements PatternCodec {
 		QueryGraphNode minNode = graph.getNode(0);
 		
 		if (graph.nodeCount() == 1)
-			return minNode.getLabel();
+			return Integer.toString(minNode.getLabel());
 
 		for (int i = 1; i < graph.nodeCount(); i++) {
 			QueryGraphNode currentNode = graph.getNode(i);
-			if ((cmpRes = currentNode.getHashLabel(hf).compareTo(minNode.getHashLabel(hf))) < 0)
+			if ((cmpRes = currentNode.getHashLabel(hf)- minNode.getHashLabel(hf)) < 0)
 				minNode = currentNode;
 			else if (cmpRes == 0 && (cmpRes = (currentNode.getOutDegree() - minNode.getOutDegree())) > 0)
 				minNode = currentNode;
@@ -113,15 +113,15 @@ public class HashingPatternCodec implements PatternCodec {
 
 		QueryGraphNode n;
 		if (isHash && !nodeLabel.equals(wildcard))
-			n = g.addNode(nodeLabel, true); 
+			n = g.addNode(Integer.parseInt(nodeLabel), true); 
 		else
 			n = g.addNode();
 		
 		if (edgeLabel != null) {
 			if (outEdge)
-				g.addEdge(last, n, edgeLabel);
+				g.addEdge(last, n, Integer.parseInt(edgeLabel));
 			else
-				g.addEdge(n, last, edgeLabel);
+				g.addEdge(n, last, Integer.parseInt(edgeLabel));
 		}
 
 		if (content != null) {
@@ -169,9 +169,9 @@ public class HashingPatternCodec implements PatternCodec {
 			Connectivity a = (Connectivity) o1;
 			Connectivity b = (Connectivity) o2;
 			
-			if ((cmpRes = a.getNode().getHashLabel(hf).compareTo(b.getNode().getHashLabel(hf))) != 0)
+			if ((cmpRes = a.getNode().getHashLabel(hf)- b.getNode().getHashLabel(hf)) != 0)
 				return cmpRes;
-			else if ((cmpRes = a.getEdge().getLabel().compareTo(b.getEdge().getLabel())) != 0)
+			else if ((cmpRes = a.getEdge().getLabel() - b.getEdge().getLabel()) != 0)
 				return cmpRes;
 			else
 				return 0;	
