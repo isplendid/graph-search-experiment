@@ -1,6 +1,7 @@
 package sjtu.apex.gse.operator.join;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -9,7 +10,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import sjtu.apex.gse.operator.Scan;
-import sjtu.apex.gse.storage.web.WebRepository;
+import sjtu.apex.gse.operator.web.WebPatternScan;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
 
@@ -19,12 +20,12 @@ public class NestedLoopJoinScan implements Scan {
 	
 	private BlockingQueue<Tuple> outputQueue;
 	private Scan isrc;
-	private WebRepository esrc;
+	private WebPatternScan esrc;
 	private QuerySchema sch;
 	private ThreadCounter threadCnt;
 	private Tuple currentEntry;
 	
-	public NestedLoopJoinScan(Scan isrc, WebRepository esrc, List<Integer> lo, List<Integer> ro, QuerySchema sch, QueryGraphNode subject, QueryGraphNode object) {
+	public NestedLoopJoinScan(Scan isrc, WebPatternScan esrc, List<Integer> lo, List<Integer> ro, QuerySchema sch, QueryGraphNode subject, QueryGraphNode object) {
 		this.outputQueue = new LinkedBlockingQueue<Tuple>();
 		this.isrc = isrc;
 		this.esrc = esrc;
@@ -113,14 +114,14 @@ public class NestedLoopJoinScan implements Scan {
 	
 	private class KeyRegistrationThread extends Thread {
 		Scan src;
-		WebRepository tar;
+		WebPatternScan tar;
 		ResultMerger merger;
 		QueryGraphNode[] nodeList;
 		QueryGraphNode subject, object;
 		List<Integer> joinColumn;
 		int rowWidth;
 		
-		public KeyRegistrationThread(Scan src, WebRepository tar, List<Integer> joinColumn, ResultMerger merger, QueryGraphNode[] nodeList, QueryGraphNode subject, QueryGraphNode object) {
+		public KeyRegistrationThread(Scan src, WebPatternScan tar, List<Integer> joinColumn, ResultMerger merger, QueryGraphNode[] nodeList, QueryGraphNode subject, QueryGraphNode object) {
 			this.src = src;
 			this.tar = tar;
 			this.merger = merger;
@@ -132,9 +133,7 @@ public class NestedLoopJoinScan implements Scan {
 		}
 		
 		public void run() {
-			String sub, pred, obj;
-			
-			pred = sch.getQueryGraph().getEdge(0).getLabel();
+			int sub, obj;
 			
 			while (src.next()) {
 				Integer[] row = new Integer[rowWidth];
@@ -145,29 +144,30 @@ public class NestedLoopJoinScan implements Scan {
 				
 				merger.addTuple(joinValue, new Tuple(row, src.getSourceSet()));
 				
-				//TODO It is necessary to convert IDs into URIs
-				sub = (subject == null ? subject.getLabel() : Integer.toString(src.getID(subject)));
-				obj = (object == null ? object.getLabel() : Integer.toString(src.getID(object)));
-				tar.addKey(sub, pred, obj);
+				//TODO Handle nodes representing resources here
+				sub = (src.hasNode(subject) ? src.getID(subject) : -1);
+				obj = (src.hasNode(object) ? src.getID(object) : -1);
+				tar.addKey(sub, obj, new HashSet<Integer>(0));
 			}
 			tar.keyEnded();
 		}
 	}
 	
 	private class JoinThread extends Thread {
-		WebRepository src;
+		WebPatternScan src;
 		ResultMerger merger;
 		List<Integer> joinColumn;
 		int rowWidth;
 		QueryGraphNode[] nodeList;
 		ThreadCounter counter;
 	
-		public JoinThread(WebRepository src, List<Integer> joinColumn, ResultMerger merger, QueryGraphNode[] nodeList, ThreadCounter counter) {
+		public JoinThread(WebPatternScan src, List<Integer> joinColumn, ResultMerger merger, QueryGraphNode[] nodeList, ThreadCounter counter) {
 			this.src = src;
 			this.merger = merger;
 			this.joinColumn = joinColumn;
 			this.rowWidth = nodeList.length;
 			this.nodeList = nodeList;
+			this.counter = counter;
 		}
 		
 		public void run() {
