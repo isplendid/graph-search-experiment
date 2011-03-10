@@ -69,9 +69,9 @@ public class FileRepositoryWriter {
 		
 		
 		System.arraycopy(intToByteArray(shr.getStartIndex().getPageID()), 0, buf, numPos, 4);
-		System.arraycopy(intToByteArray(shr.getStartIndex().getOffset()), 0, buf, numPos, 4);
-		System.arraycopy(intToByteArray(shr.getEndIndex().getPageID()), 0, buf, numPos, 4);
-		System.arraycopy(intToByteArray(shr.getEndIndex().getOffset()), 0, buf, numPos, 4);
+		System.arraycopy(intToByteArray(shr.getStartIndex().getOffset()), 0, buf, numPos + 4, 4);
+		System.arraycopy(intToByteArray(shr.getEndIndex().getPageID()), 0, buf, numPos + 8, 4);
+		System.arraycopy(intToByteArray(shr.getEndIndex().getOffset()), 0, buf, numPos + 12, 4);
 		
 		offset += recLen;
 	}
