@@ -8,17 +8,25 @@ import sjtu.apex.gse.struct.QuerySchema;
 import sjtu.apex.gse.system.QuerySystem;
 
 public class WebPatternPlan implements Plan {
-	QuerySystem qs;
-	QuerySchema sch;
+	private QuerySystem qs;
+	private QuerySchema sch;
+	private String ps;
+	private Integer webAccCnt = null;
+	private Integer resCnt = null;
 	
 	public WebPatternPlan(QuerySchema sch, QuerySystem qs) {
+		this(sch, qs, qs.patternManager().getCodec().encodePattern(sch.getQueryGraph()));	
+	}
+	
+	public WebPatternPlan(QuerySchema sch, QuerySystem qs, String ps) {
 		this.sch = sch;
 		this.qs = qs;
+		this.ps = ps;
 	}
 
 	@Override
 	public Scan open() {
-		WebPatternScan wps = new WebPatternScan(sch, qs.idManager(), qs.sourceManager());
+		WebPatternScan wps = new WebPatternScan(sch, qs.idManager(), qs.sourceManager(), qs.webRepository());
 		
 		wps.addKey(-1, -1, new HashSet<Integer>());
 		wps.keyEnded();
@@ -39,14 +47,43 @@ public class WebPatternPlan implements Plan {
 
 	@Override
 	public int diskIO() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public int resultCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		if (resCnt == null) {
+			if (sch.getQueryGraph().getEdge(0).getNodeFrom().isGeneral() && sch.getQueryGraph().getEdge(0).getNodeTo().isGeneral())
+				resCnt = 1000;
+			else
+				resCnt = 10;
+		}
+		
+		return resCnt;
 	}
 
+	@Override
+	public int executionCost() {
+		return webAccess() * 100;
+	}
+	
+	@Override
+	public int webAccess() {
+		if (webAccCnt == null) {
+			if (sch.getQueryGraph().getEdge(0).getNodeFrom().isGeneral() && sch.getQueryGraph().getEdge(0).getNodeTo().isGeneral())
+				webAccCnt = 20;
+			else
+				webAccCnt = 3;
+		}
+		
+		return webAccCnt;
+	}
+	
+	@Override
+	public String toString() {
+		return "WebPattern(" + ps + ")";
+	}
+
+
 }
+
