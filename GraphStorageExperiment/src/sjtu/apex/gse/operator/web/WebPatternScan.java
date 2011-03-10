@@ -26,20 +26,27 @@ public class WebPatternScan implements Scan {
 	protected IDManager idman;
 	protected SourceManager srcman;
 	
-	public WebPatternScan(QuerySchema sch, IDManager idman, SourceManager srcman) {
-		this(sch.getQueryGraph().getEdge(0).getNodeFrom(), sch.getQueryGraph().getEdge(0).getLabel(), sch.getQueryGraph().getEdge(0).getNodeTo(), idman, srcman);
+	public WebPatternScan(QuerySchema sch, IDManager idman, SourceManager srcman, ie.deri.urq.lidaq.repos.WebRepository webRepos) {
+		this(sch.getQueryGraph().getEdge(0).getNodeFrom(), sch.getQueryGraph().getEdge(0).getLabel(), sch.getQueryGraph().getEdge(0).getNodeTo(), idman, srcman, webRepos);
 	}
 	
-	public WebPatternScan(QueryGraphNode sub, String pred, QueryGraphNode obj, IDManager idman, SourceManager srcman) {
-		this.src = new ie.deri.urq.lidaq.repos.WebRepository(null, null);
+	public WebPatternScan(QueryGraphNode sub, int pred, QueryGraphNode obj, IDManager idman, SourceManager srcman, ie.deri.urq.lidaq.repos.WebRepository webRepos) {
+		this.src = webRepos;
 		this.output = new LinkedBlockingQueue<Tuple>();
-		this.pred = pred;
+		this.pred = idman.getURI(pred);
 		this.subNode = sub;
 		this.objNode = obj;
 		this.idman = idman;
 		this.keyEnded = false;
 		this.srcman = srcman;
 		this.srcIdled = true;
+	}
+	
+	private String getLabelFromID(int id) {
+		if (id < 0)
+			return "*";
+		else
+			return idman.getURI(id);
 	}
 
 	/**
@@ -50,8 +57,8 @@ public class WebPatternScan implements Scan {
 	 * @param sources - The set of sources
 	 */
 	public void addKey(int sub, int obj, Set<Integer> sources) {
-		String subStr = sub < 0 ? subNode.getLabel() : idman.getURI(sub);
-		String objStr = obj < 0 ? objNode.getLabel() : idman.getURI(obj);
+		String subStr = sub < 0 ? getLabelFromID(subNode.getLabel()) : idman.getURI(sub);
+		String objStr = obj < 0 ? getLabelFromID(objNode.getLabel()) : idman.getURI(obj);
 		
 		if (subStr == "*") subStr = "?s";
 		if (objStr == "*") objStr = "?o";
