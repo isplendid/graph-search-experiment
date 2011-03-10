@@ -50,10 +50,17 @@ public class RAMArrayRepository implements UpdateScan {
 
 	public void insert() {
 		entryCnt++;
-		if (entryCnt > data[0].length) 
+		if (entryCnt > data[0].length)
 			for (int i = 0; i < qs.getSelectedNodeCount(); i++){
-				int[] newData = new int[data[i].length * 2];
-				Set<Integer>[] newSource = new Set[sources.length * 2];
+				int newSize;
+				
+				if (data[i].length > 32767)
+					newSize = data[i].length + 32768;
+				else
+					newSize = data[i].length * 2;
+				
+				int[] newData = new int[newSize];
+				Set<Integer>[] newSource = new Set[newSize];
 				
 				System.arraycopy(data[i], 0, newData, 0, pointer + 1);
 				System.arraycopy(data[i], pointer + 1, newData, pointer + 2, entryCnt - 2 - pointer);
