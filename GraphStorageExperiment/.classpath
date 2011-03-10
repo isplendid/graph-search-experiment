@@ -18,5 +18,7 @@
 	<classpathentry kind="lib" path="lib/rio.jar"/>
 	<classpathentry kind="lib" path="lib/openrdf-model.jar"/>
 	<classpathentry kind="lib" path="lib/openrdf-util.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/WebRepositoryCache"/>
+	<classpathentry kind="lib" path="lib/nxparser.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
