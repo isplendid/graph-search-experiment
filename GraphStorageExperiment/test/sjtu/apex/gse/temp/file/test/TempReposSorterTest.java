@@ -1,9 +1,11 @@
-package sjtu.apex.gse.index.file.test;
+package sjtu.apex.gse.temp.file.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import sjtu.apex.gse.storage.file.RID;
+import sjtu.apex.gse.storage.file.SourceHeapRange;
 import sjtu.apex.gse.temp.file.TempFileEntry;
 import sjtu.apex.gse.temp.file.TempRepositoryFileReader;
 import sjtu.apex.gse.temp.file.TempRepositoryFileWriter;
@@ -28,7 +30,7 @@ public class TempReposSorterTest {
 			tmp[0] = i;
 			tmp[1] = i + 2;
 			tmp[2] = i + 3;
-			tw.writeRecord(new TempFileEntry(Integer.toString(i), tmp));
+			tw.writeRecord(new TempFileEntry(Integer.toString(i), tmp, new SourceHeapRange(new RID(0, 0), new RID(0, 0))));
 		}
 		tw.close();
 	}
