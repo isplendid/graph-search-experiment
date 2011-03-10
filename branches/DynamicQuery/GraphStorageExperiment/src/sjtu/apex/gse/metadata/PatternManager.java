@@ -5,10 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import sjtu.apex.gse.hash.HashFunction;
 import sjtu.apex.gse.pattern.PatternCodec;
 import sjtu.apex.gse.pattern.PatternInfo;
-import sjtu.apex.gse.struct.Connectivity;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphEdge;
 import sjtu.apex.gse.struct.QueryGraphNode;
@@ -24,12 +22,10 @@ public class PatternManager {
 	//	static Connection conn = ConnectionFactory.createConnection();
 	PatternCodec codec;
 	IndexManager indexMan;
-	HashFunction hf;
 
-	public PatternManager(PatternCodec codec, IndexManager indexMan, HashFunction hf) {
+	public PatternManager(PatternCodec codec, IndexManager indexMan) {
 		this.codec = codec;
 		this.indexMan = indexMan;
-		this.hf = hf;
 	}
 
 	/**
@@ -73,80 +69,84 @@ public class PatternManager {
 	public List<PatternInfo> getSubPatterns(QueryGraph graph) {
 		List<PatternInfo> elems = new ArrayList<PatternInfo>();
 		SubpatternSet generated = new SubpatternSet();
-		int pointer = 0;
-		PatternInfo toExt;
+//		int pointer = 0;
+//		PatternInfo toExt;
 
-		for (int i = 0; i < graph.nodeCount(); i++) 
-			if (!graph.getNode(i).isGeneral()) {
-				QueryGraphNode n = graph.getNode(i);
-				Set<QueryGraphNode> ns = new HashSet<QueryGraphNode>();
-
-				ns.add(n);
-				QueryGraph g = graph.getInducedSubgraph(ns, null, null, null);
-				String ps = codec.encodePattern(g);
-				Integer ti = getPatternInstanceCount(ps, g.nodeCount());
-				if (ti != null) {
-					PatternInfo pi = new PatternInfo(g, ps, ti); 
-					elems.add(pi);
-					generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
-				}
-			}
+//		for (int i = 0; i < graph.nodeCount(); i++) 
+//			if (!graph.getNode(i).isGeneral()) {
+//				QueryGraphNode n = graph.getNode(i);
+//				Set<QueryGraphNode> ns = new HashSet<QueryGraphNode>();
+//
+//				ns.add(n);
+//				QueryGraph g = graph.getInducedSubgraph(ns, null, null, null);
+//				String ps = codec.encodePattern(g);
+//				Integer ti = getPatternInstanceCount(ps, g.nodeCount());
+//				if (ti != null) {
+//					PatternInfo pi = new PatternInfo(g, ps, ti); 
+//					elems.add(pi);
+//					generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
+//				}
+//			}
 		
 		for (int i = 0; i < graph.edgeCount(); i++) {
 			QueryGraphEdge e = graph.getEdge(i);
 			Set<QueryGraphEdge> es = new HashSet<QueryGraphEdge>();
+			Set<QueryGraphNode> ns = new HashSet<QueryGraphNode>();
 			
 			es.add(e);
-			QueryGraph g = graph.getInducedSubgraph(null, es, null, null);
+			ns.add(e.getNodeFrom());
+			ns.add(e.getNodeTo());
+			
+			QueryGraph g = graph.getInducedSubgraph(ns, es, null, null);
 			String ps = codec.encodePattern(g);
 			PatternInfo pi = new PatternInfo(g, ps, getPatternInstanceCount(ps, g.nodeCount()));
 			elems.add(pi);
 			generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
 		}
 
-		while (pointer < elems.size()) {
-			toExt = elems.get(pointer);
-			Set<QueryGraphNode> nodeCovered = toExt.getCoveredNodes();
-			Set<QueryGraphEdge> edgeCovered = toExt.getCoveredEdges();
-			Set<QueryGraphNode> nodeConstrained = toExt.getConstrainedNodes();
-			
-			for (QueryGraphNode n : nodeCovered) {
-				for (Connectivity c : n.getAncestor().getConnectivities()) 
-					if (!edgeCovered.contains(c.getEdge())){
-						edgeCovered.add(c.getEdge());
-						
-						QueryGraph ng = graph.getInducedSubgraph(nodeConstrained, edgeCovered, nodeConstrained, hf);
-						String ps = codec.encodePattern(ng);
-						Integer insCnt;
-						
-						if (!generated.contains(ps, ng.getEdgeSet(), ng.getNodeSet()) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
-							PatternInfo pi = new PatternInfo(ng, ps, insCnt);
-							elems.add(pi);
-							generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
-						}
-						
-						edgeCovered.remove(c.getEdge());
-					}
-				
-				if (n.isGeneral() && n.isGeneralized()) {
-					nodeConstrained.add(n);
-					
-					QueryGraph ng = graph.getInducedSubgraph(nodeConstrained, edgeCovered, nodeConstrained, hf);
-					String ps = codec.encodePattern(ng);
-					Integer insCnt;
-					
-					if (!generated.contains(ps, ng.getEdgeSet(), ng.getNodeSet()) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
-						PatternInfo pi = new PatternInfo(ng, ps, insCnt);
-						elems.add(pi);
-						generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
-					}
-					
-					nodeConstrained.remove(n);
-				}
-			}
-
-			pointer++;
-		}
+//		while (pointer < elems.size()) {
+//			toExt = elems.get(pointer);
+//			Set<QueryGraphNode> nodeCovered = toExt.getCoveredNodes();
+//			Set<QueryGraphEdge> edgeCovered = toExt.getCoveredEdges();
+//			Set<QueryGraphNode> nodeConstrained = toExt.getConstrainedNodes();
+//			
+//			for (QueryGraphNode n : nodeCovered) {
+//				for (Connectivity c : n.getAncestor().getConnectivities()) 
+//					if (!edgeCovered.contains(c.getEdge())){
+//						edgeCovered.add(c.getEdge());
+//						
+//						QueryGraph ng = graph.getInducedSubgraph(nodeConstrained, edgeCovered, nodeConstrained, hf);
+//						String ps = codec.encodePattern(ng);
+//						Integer insCnt;
+//						
+//						if (!generated.contains(ps, ng.getEdgeSet(), ng.getNodeSet()) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
+//							PatternInfo pi = new PatternInfo(ng, ps, insCnt);
+//							elems.add(pi);
+//							generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
+//						}
+//						
+//						edgeCovered.remove(c.getEdge());
+//					}
+//				
+//				if (n.isGeneral() && n.isGeneralized()) {
+//					nodeConstrained.add(n);
+//					
+//					QueryGraph ng = graph.getInducedSubgraph(nodeConstrained, edgeCovered, nodeConstrained, hf);
+//					String ps = codec.encodePattern(ng);
+//					Integer insCnt;
+//					
+//					if (!generated.contains(ps, ng.getEdgeSet(), ng.getNodeSet()) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
+//						PatternInfo pi = new PatternInfo(ng, ps, insCnt);
+//						elems.add(pi);
+//						generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
+//					}
+//					
+//					nodeConstrained.remove(n);
+//				}
+//			}
+//
+//			pointer++;
+//		}
 
 		return elems;
 	}
