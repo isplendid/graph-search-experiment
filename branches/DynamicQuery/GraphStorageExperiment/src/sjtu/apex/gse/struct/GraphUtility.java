@@ -14,10 +14,6 @@ public class GraphUtility {
 		return extendConstraint(g, toExt, con, false);
 	}
 	
-	public static QueryGraph extendEdge(QueryGraph g, int toExt, int e, boolean dir) {
-		return extendEdge(g, toExt, e, dir, false);
-	}
-	
 	private static QueryGraphNode getNewNode(int lbl, int sn, boolean isHash) {
 		if (isHash)
 			return new HashQueryGraphNode(sn, null, lbl);
@@ -58,6 +54,18 @@ public class GraphUtility {
 		}
 		
 		return ng;
+	}
+	
+	/**
+	 * Add an edge with a new general node to the given graph
+	 * @param g - The original query graph.
+	 * @param toExt - The ID of the node on which the edge is extended
+	 * @param e - The label of the edge to be extended.
+	 * @param dir - The direction of the edge. True - pointing to the new node; false - pointing from the new node.
+	 * @return The new graph
+	 */
+	public static QueryGraph extendEdge(QueryGraph g, int toExt, int e, boolean dir) {
+		return extendEdge(g, toExt, e, dir, false);
 	}
 	
 	public static QueryGraph extendEdge(QueryGraph g, int toExt, int e, boolean dir, boolean isHash) {

@@ -19,6 +19,7 @@ import sjtu.apex.gse.query.FileQueryReader;
 import sjtu.apex.gse.query.FileQueryWriter;
 import sjtu.apex.gse.query.QueryReader;
 import sjtu.apex.gse.query.QueryWriter;
+import sjtu.apex.gse.struct.Connectivity;
 import sjtu.apex.gse.struct.GraphUtility;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphNode;
@@ -84,20 +85,24 @@ public class ComplexQueryGenerator {
 		while (s.next() && cnt < conScanMax) {
 			cnt ++;
 			for (int i = qg.nodeCount() - 1; i >= 0; i--)
-				if (qg.getNode(i).isGeneral() && Math.random() < pec) {
-					QueryGraphNode extNode = qg.getNode(i);
-					int ni = s.getID(extNode);
-					String[] sl = lm.getLabel(im.getURI(ni));
-					int[] sli = new int[sl.length];
+				if (qg.getNode(i).isGeneral()) {
+					boolean canBeExt = true;
 					
-					for (int j = 0; j < sl.length; j++) sli[j] = sys.idManager().addGetID(sl[j]);
-
-					if (sl.length != 0) {
-						QueryGraph ng = GraphUtility.extendConstraint(qg, i, sli[(int)(sl.length * Math.random())]);
-
+					for (Connectivity c : qg.getNode(i).getConnectivities()) 
+						if (!c.getNode().isGeneral()) {
+							canBeExt = false;
+							break;
+						}
+				
+					if (canBeExt && Math.random() < pec) {
+						QueryGraphNode extNode = qg.getNode(i);
+						int ni = s.getID(extNode);
+						
+						QueryGraph ng = GraphUtility.extendConstraint(qg, i, ni);
+	
 						ret.add(getFullSchema(ng));
 					}
-				}
+			}
 		}
 		s.close();
 		
