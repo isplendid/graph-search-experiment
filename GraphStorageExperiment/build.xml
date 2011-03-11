@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="DynamicQueryExperiment" basedir="." default="compile">
+  
+    <!-- DIRECTORIES -->
+    <property name="lib.dir" value="lib"/>
+    <property name="src.dir" value="src"/>
+	<property name="bin.dir" value="bin"/>
+    <property environment="env"/>
+  
+    <path id="classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+            <exclude name="${junit.jar}"/>
+        </fileset>
+        <pathelement path="${java.class.path}"/>
+    </path>
+    
+    <target name="clean">
+        <tstamp />
+        <echo>Cleaning up</echo>
+        <delete dir="${build.dir}"/>
+    </target>
+    
+    <target name="prepare">
+        <echo>Preparing directories</echo>
+        <mkdir dir="${bin.dir}"/>
+    </target>
+    
+    <target name="compile" depends="prepare">
+    	<echo>Compiling</echo>
+        <javac destdir="${bin.dir}"
+            srcdir="${src.dir}"
+            debug="yes">
+          <classpath refid="classpath"/>
+        </javac>
+    </target>
+
+</project>
