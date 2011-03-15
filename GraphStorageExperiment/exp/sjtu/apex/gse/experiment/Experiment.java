@@ -36,10 +36,15 @@ public class Experiment {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
+		String configFilename = args[0];
+		String queryFilename = args[1];
+		String resultFilename = args[2];
+		
 		File bkf = new File("break");
-		Configuration config = new FileConfig(args[0]);
+		Configuration config = new FileConfig(configFilename);
+		
 		QuerySystem sys = new QuerySystem(config);
-		QueryReader rd = new FileQueryReader(args[1], sys.idManager());
+		QueryReader rd = new FileQueryReader(queryFilename, sys.idManager());
 		BufferedWriter wr;
 		IDManager idman = null;
 		int startId = -1;
@@ -50,7 +55,7 @@ public class Experiment {
 			startId = Integer.parseInt(bkr.readLine());
 			bkr.close();
 			bkf.delete();
-			wr = new BufferedWriter(new FileWriter(args[2], true));
+			wr = new BufferedWriter(new FileWriter(resultFilename, true));
 			wr.append("#\n");
 		}
 		else
@@ -111,6 +116,7 @@ public class Experiment {
 		bkf.delete();
 		
 		wr.close();
+		sys.close();
 	}
 
 }
