@@ -13,6 +13,7 @@ import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.operator.web.WebPatternScan;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
+import sun.security.util.Debug;
 
 public class NestedLoopJoinScan implements Scan {
 	
@@ -145,7 +146,9 @@ public class NestedLoopJoinScan implements Scan {
 				Integer[] joinValue = new Integer[joinColumn.size()];
 				for (int i = 0; i < joinColumn.size(); i++) joinValue[i] = src.getID(joinColumn.get(i));
 				
+				Debug.println("Add Key", "Entered merger");
 				merger.addTuple(joinValue, new Tuple(row, src.getSourceSet()));
+				Debug.println("Add Key", "Exited from merger");
 				
 				//TODO Handle nodes representing resources here
 				sub = (src.hasNode(subject) ? src.getID(subject) : -1);
@@ -153,6 +156,7 @@ public class NestedLoopJoinScan implements Scan {
 				tar.addKey(sub, obj, new HashSet<Integer>(0));
 			}
 			tar.keyEnded();
+			Debug.println("Add Key Thread", "Finished");
 		}
 	}
 	

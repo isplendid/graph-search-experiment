@@ -68,39 +68,45 @@ public class WebPatternScan implements Scan {
 		String[] key = {subStr, pred, objStr};
 		
 		
+		Debug.println("addKey", key[0] + " " + key[1] + " " + key[2]);
 		src.addObserver(new KeyObserverImpl(this, key, convertSrcSetToExternal(sources)));
 		hasKey = true;
 	}
+	
+	private synchronized boolean hasThreadWaitingOnNext() {
+		return keyEnded;// && output.size() <= 0;
+	}
+	
+	private synchronized void setKeyEnded(boolean value) {
+		keyEnded = value;
+	}
+	
+//	private synchronized boolean hasMoreResults() {
+//		return true;
+////		return !keyEnded || !src.idle() || output.size() > 0;
+//	}
 	
 	/**
 	 * Indicate there is no more key that will be added to the listener's list
 	 */
 	public void keyEnded() {
-		keyEnded = true;
+		Debug.println("keyEnded", " called by " + pred);
+		setKeyEnded(true);
 		
 		if (!hasKey)
-			try {
-				output.put(new Tuple());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			output.add(new Tuple());
 	}
 	
-	protected synchronized void systemIdled() {
-		if (keyEnded && src.idle() && output.size() <= 0)
-			try {
-				output.put(new Tuple());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-	}
-	
-	protected synchronized void addResult(Tuple t) {
-		try {
-			output.put(t);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+	protected void systemIdled() {
+		if (hasThreadWaitingOnNext()) {
+			Debug.println("systemIdled", "called by prdicate " + pred + " , keyEnded = " + keyEnded + " , output size = " + output.size());
+			output.add(new Tuple());
 		}
+	}
+	
+	protected void addResult(Tuple t) {
+		Debug.println("addResult", t.toString());
+		output.add(t);
 	}
 	
 	private Set<String> convertSrcSetToExternal(Set<Integer> sources) {
@@ -119,10 +125,10 @@ public class WebPatternScan implements Scan {
 	}
 
 	@Override
-	public synchronized boolean next() {
+	public boolean next() {
 		boolean ret;
 		
-		if (!keyEnded || !src.idle() || output.size() > 0) {
+//		if (hasMoreResults()) {
 			try {
 				currentEntry = output.take();
 			} catch (InterruptedException e) {
@@ -132,9 +138,9 @@ public class WebPatternScan implements Scan {
 				ret = false;
 			else
 				ret = true;
-		}
-		else
-			ret = false;
+//		}
+//		else
+//			ret = false;
 		
 		return ret;
 	}
