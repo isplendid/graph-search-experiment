@@ -11,6 +11,7 @@ import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.operator.join.Tuple;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
+import sun.security.util.Debug;
 
 public class WebPatternScan implements Scan {
 	
@@ -22,6 +23,7 @@ public class WebPatternScan implements Scan {
 	private Tuple currentEntry;
 	private boolean keyEnded;
 	protected boolean srcIdled;
+	private boolean hasKey;
 	
 	protected IDManager idman;
 	protected SourceManager srcman;
@@ -67,6 +69,7 @@ public class WebPatternScan implements Scan {
 		
 		
 		src.addObserver(new KeyObserverImpl(this, key, convertSrcSetToExternal(sources)));
+		hasKey = true;
 	}
 	
 	/**
@@ -74,15 +77,30 @@ public class WebPatternScan implements Scan {
 	 */
 	public void keyEnded() {
 		keyEnded = true;
+		
+		if (!hasKey)
+			try {
+				output.put(new Tuple());
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 	}
 	
-	protected void systemIdled() {
+	protected synchronized void systemIdled() {
 		if (keyEnded && src.idle() && output.size() <= 0)
-			output.add(new Tuple());
+			try {
+				output.put(new Tuple());
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 	}
 	
-	protected void addResult(Tuple t) {
-		output.add(t);
+	protected synchronized void addResult(Tuple t) {
+		try {
+			output.put(t);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private Set<String> convertSrcSetToExternal(Set<Integer> sources) {
@@ -101,7 +119,7 @@ public class WebPatternScan implements Scan {
 	}
 
 	@Override
-	public boolean next() {
+	public synchronized boolean next() {
 		boolean ret;
 		
 		if (!keyEnded || !src.idle() || output.size() > 0) {
@@ -123,7 +141,7 @@ public class WebPatternScan implements Scan {
 
 	@Override
 	public void close() {
-		src.shutdown();
+//		src.shutdown();
 
 	}
 

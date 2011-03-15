@@ -80,7 +80,10 @@ public class NestedLoopJoinScan implements Scan {
 				e.printStackTrace();
 			}
 			
-			return true;
+			if (currentEntry.isDummy())
+				return false;
+			else
+				return true;
 		}
 		else
 			return false;
@@ -181,6 +184,7 @@ public class NestedLoopJoinScan implements Scan {
 				merger.addTuple(joinValue, new Tuple(row, src.getSourceSet()));
 			}
 			counter.threadEnded();
+			merger.addPoisonToken();
 		}
 	}
 }

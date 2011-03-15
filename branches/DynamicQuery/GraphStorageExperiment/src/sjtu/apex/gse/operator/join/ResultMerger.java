@@ -66,8 +66,16 @@ public class ResultMerger {
 		for (Tuple t : joining.getTuples(key)) {
 			Tuple o = mergeTuples(tuple, t);
 			
-			output.add(o);
+			try {
+				output.put(o);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+	}
+	
+	public synchronized void addPoisonToken() {
+		output.add(new Tuple());
 	}
 	
 	public synchronized List<Tuple> getTuples(ArrayHashKey key) {
