@@ -35,7 +35,11 @@ public class ArrayHashKey {
 				 for (int i = 0; i < oValues.length; i++)
 					 if (oValues[i] != joinValue[i])
 						 ret = false;
+			 } else {
+				 System.err.println("Error length");
 			 }
+		} else {
+			System.err.println("Error data type");
 		}
 		
 		return ret;

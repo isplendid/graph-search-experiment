@@ -78,7 +78,7 @@ public class ResultMerger {
 		output.add(new Tuple());
 	}
 	
-	public synchronized List<Tuple> getTuples(ArrayHashKey key) {
+	private List<Tuple> getTuples(ArrayHashKey key) {
 		List<Tuple> ret = map.get(key);
 		if (ret == null)
 			ret = new ArrayList<Tuple>();
