@@ -131,6 +131,7 @@ public class NestedLoopJoinTest {
 	@Test
 	public void testOpen() {
 		long time = System.currentTimeMillis();
+		
 		for (int i = 0; i < left.size(); i++) {
 			Plan p = new NestedLoopJoinPlan(left.get(i), right.get(i), joinOn.get(i), qsAll.get(i), sys);
 			Scan s = p.open();
