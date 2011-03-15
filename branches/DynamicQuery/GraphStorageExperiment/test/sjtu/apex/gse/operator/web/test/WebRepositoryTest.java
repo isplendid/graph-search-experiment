@@ -1,8 +1,8 @@
 package sjtu.apex.gse.operator.web.test;
 
 import static org.junit.Assert.assertTrue;
-
 import ie.deri.urq.lidaq.log.LODQ2_LogHandling;
+import ie.deri.urq.lidaq.repos.WebRepository;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,32 +40,31 @@ public class WebRepositoryTest {
 		QueryGraph graph = new QueryGraph();
 		QueryGraphNode from = graph.addNode();
 		QueryGraphNode to = graph.addNode();
-		graph.addEdge(from, to, idman.addGetID("http://xmlns.com/foaf/0.1/knows"));
+		graph.addEdge(from, to, idman.addGetID("http://xmlns.com/foaf/0.1/title"));
 		List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
 		seln.add(to);
 		
 		QuerySchema qs = new QuerySchema(graph, seln);
 		list.add(qs);
-		bind.add("http://www.polleres.net/foaf.rdf#me");
-		
-		if (idman.getID("http://www.polleres.net/foaf.rdf#me") < 0)
-			idman.addURI("http://www.polleres.net/foaf.rdf#me");
+		bind.add("http://www.informatik.uni-leipzig.de/~auer/foaf.rdf#me");
 	}
 	
 	@Test
 	public void test() {
 		LODQ2_LogHandling.setDefaultLogging();
+		System.out.println("Test started");
 		for (int i = 0; i < list.size(); i++) {
 			QuerySchema qs = list.get(i);
 			String uri = bind.get(i);
 			
-			WebPatternScan webrepos = new WebPatternScan(qs, idman, srcman, null);
+			WebPatternScan webrepos = new WebPatternScan(qs, idman, srcman, new WebRepository(null, null));
 			
-			webrepos.addKey(idman.getID(uri), -1, new HashSet<Integer>());
+			webrepos.addKey(idman.addGetID(uri), -1, new HashSet<Integer>());
 			Set<QueryGraphNode> ns = qs.getSelectedNodeSet();
 			
 			webrepos.keyEnded();
 			
+			System.out.println("Iteration begins");
 			while (webrepos.next()) {
 				System.out.print("Output : ");
 				for (QueryGraphNode n : ns) {
