@@ -17,8 +17,9 @@ public class KeyObserverImpl extends KeyObserver {
 
 	@Override
 	protected void receiveStatement(String[] statement) {
-		if (statement == null)
+		if (statement == null) {
 			src.systemIdled();
+		}
 		else {
 			Integer[] values = new Integer[2];
 			int subID = src.idman.getID(statement[0]);

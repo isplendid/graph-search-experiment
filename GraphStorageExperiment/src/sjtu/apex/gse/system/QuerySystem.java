@@ -31,6 +31,7 @@ public class QuerySystem {
 	private Planner queryPlanner;
 	private String folder;
 	private int pl, psl;
+	private QuerySystemMode sysMode;
 	
 	private SourceManager sourceMan;
 	private ie.deri.urq.lidaq.repos.WebRepository webRepos;
@@ -46,6 +47,7 @@ public class QuerySystem {
 	
 	public QuerySystem(Configuration config, QuerySystemMode mode) {
 		this.config = config;
+		this.sysMode = mode;
 		
 		paramsInit();
 		
@@ -63,10 +65,9 @@ public class QuerySystem {
 	}
 	
 	private void webReposInit() {
-		if (config.getIntegerSetting("", 0) > 0) {
+		if (sysMode == QuerySystemMode.WEB_ONLY && config.getIntegerSetting("WebAccess", 0) > 0) {
 			webRepos = new ie.deri.urq.lidaq.repos.WebRepository(null, null);
 		}
-		
 	}
 	
 	private void paramsInit() {
