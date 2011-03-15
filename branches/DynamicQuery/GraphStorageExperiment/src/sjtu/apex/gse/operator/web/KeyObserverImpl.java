@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import sjtu.apex.gse.operator.join.Tuple;
+import sun.security.util.Debug;
 
 public class KeyObserverImpl extends KeyObserver {
 	WebPatternScan src;
@@ -21,7 +22,7 @@ public class KeyObserverImpl extends KeyObserver {
 			src.systemIdled();
 		}
 		else {
-			Integer[] values = new Integer[2];
+			int[] values = new int[2];
 			int subID = src.idman.getID(statement[0]);
 			int objID = src.idman.getID(statement[2]);
 			int srcID = src.srcman.getID(statement[3]);
@@ -38,6 +39,7 @@ public class KeyObserverImpl extends KeyObserver {
 			
 			sources.add(srcID);
 			
+			Debug.println("receiveStatement", "p = " + statement[1] + " , " + subID + " = " + statement[0] + " , " + objID + " = " + statement[2]);
 			src.addResult(new Tuple(values, sources));
 		}
 	}

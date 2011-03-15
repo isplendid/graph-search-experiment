@@ -140,10 +140,10 @@ public class NestedLoopJoinScan implements Scan {
 			int sub, obj;
 			
 			while (src.next()) {
-				Integer[] row = new Integer[rowWidth];
+				int[] row = new int[rowWidth];
 				for (int i = 0; i < rowWidth; i++) row[i] = src.getID(nodeList[i]);
 				
-				Integer[] joinValue = new Integer[joinColumn.size()];
+				int[] joinValue = new int[joinColumn.size()];
 				for (int i = 0; i < joinColumn.size(); i++) joinValue[i] = src.getID(joinColumn.get(i));
 				
 				Debug.println("Add Key", "Entered merger");
@@ -179,10 +179,10 @@ public class NestedLoopJoinScan implements Scan {
 		
 		public void run() {
 			while (src.next()) {
-				Integer[] row = new Integer[rowWidth];
+				int[] row = new int[rowWidth];
 				for (int i = 0; i < rowWidth; i++) row[i] = src.getID(nodeList[i]);
 				
-				Integer[] joinValue = new Integer[joinColumn.size()];
+				int[] joinValue = new int[joinColumn.size()];
 				for (int i = 0; i < joinColumn.size(); i++) joinValue[i] = src.getID(joinColumn.get(i));
 				
 				merger.addTuple(joinValue, new Tuple(row, src.getSourceSet()));

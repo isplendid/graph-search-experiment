@@ -10,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
+import sun.security.util.Debug;
 
 public class ResultMerger {
 	ResultMerger joining;
@@ -32,7 +33,7 @@ public class ResultMerger {
 	}
 	
 	private Tuple mergeTuples(Tuple from, Tuple to) {
-		Integer[] values = new Integer[sch.getSelectedNodeCount()];
+		int[] values = new int[sch.getSelectedNodeCount()];
 		Set<Integer> sources = new HashSet<Integer>();
 		
 		for (int i = 0; i < sch.getSelectedNodeCount(); i++) {
@@ -50,8 +51,9 @@ public class ResultMerger {
 		return new Tuple(values, sources);
 	}
 	
-	public synchronized void addTuple(Integer[] joinValue, Tuple tuple) {
+	public synchronized void addTuple(int[] joinValue, Tuple tuple) {
 		ArrayHashKey key = new ArrayHashKey(joinValue);
+		Debug.println("addTuple", "jv = " + joinValue[0] + " by " + this.toString());
 		List<Tuple> value;
 		
 		if (map.containsKey(key))
@@ -66,11 +68,7 @@ public class ResultMerger {
 		for (Tuple t : joining.getTuples(key)) {
 			Tuple o = mergeTuples(tuple, t);
 			
-			try {
-				output.put(o);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			output.add(o);
 		}
 	}
 	

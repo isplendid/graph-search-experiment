@@ -3,7 +3,7 @@ package sjtu.apex.gse.operator.join;
 import java.util.Set;
 
 public class Tuple {
-	Integer[] values;
+	int[] values;
 	Set<Integer> sources;
 	
 	/**
@@ -20,7 +20,7 @@ public class Tuple {
 	 * @param values - The array holding the IDs of the bindings
 	 * @param sources - The set of sources relavent to this tuple
 	 */
-	public Tuple(Integer[] values, Set<Integer> sources) {
+	public Tuple(int[] values, Set<Integer> sources) {
 		this.values = values;
 		this.sources = sources;
 	}

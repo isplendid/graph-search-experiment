@@ -2,9 +2,9 @@ package sjtu.apex.gse.operator.join;
 
 
 public class ArrayHashKey {
-	private Integer[] joinValue;
+	private int[] joinValue;
 	
-	public ArrayHashKey(Integer[] joinValue) {
+	public ArrayHashKey(int[] joinValue) {
 		this.joinValue = joinValue;
 	}
 	
@@ -27,7 +27,7 @@ public class ArrayHashKey {
 		boolean ret = false;
 		
 		if (o instanceof ArrayHashKey) {
-			 Integer[] oValues = ((ArrayHashKey) o).joinValue;
+			 int[] oValues = ((ArrayHashKey) o).joinValue;
 			 
 			 if (oValues.length == joinValue.length) {
 				 ret = true;

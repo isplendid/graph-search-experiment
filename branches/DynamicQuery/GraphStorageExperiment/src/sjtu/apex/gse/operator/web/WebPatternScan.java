@@ -22,6 +22,7 @@ public class WebPatternScan implements Scan {
 	private String pred;
 	private Tuple currentEntry;
 	private boolean keyEnded;
+	private boolean lastFetched;
 	protected boolean srcIdled;
 	private boolean hasKey;
 	
@@ -42,6 +43,7 @@ public class WebPatternScan implements Scan {
 		this.keyEnded = false;
 		this.srcman = srcman;
 		this.srcIdled = true;
+		this.lastFetched = false;
 	}
 	
 	private String getLabelFromID(int id) {
@@ -74,17 +76,12 @@ public class WebPatternScan implements Scan {
 	}
 	
 	private synchronized boolean hasThreadWaitingOnNext() {
-		return keyEnded;// && output.size() <= 0;
+		return keyEnded && !lastFetched;// && output.size() <= 0;
 	}
 	
 	private synchronized void setKeyEnded(boolean value) {
 		keyEnded = value;
 	}
-	
-//	private synchronized boolean hasMoreResults() {
-//		return true;
-////		return !keyEnded || !src.idle() || output.size() > 0;
-//	}
 	
 	/**
 	 * Indicate there is no more key that will be added to the listener's list
@@ -106,7 +103,10 @@ public class WebPatternScan implements Scan {
 	
 	protected void addResult(Tuple t) {
 		Debug.println("addResult", t.toString());
-		output.add(t);
+		if (!lastFetched)
+			output.add(t);
+		else
+			throw new AddResultAfterIteratorFinishException();
 	}
 	
 	private Set<String> convertSrcSetToExternal(Set<Integer> sources) {
@@ -127,20 +127,18 @@ public class WebPatternScan implements Scan {
 	@Override
 	public boolean next() {
 		boolean ret;
-		
-//		if (hasMoreResults()) {
-			try {
-				currentEntry = output.take();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			if (currentEntry.isDummy())
-				ret = false;
-			else
-				ret = true;
-//		}
-//		else
-//			ret = false;
+	
+		try {
+			currentEntry = output.take();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		if (currentEntry.isDummy()) {
+			ret = false;
+			lastFetched = true;
+		}
+		else
+			ret = true;
 		
 		return ret;
 	}
@@ -184,4 +182,7 @@ public class WebPatternScan implements Scan {
 		return (n.equals(subNode) || n.equals(objNode));
 	}
 
+	public class AddResultAfterIteratorFinishException extends RuntimeException{
+		
+	}
 }
