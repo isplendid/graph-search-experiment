@@ -1,3 +1,5 @@
+#!/bin/bash
+
 mkdir tmp
 mkdir tmp/id
 mkdir tmp/lbl
