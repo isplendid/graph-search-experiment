@@ -1,6 +1,8 @@
 package sjtu.apex.gse.operator.web;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -16,6 +18,7 @@ import sun.security.util.Debug;
 public class WebPatternScan implements Scan {
 	
 	private BlockingQueue<Tuple> output;
+	private Queue<Tuple> buffer;
 	private ie.deri.urq.lidaq.repos.WebRepository src;
 	private QueryGraphNode subNode;
 	private QueryGraphNode objNode;
@@ -36,6 +39,7 @@ public class WebPatternScan implements Scan {
 	public WebPatternScan(QueryGraphNode sub, int pred, QueryGraphNode obj, IDManager idman, SourceManager srcman, ie.deri.urq.lidaq.repos.WebRepository webRepos) {
 		this.src = webRepos;
 		this.output = new LinkedBlockingQueue<Tuple>();
+		this.buffer = new LinkedList<Tuple>();
 		this.pred = idman.getURI(pred);
 		this.subNode = sub;
 		this.objNode = obj;
@@ -128,11 +132,16 @@ public class WebPatternScan implements Scan {
 	public boolean next() {
 		boolean ret;
 	
-		try {
-			currentEntry = output.take();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		if (buffer.size() <= 0) {
+			try {
+				buffer.add(output.take());
+				output.drainTo(buffer);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+		currentEntry = buffer.remove();
+		
 		if (currentEntry.isDummy()) {
 			ret = false;
 			lastFetched = true;
