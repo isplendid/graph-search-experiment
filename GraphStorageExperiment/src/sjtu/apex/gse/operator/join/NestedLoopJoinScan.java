@@ -2,9 +2,11 @@ package sjtu.apex.gse.operator.join;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -20,6 +22,7 @@ public class NestedLoopJoinScan implements Scan {
 	private final static int totalThread = 1;
 	
 	private BlockingQueue<Tuple> outputQueue;
+	private Queue<Tuple> buffer;
 	private Scan isrc;
 	private WebPatternScan esrc;
 	private QuerySchema sch;
@@ -32,6 +35,7 @@ public class NestedLoopJoinScan implements Scan {
 		this.esrc = esrc;
 		this.sch = sch;
 		this.threadCnt = new ThreadCounter();
+		this.buffer = new LinkedList<Tuple>();
 		
 		Map<QueryGraphNode, Integer> leftMapping = new HashMap<QueryGraphNode, Integer>();
 		Map<QueryGraphNode, Integer> rightMapping = new HashMap<QueryGraphNode, Integer>();
@@ -75,11 +79,16 @@ public class NestedLoopJoinScan implements Scan {
 	@Override
 	public boolean next() {
 		if (threadCnt.getEndedThreadCount() < totalThread) {
-			try {
-				currentEntry = outputQueue.take();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			if (buffer.size() <= 0) {
+				try {
+					buffer.add(outputQueue.take());
+					outputQueue.drainTo(buffer);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
+			
+			currentEntry = buffer.remove();
 			
 			if (currentEntry.isDummy())
 				return false;
