@@ -76,7 +76,7 @@ public class WebPatternScan implements Scan {
 	}
 	
 	private synchronized boolean hasThreadWaitingOnNext() {
-		return keyEnded && !lastFetched;// && output.size() <= 0;
+		return keyEnded && !lastFetched;
 	}
 	
 	private synchronized void setKeyEnded(boolean value) {
@@ -145,7 +145,6 @@ public class WebPatternScan implements Scan {
 
 	@Override
 	public void close() {
-//		src.shutdown();
 
 	}
 
@@ -183,6 +182,11 @@ public class WebPatternScan implements Scan {
 	}
 
 	public class AddResultAfterIteratorFinishException extends RuntimeException{
+
+		/**
+		 * Automatically generated serial version UID
+		 */
+		private static final long serialVersionUID = 7087917937322197599L;
 		
 	}
 }
