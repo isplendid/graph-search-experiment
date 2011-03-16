@@ -23,6 +23,8 @@ public class NestedLoopJoinScan implements Scan {
 	
 	private BlockingQueue<Tuple> outputQueue;
 	private Queue<Tuple> buffer;
+	
+	private Set<ArrayHashKey> usedKey;
 	private Scan isrc;
 	private WebPatternScan esrc;
 	private QuerySchema sch;
@@ -36,6 +38,7 @@ public class NestedLoopJoinScan implements Scan {
 		this.sch = sch;
 		this.threadCnt = new ThreadCounter();
 		this.buffer = new LinkedList<Tuple>();
+		this.usedKey = new HashSet<ArrayHashKey>();
 		
 		Map<QueryGraphNode, Integer> leftMapping = new HashMap<QueryGraphNode, Integer>();
 		Map<QueryGraphNode, Integer> rightMapping = new HashMap<QueryGraphNode, Integer>();
@@ -145,6 +148,14 @@ public class NestedLoopJoinScan implements Scan {
 			this.subject = subject;
 		}
 		
+		private ArrayHashKey assembleHashKey(int subject, int object) {
+			int[] keyArr = new int[2];
+			
+			keyArr[0] = subject;
+			keyArr[1] = object;
+			return new ArrayHashKey(keyArr);
+		}
+		
 		public void run() {
 			int sub, obj;
 			
@@ -162,7 +173,12 @@ public class NestedLoopJoinScan implements Scan {
 				//TODO Handle nodes representing resources here
 				sub = (src.hasNode(subject) ? src.getID(subject) : -1);
 				obj = (src.hasNode(object) ? src.getID(object) : -1);
-				tar.addKey(sub, obj, new HashSet<Integer>(0));
+				
+				ArrayHashKey key = assembleHashKey(sub, obj);
+				if (!usedKey.contains(key)) {
+					tar.addKey(sub, obj, new HashSet<Integer>(0));
+					usedKey.add(key);
+				}
 			}
 			tar.keyEnded();
 			Debug.println("Add Key Thread", "Finished");
