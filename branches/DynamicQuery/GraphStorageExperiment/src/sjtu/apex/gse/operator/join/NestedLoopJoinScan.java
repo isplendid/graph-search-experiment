@@ -24,7 +24,6 @@ public class NestedLoopJoinScan implements Scan {
 	private BlockingQueue<Tuple> outputQueue;
 	private Queue<Tuple> buffer;
 	
-	private Set<ArrayHashKey> usedKey;
 	private Scan isrc;
 	private WebPatternScan esrc;
 	private QuerySchema sch;
@@ -38,7 +37,6 @@ public class NestedLoopJoinScan implements Scan {
 		this.sch = sch;
 		this.threadCnt = new ThreadCounter();
 		this.buffer = new LinkedList<Tuple>();
-		this.usedKey = new HashSet<ArrayHashKey>();
 		
 		Map<QueryGraphNode, Integer> leftMapping = new HashMap<QueryGraphNode, Integer>();
 		Map<QueryGraphNode, Integer> rightMapping = new HashMap<QueryGraphNode, Integer>();
@@ -157,6 +155,7 @@ public class NestedLoopJoinScan implements Scan {
 		}
 		
 		public void run() {
+			Set<ArrayHashKey> usedKey = new HashSet<ArrayHashKey>();
 			int sub, obj;
 			
 			while (src.next()) {
