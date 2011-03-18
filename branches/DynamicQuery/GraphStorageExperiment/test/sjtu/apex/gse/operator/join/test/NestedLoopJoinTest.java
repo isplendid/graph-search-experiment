@@ -33,7 +33,7 @@ public class NestedLoopJoinTest {
 		joinOn = new ArrayList<List<QueryGraphNode>>();
 		qsAll = new ArrayList<QuerySchema>();
 		
-		sys = new QuerySystem(new FileConfig("cfg-test"));
+		sys = new QuerySystem(new FileConfig("cfg-web"));
 		
 //		/* TEST CASE 1 */
 //		QueryGraph g = new QueryGraph();
