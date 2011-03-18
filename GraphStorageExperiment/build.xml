@@ -4,6 +4,7 @@
     <!-- DIRECTORIES -->
     <property name="lib.dir" value="lib"/>
     <property name="src.dir" value="src"/>
+	<property name="exp.dir" value="exp"/>
 	<property name="bin.dir" value="bin"/>
     <property environment="env"/>
   
@@ -30,6 +31,15 @@
     	<echo>Compiling</echo>
         <javac destdir="${bin.dir}"
             srcdir="${src.dir}"
+            debug="yes">
+          <classpath refid="classpath"/>
+        </javac>
+    </target>
+	
+	<target name="compileall" depends="compile">
+        <echo>Compiling all ...</echo>
+        <javac destdir="${bin.dir}"
+            srcdir="${exp.dir}"
             debug="yes">
           <classpath refid="classpath"/>
         </javac>
