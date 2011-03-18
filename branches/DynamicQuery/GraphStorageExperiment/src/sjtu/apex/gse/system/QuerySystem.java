@@ -66,7 +66,10 @@ public class QuerySystem {
 	
 	private void webReposInit() {
 		if (sysMode == QuerySystemMode.WEB_ONLY && config.getIntegerSetting("WebAccess", 0) > 0) {
-			webRepos = new ie.deri.urq.lidaq.repos.WebRepository(null, null);
+			String host = config.getStringSetting("LDProxyHost", null);
+			String port = config.getStringSetting("LDProxyPort", null);
+			
+			webRepos = new ie.deri.urq.lidaq.repos.WebRepository(host, port);
 		}
 	}
 	
