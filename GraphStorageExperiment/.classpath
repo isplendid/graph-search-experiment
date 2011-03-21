@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="lib/openrdf-util.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/WebRepositoryCache"/>
 	<classpathentry kind="lib" path="lib/nxparser.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

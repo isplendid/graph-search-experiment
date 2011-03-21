@@ -12,7 +12,6 @@ import java.util.Set;
 import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.config.FileConfig;
 import sjtu.apex.gse.indexer.IDManager;
-import sjtu.apex.gse.indexer.file.SleepyCatIDManager;
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.query.FileQueryReader;
@@ -63,7 +62,7 @@ public class Experiment {
 		else
 			wr = new BufferedWriter(new FileWriter(args[2]));
 		
-		if (outResult) idman = new SleepyCatIDManager(config);
+		if (outResult) idman = sys.idManager();
 		
 		int cnt = 0;
 		QuerySchema qs;
@@ -108,21 +107,24 @@ public class Experiment {
 			}
 			scan.close();
 			
-			wr.append((System.currentTimeMillis() - time) + "\t " + count + "\t" + srcs.size() + "\n");
+			sys.close();
+			ie.deri.urq.lidaq.benchmark.Benchmark bm = sys.webRepository().getBenchmark();
+			long relSrc = (Long)bm.get(new String(ie.deri.urq.lidaq.benchmark.SourceLookupBenchmark.TOTAL_LOOKUPS)) - 
+				(Long)bm.get(new String(ie.deri.urq.lidaq.benchmark.SourceLookupBenchmark.TOTAL_3XX_LOOKUPS));
+			
+			wr.append((System.currentTimeMillis() - time) + "\t " + count + "\t" + srcs.size() + "\t" + relSrc + "\n");
 			if (breakRestart) wr.flush();
+			
+			File log = new File("plan.log");
+			log.delete();
+			
+			wr.close();	
+			bkf.delete();
+			
+			
+			System.exit(0);
 		}
 		
-		if (outResult) idman.close();
-		
-		File log = new File("plan.log");
-		log.delete();
-		
-		bkf.delete();
-		
-		wr.close();
-		sys.close();
-		
-		System.exit(0);
 	}
 	
 	
