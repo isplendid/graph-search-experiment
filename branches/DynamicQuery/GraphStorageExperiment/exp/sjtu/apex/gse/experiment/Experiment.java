@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.config.FileConfig;
@@ -75,6 +77,7 @@ public class Experiment {
 			System.out.println(++cnt);
 			
 			Plan p = sys.queryPlanner().plan(qs);
+			Set<Integer> srcs = new HashSet<Integer>();
 			
 			if (logPlan) {
 				FileWriter lw = new FileWriter("plan.log");
@@ -99,12 +102,13 @@ public class Experiment {
 						System.out.print(idman.getURI(scan.getID(qg.getNode(i))) + " ");
 					System.out.println();
 				}
+				srcs.addAll(scan.getSourceSet());
 				/* DO SOMETHING */
 				count++;
 			}
 			scan.close();
 			
-			wr.append((System.currentTimeMillis() - time) + "\t " + count + "\n");
+			wr.append((System.currentTimeMillis() - time) + "\t " + count + "\t" + srcs.size() + "\n");
 			if (breakRestart) wr.flush();
 		}
 		
@@ -117,6 +121,10 @@ public class Experiment {
 		
 		wr.close();
 		sys.close();
+		
+		System.exit(0);
 	}
+	
+	
 
 }
