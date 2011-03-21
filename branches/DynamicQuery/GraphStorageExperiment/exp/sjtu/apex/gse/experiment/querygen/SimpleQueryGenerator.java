@@ -9,6 +9,7 @@ import java.util.Map;
 
 import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.config.FileConfig;
+import sjtu.apex.gse.filesystem.FilesystemUtility;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.storage.file.FileRepositoryEntry;
 import sjtu.apex.gse.storage.file.FileRepositoryReader;
@@ -45,9 +46,11 @@ public class SimpleQueryGenerator {
 		IDManager idman = sys.idManager();
 //		LabelManager labman = new SleepyCatLabelManager(sys.config());
 		String temp;
-		int count = 0;
 		
+		int fldrcnt = 0;
 		while ((temp = rd.readLine()) != null) {
+			FilesystemUtility.createDir(args[2] + "/" + fldrcnt);
+			
 			if (temp.length() == 0) continue;
 			String p = temp.split("\t")[0];
 			RecordRange rr = sys.indexManager().seek("*[+" + Integer.toString(idman.getID(p)) + "::*]", 2);
@@ -59,7 +62,10 @@ public class SimpleQueryGenerator {
 			FileRepositoryEntry ent;
 
 			BufferedWriter wr = null;
+			int filecount = 0;
+			
 			while ((ent = fr.readEntry()) != null) {
+				
 				if (Math.random() < (prob + (wr == null? base : 0))) {
 					int ss = ent.bindings[map.get(edge.getNodeFrom())];
 					int os = ent.bindings[map.get(edge.getNodeTo())];
@@ -75,18 +81,18 @@ public class SimpleQueryGenerator {
 						obj = idman.getURI(os);
 					}
 					
-					if (wr == null) {
-						wr = new BufferedWriter(new FileWriter(args[2] + "." + count));
-						count++;
-					}
+					wr = new BufferedWriter(new FileWriter(args[2] + "/" + fldrcnt + "/q." + filecount));
+					
 					wr.append("2 1\n");
 					wr.append(sub + "\n");
 					wr.append(obj + "\n");
 					wr.append("1 2 " + pred + "\n");
 
+					wr.close();
+					filecount++;
 				}
-			}	
-			if (wr != null) wr.close();
+			}
+			fldrcnt ++;
 		}			
 		
 		rd.close();

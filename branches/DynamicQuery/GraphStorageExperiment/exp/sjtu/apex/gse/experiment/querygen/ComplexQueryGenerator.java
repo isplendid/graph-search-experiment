@@ -10,6 +10,7 @@ import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.config.FileConfig;
 import sjtu.apex.gse.experiment.edge.Edge;
 import sjtu.apex.gse.experiment.edge.EdgeInfo;
+import sjtu.apex.gse.filesystem.FilesystemUtility;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.LabelManager;
 import sjtu.apex.gse.indexer.file.SleepyCatLabelManager;
@@ -217,14 +218,19 @@ public class ComplexQueryGenerator {
 		Configuration cf = new FileConfig(args[0]); 
 		
 		File f = new File(args[1]);
-		File[] queries = f.listFiles();
+		File[] querySet = f.listFiles();
 
-		for (File q : queries) {
-			String in = q.getAbsolutePath();
-			String out = args[2] + "/" + q.getName();
-			ComplexQueryGenerator qg = new ComplexQueryGenerator(cf);
-			qg.generate(in, out, Integer.parseInt(args[3]), Integer.parseInt(args[4]));
-			qg.close();
+		for (File qs : querySet) {
+			File[] queryFiles = qs.listFiles();
+			
+			FilesystemUtility.createDir(args[2] + "/" + qs.getName());
+			for (File q : queryFiles) {
+				String in = q.getAbsolutePath();
+				String out = args[2] + "/" + qs.getName() + "/" + q.getName();
+				ComplexQueryGenerator qg = new ComplexQueryGenerator(cf);
+				qg.generate(in, out, Integer.parseInt(args[3]), Integer.parseInt(args[4]));
+				qg.close();
+			}
 		}
 		
 	}
