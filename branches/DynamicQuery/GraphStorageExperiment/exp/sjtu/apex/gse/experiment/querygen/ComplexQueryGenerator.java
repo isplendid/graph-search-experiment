@@ -206,7 +206,7 @@ public class ComplexQueryGenerator {
 	
 	public void close() {
 		lm.close();
-		im.close();
+		sys.close();
 		einfo.close();
 	}
 
@@ -216,6 +216,7 @@ public class ComplexQueryGenerator {
 	 */
 	public static void main(String[] args) {
 		Configuration cf = new FileConfig(args[0]); 
+		ComplexQueryGenerator qg = new ComplexQueryGenerator(cf);
 		
 		File f = new File(args[1]);
 		File[] querySet = f.listFiles();
@@ -227,11 +228,10 @@ public class ComplexQueryGenerator {
 			for (File q : queryFiles) {
 				String in = q.getAbsolutePath();
 				String out = args[2] + "/" + qs.getName() + "/" + q.getName();
-				ComplexQueryGenerator qg = new ComplexQueryGenerator(cf);
 				qg.generate(in, out, Integer.parseInt(args[3]), Integer.parseInt(args[4]));
-				qg.close();
 			}
 		}
+		qg.close();
 		
 	}
 
