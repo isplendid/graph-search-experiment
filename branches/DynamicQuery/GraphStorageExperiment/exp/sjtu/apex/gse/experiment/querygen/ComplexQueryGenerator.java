@@ -1,6 +1,5 @@
 package sjtu.apex.gse.experiment.querygen;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -210,17 +209,17 @@ public class ComplexQueryGenerator {
 	 */
 	public static void main(String[] args) {
 		Configuration cf = new FileConfig(args[0]); 
+		ComplexQueryGenerator qg = new ComplexQueryGenerator(cf);
 
 		for (String folder : FilesystemUtility.listAllFiles(args[1])) {
-			ComplexQueryGenerator qg = new ComplexQueryGenerator(cf);
 			String in = folder;
 			String out = args[2] + "/" + FilesystemUtility.getBaseName(folder);
 			
 			FilesystemUtility.createDir(out);
 			
 			qg.generate(in, out, Integer.parseInt(args[3]), Integer.parseInt(args[4]));
-			qg.close();
 		}
+		qg.close();
 	}
 
 }
