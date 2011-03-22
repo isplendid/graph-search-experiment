@@ -161,6 +161,7 @@ public class QuerySystem {
 	public void close() {
 		sourceMan.close();
 		idMan.close();
+		indexMan.close();
 		if (webRepos != null)
 			webRepos.shutdown();
 	}
