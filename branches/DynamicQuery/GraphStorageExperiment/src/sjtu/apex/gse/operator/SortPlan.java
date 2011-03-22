@@ -36,7 +36,10 @@ public class SortPlan implements Plan {
 	public Scan open() {
 		Scan s = src.open();
 		
-		return MergeSorter.sort(s, src.getSchema(), comp);
+		Scan ret = MergeSorter.sort(s, src.getSchema(), comp);
+		s.close();
+		
+		return ret;
 	}
 
 	public void close() {
