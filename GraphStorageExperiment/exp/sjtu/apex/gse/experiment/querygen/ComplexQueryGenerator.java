@@ -165,7 +165,7 @@ public class ComplexQueryGenerator {
 		ArrayList<QuerySchema> qarr = new ArrayList<QuerySchema>();
 		
 		for (String file : FilesystemUtility.listAllFiles(infldr)) {
-			QueryReader qp = new FileQueryReader(file, sys.idManager());
+			QueryReader qp = new FileQueryReader(file, im);
 			QuerySchema qs;
 			
 			while ((qs = qp.read()) != null)
