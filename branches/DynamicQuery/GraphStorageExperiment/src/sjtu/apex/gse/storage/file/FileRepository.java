@@ -52,6 +52,7 @@ public class FileRepository implements Scan {
 	@Override
 	public void close() {
 		try {
+			heapFile.close();
 			file.close();
 		} catch (IOException e) {
 			e.printStackTrace();
