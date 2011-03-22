@@ -33,14 +33,25 @@ public class FileQueryReader implements QueryReader {
 		
 		return ret;
 	}
+	
+	private String getLineFromFile() {
+		String ret = null;
+		
+		try {
+			ret = rd.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
 
 	public QuerySchema read() {
-		try {
 			String temp;
 			String[] ts;
 			QueryGraph graph = new QueryGraph();
 
-			temp = rd.readLine();
+			temp = getLineFromFile();
 			if (temp == null || temp.length() == 0) return null;
 			
 			ts = temp.split(" ");
@@ -50,7 +61,7 @@ public class FileQueryReader implements QueryReader {
 			QueryGraphNode[] nodes = new QueryGraphNode[nodeCnt];
 			HashSet<QueryGraphNode> ns = new HashSet<QueryGraphNode>();
 			for (int i = 0; i < nodeCnt; i++) {
-				temp = rd.readLine();
+				temp = getLineFromFile();
 				if (temp.length() == 0 || temp.equals("*"))
 					nodes[i] = graph.addNode();
 				else
@@ -60,18 +71,21 @@ public class FileQueryReader implements QueryReader {
 			}
 
 			for (int i = 0; i < edgeCnt; i++) {
-				temp = rd.readLine();
+				temp = getLineFromFile();
 				ts = temp.split(" ");
-				int a = Integer.parseInt(ts[0]), b = Integer.parseInt(ts[1]);
+				int a, b;
+				
+				try {
+					a = Integer.parseInt(ts[0]);
+					b = Integer.parseInt(ts[1]);
+				} catch (NumberFormatException e) {
+					return null;
+				}
 
 				graph.addEdge(nodes[a - 1], nodes[b - 1], convertToInternal(ts[2]));
 			}
 
 			return new QuerySchema(graph, ns);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
 	}
 
 	@Override

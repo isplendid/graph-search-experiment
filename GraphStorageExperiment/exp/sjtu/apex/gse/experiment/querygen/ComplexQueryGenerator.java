@@ -43,7 +43,6 @@ public class ComplexQueryGenerator {
 	double pee2 = 0.03;
 	int edgeScanMax = 100;
 	int conScanMax = 3000;
-	final boolean logging = true;
 	
 	String eip;
 	LabelManager lm;
@@ -161,47 +160,42 @@ public class ComplexQueryGenerator {
 		return ret;
 	}
 
-	public void generate(String initfn, String outfn, int threshold, int mod) {
-		try {
-			QueryWriter wr = new FileQueryWriter(outfn, sys.idManager());
-			QueryReader qp = new FileQueryReader(initfn, sys.idManager());
-			
-			ArrayList<QuerySchema> qarr = new ArrayList<QuerySchema>();
-			
+	public void generate(String infldr, String outfldr, int threshold, int mod) {
+		int outcnt = 0;
+		ArrayList<QuerySchema> qarr = new ArrayList<QuerySchema>();
+		
+		for (String file : FilesystemUtility.listAllFiles(infldr)) {
+			QueryReader qp = new FileQueryReader(file, sys.idManager());
 			QuerySchema qs;
 			
 			while ((qs = qp.read()) != null)
 				qarr.add(qs);
 			qp.close();
-			
-			int head = 0, orgsize = qarr.size();
-			
-			while (head < orgsize && head < qarr.size() && (qarr.size() - orgsize < threshold)) {
-				qs = qarr.get(head);
-				
-				int pp = qarr.size();
-				System.out.println("CHECKING nodeid = " + head);
-				
-				if ((mod & 0x00000001) != 0) qarr.addAll(edgeExtend(qs));
-				if ((mod & 0x00000002) != 0) qarr.addAll(constraintExtend(qs));
-				
-				System.out.println((qarr.size() - orgsize) + "ADDED");
-				
-				if (qarr.size() > pp)
-					for (int i = pp; i < qarr.size(); i++)
-						wr.write(qarr.get(i));
-				
-				head ++;
-			}
-			
-			File f = new File("crash.log");
-			f.delete();
-			
-			wr.close();
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-
+		
+		int head = 0, orgsize = qarr.size();
+		
+		while (head < orgsize && head < qarr.size() && (qarr.size() - orgsize < threshold)) {
+			QuerySchema qs = qarr.get(head);
+			
+			int pp = qarr.size();
+			System.out.println("CHECKING nodeid = " + head);
+			
+			if ((mod & 0x00000001) != 0) qarr.addAll(edgeExtend(qs));
+			if ((mod & 0x00000002) != 0) qarr.addAll(constraintExtend(qs));
+			
+			System.out.println((qarr.size() - orgsize) + "ADDED");
+			
+			if (qarr.size() > pp)
+				for (int i = pp; i < qarr.size(); i++) {
+					QueryWriter wr = new FileQueryWriter(outfldr + "/q." + outcnt , sys.idManager());
+					wr.write(qarr.get(i));
+					outcnt++;
+					wr.close();
+				}
+			
+			head ++;
+		}
 	}
 	
 	public void close() {
@@ -217,22 +211,16 @@ public class ComplexQueryGenerator {
 	public static void main(String[] args) {
 		Configuration cf = new FileConfig(args[0]); 
 		ComplexQueryGenerator qg = new ComplexQueryGenerator(cf);
-		
-		File f = new File(args[1]);
-		File[] querySet = f.listFiles();
 
-		for (File qs : querySet) {
-			File[] queryFiles = qs.listFiles();
+		for (String folder : FilesystemUtility.listAllFiles(args[1])) {
+			String in = folder;
+			String out = args[2] + "/" + FilesystemUtility.getBaseName(folder);
 			
-			FilesystemUtility.createDir(args[2] + "/" + qs.getName());
-			for (File q : queryFiles) {
-				String in = q.getAbsolutePath();
-				String out = args[2] + "/" + qs.getName() + "/" + q.getName();
-				qg.generate(in, out, Integer.parseInt(args[3]), Integer.parseInt(args[4]));
-			}
+			FilesystemUtility.createDir(out);
+			
+			qg.generate(in, out, Integer.parseInt(args[3]), Integer.parseInt(args[4]));
 		}
 		qg.close();
-		
 	}
 
 }
