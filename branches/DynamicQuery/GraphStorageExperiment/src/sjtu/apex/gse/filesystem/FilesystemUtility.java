@@ -1,6 +1,8 @@
 package sjtu.apex.gse.filesystem;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FilesystemUtility {
 	
@@ -43,4 +45,18 @@ public class FilesystemUtility {
 		return(path.delete());
 	}
 
+	public static List<String> listAllFiles(String path) {
+		List<String> ret = new ArrayList<String>();
+		
+		File dir = new File(path);
+		
+		for (File file : dir.listFiles()) {
+			ret.add(file.getAbsolutePath());
+		}
+		return ret;
+	}
+	
+	public static String getBaseName(String path) {
+		return new File(path).getName();
+	}
 }
