@@ -21,9 +21,24 @@ public class FilesystemUtility {
 		return f.exists();
 	}
 	
-	public static void createDir(String dir) {
+	public static int createDir(String dir) {
+		int ret;
+		
 		File f = new File(dir);
-		if (!f.exists()) f.mkdir();
+		if (!f.exists()) {
+			f.mkdir();
+			ret = 0;
+		}
+		else {
+			if (f.isDirectory())
+				ret = 1;
+			else if (f.isFile())
+				ret = 2;
+			else
+				ret = -1;
+		}
+		
+		return ret;
 	}
 
 	public static void deleteDir(String dir) {
