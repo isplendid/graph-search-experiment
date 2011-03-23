@@ -215,9 +215,9 @@ public class ComplexQueryGenerator {
 			String in = folder;
 			String out = args[2] + "/" + FilesystemUtility.getBaseName(folder);
 			
-			FilesystemUtility.createDir(out);
-			
-			qg.generate(in, out, Integer.parseInt(args[3]), Integer.parseInt(args[4]));
+			if (FilesystemUtility.createDir(out) == 0) {
+				qg.generate(in, out, Integer.parseInt(args[3]), Integer.parseInt(args[4]));
+			}
 		}
 		qg.close();
 	}
