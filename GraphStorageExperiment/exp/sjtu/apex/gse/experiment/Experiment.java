@@ -1,9 +1,7 @@
 package sjtu.apex.gse.experiment;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
@@ -28,7 +26,6 @@ import sjtu.apex.gse.system.QuerySystem;
  */
 public class Experiment {
 	
-	final static boolean breakRestart = true;
 	final static boolean logPlan = false;
 	final static boolean outResult = false;
 
@@ -50,17 +47,7 @@ public class Experiment {
 		IDManager idman = null;
 		int startId = -1;
 		
-		if (breakRestart && bkf.exists()) {
-			BufferedReader bkr = new BufferedReader(new FileReader(bkf));
-
-			startId = Integer.parseInt(bkr.readLine());
-			bkr.close();
-			bkf.delete();
-			wr = new BufferedWriter(new FileWriter(resultFilename, true));
-			wr.append("#\n");
-		}
-		else
-			wr = new BufferedWriter(new FileWriter(args[2]));
+		wr = new BufferedWriter(new FileWriter(resultFilename));
 		
 		if (outResult) idman = sys.idManager();
 		
@@ -81,12 +68,6 @@ public class Experiment {
 			if (logPlan) {
 				FileWriter lw = new FileWriter("plan.log");
 				lw.append(p.toString());
-				lw.close();
-			}
-			
-			if (breakRestart) {
-				FileWriter lw = new FileWriter("break");
-				lw.append(Integer.toString(cnt));
 				lw.close();
 			}
 			
@@ -113,7 +94,6 @@ public class Experiment {
 				(Long)bm.get(new String(ie.deri.urq.lidaq.benchmark.SourceLookupBenchmark.TOTAL_3XX_LOOKUPS));
 			
 			wr.append((System.currentTimeMillis() - time) + "\t " + count + "\t" + srcs.size() + "\t" + relSrc + "\n");
-			if (breakRestart) wr.flush();
 			
 			File log = new File("plan.log");
 			log.delete();
