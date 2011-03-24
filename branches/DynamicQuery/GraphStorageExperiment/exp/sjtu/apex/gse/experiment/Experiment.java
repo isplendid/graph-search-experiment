@@ -39,7 +39,6 @@ public class Experiment {
 		String queryFilename = args[1];
 		String resultFilename = args[2];
 		
-		File bkf = new File("break");
 		Configuration config = new FileConfig(configFilename);
 		
 		QuerySystem sys = new QuerySystem(config);
@@ -107,8 +106,6 @@ public class Experiment {
 			log.delete();
 			
 			wr.close();	
-			bkf.delete();
-			
 			
 			System.exit(0);
 		}
