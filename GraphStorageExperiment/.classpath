@@ -13,10 +13,9 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.emf.ecore.xmi_2.3.1.v200709252135.jar"/>
 	<classpathentry kind="lib" path="lib/je-3.3.69.jar"/>
 	<classpathentry kind="lib" path="lib/rio.jar"/>
-	<classpathentry kind="lib" path="lib/openrdf-model.jar"/>
-	<classpathentry kind="lib" path="lib/openrdf-util.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/WebRepositoryCache"/>
 	<classpathentry kind="lib" path="lib/nxparser.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
+	<classpathentry kind="lib" path="lib/openrdf-sesame-2.3.2-onejar.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
