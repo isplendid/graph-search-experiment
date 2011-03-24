@@ -14,6 +14,7 @@ import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.query.FileQueryReader;
 import sjtu.apex.gse.query.QueryReader;
+import sjtu.apex.gse.query.SPARQLQueryReader;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QuerySchema;
 import sjtu.apex.gse.system.QuerySystem;
@@ -42,7 +43,14 @@ public class Experiment {
 		Configuration config = new FileConfig(configFilename);
 		
 		QuerySystem sys = new QuerySystem(config);
-		QueryReader rd = new FileQueryReader(queryFilename, sys.idManager());
+		QueryReader rd;
+		
+		if (queryFilename.endsWith(".sparql")) {
+			rd = new SPARQLQueryReader(queryFilename, sys.idManager());
+		} else {
+			rd = new FileQueryReader(queryFilename, sys.idManager());
+		}
+		
 		BufferedWriter wr;
 		IDManager idman = null;
 		int startId = -1;
