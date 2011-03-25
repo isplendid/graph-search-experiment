@@ -1,6 +1,6 @@
 package sjtu.apex.gse.operator.web;
 
-import ie.deri.urq.lidaq.repos.KeyObserver;
+import ie.deri.urq.lidaq.repos.StringKeyObserver;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -8,11 +8,11 @@ import java.util.Set;
 import sjtu.apex.gse.operator.join.Tuple;
 import sun.security.util.Debug;
 
-public class KeyObserverImpl extends KeyObserver {
+public class KeyObserverImpl extends StringKeyObserver {
 	WebPatternScan src;
 
-	public KeyObserverImpl(WebPatternScan src, String[] key, Set<String> sources) {
-		super(key, sources);
+	public KeyObserverImpl(WebPatternScan src) {
+		super();
 		this.src = src;
 	}
 

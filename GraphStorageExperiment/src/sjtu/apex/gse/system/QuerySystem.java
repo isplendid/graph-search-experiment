@@ -35,6 +35,7 @@ public class QuerySystem {
 	
 	private SourceManager sourceMan;
 	private ie.deri.urq.lidaq.repos.WebRepository webRepos;
+	private ie.deri.urq.lidaq.repos.WebRepositoryManager webReposMan; 
 	private IDManager idMan;
 	
 	public enum QuerySystemMode {
@@ -69,8 +70,9 @@ public class QuerySystem {
 			String host = config.getStringSetting("LDProxyHost", null);
 			String port = config.getStringSetting("LDProxyPort", null);
 			
-			webRepos = new ie.deri.urq.lidaq.repos.WebRepository(host, port);
+			webReposMan =  new ie.deri.urq.lidaq.repos.WebRepositoryManager(host, port);
 		}
+		webRepos = webReposMan.getRepository();
 	}
 	
 	private void paramsInit() {
@@ -163,7 +165,7 @@ public class QuerySystem {
 		idMan.close();
 		indexMan.close();
 		if (webRepos != null)
-			webRepos.shutdown();
+			webRepos.close();
 	}
 	
 }

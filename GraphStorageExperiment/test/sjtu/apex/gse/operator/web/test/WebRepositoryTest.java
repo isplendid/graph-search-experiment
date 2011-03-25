@@ -2,7 +2,7 @@ package sjtu.apex.gse.operator.web.test;
 
 import static org.junit.Assert.assertTrue;
 import ie.deri.urq.lidaq.log.LODQ2_LogHandling;
-import ie.deri.urq.lidaq.repos.WebRepository;
+import ie.deri.urq.lidaq.repos.WebRepositoryManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,13 +40,13 @@ public class WebRepositoryTest {
 		QueryGraph graph = new QueryGraph();
 		QueryGraphNode from = graph.addNode();
 		QueryGraphNode to = graph.addNode();
-		graph.addEdge(from, to, idman.addGetID("http://xmlns.com/foaf/0.1/title"));
+		graph.addEdge(from, to, idman.addGetID("<http://xmlns.com/foaf/0.1/title>"));
 		List<QueryGraphNode> seln = new ArrayList<QueryGraphNode>();
 		seln.add(to);
 		
 		QuerySchema qs = new QuerySchema(graph, seln);
 		list.add(qs);
-		bind.add("http://www.informatik.uni-leipzig.de/~auer/foaf.rdf#me");
+		bind.add("<http://www.informatik.uni-leipzig.de/~auer/foaf.rdf#me>");
 	}
 	
 	@Test
@@ -57,7 +57,7 @@ public class WebRepositoryTest {
 			QuerySchema qs = list.get(i);
 			String uri = bind.get(i);
 			
-			WebPatternScan webrepos = new WebPatternScan(qs, idman, srcman, new WebRepository(null, null));
+			WebPatternScan webrepos = new WebPatternScan(qs, idman, srcman, new WebRepositoryManager(null, null).getRepository());
 			
 			webrepos.addKey(idman.addGetID(uri), -1, new HashSet<Integer>());
 			Set<QueryGraphNode> ns = qs.getSelectedNodeSet();
