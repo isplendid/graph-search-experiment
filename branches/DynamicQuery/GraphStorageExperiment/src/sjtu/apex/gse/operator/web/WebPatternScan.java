@@ -28,6 +28,7 @@ public class WebPatternScan implements Scan {
 	private boolean lastFetched;
 	protected boolean srcIdled;
 	private boolean hasKey;
+	private KeyObserverImpl obs;
 	
 	protected IDManager idman;
 	protected SourceManager srcman;
@@ -48,6 +49,7 @@ public class WebPatternScan implements Scan {
 		this.srcman = srcman;
 		this.srcIdled = true;
 		this.lastFetched = false;
+		this.obs = new KeyObserverImpl(this);
 	}
 	
 	private String getLabelFromID(int id) {
@@ -75,7 +77,7 @@ public class WebPatternScan implements Scan {
 		
 		
 		Debug.println("addKey", key[0] + " " + key[1] + " " + key[2]);
-		src.addObserver(new KeyObserverImpl(this, key, convertSrcSetToExternal(sources)));
+		src.registerKey(key, convertSrcSetToExternal(sources), obs);
 		hasKey = true;
 	}
 	
