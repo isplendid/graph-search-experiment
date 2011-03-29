@@ -17,13 +17,14 @@ public class BatchExperiment {
 		File f = new File(queryFldr);
 		File[] queries = f.listFiles();
 
-		for (File q : queries) {
-			String[] pa = new String[3];
-			pa[0] = configFn;
-			pa[1] = q.getAbsolutePath();
-			pa[2] = resultFldr + "/" + q.getName();
-			Experiment.main(pa);
-		}
+		for (File q : queries)
+			if (q.isFile()){
+				String[] pa = new String[3];
+				pa[0] = configFn;
+				pa[1] = q.getAbsolutePath();
+				pa[2] = resultFldr + "/" + q.getName();
+				Experiment.main(pa);
+			}
 	}
 
 }
