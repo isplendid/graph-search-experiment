@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openrdf.model.Value;
 import org.openrdf.query.algebra.And;
 import org.openrdf.query.algebra.BNodeGenerator;
 import org.openrdf.query.algebra.Bound;
@@ -61,6 +62,7 @@ import org.openrdf.query.algebra.Str;
 import org.openrdf.query.algebra.Union;
 import org.openrdf.query.algebra.ValueConstant;
 import org.openrdf.query.algebra.Var;
+import org.openrdf.rio.ntriples.NTriplesUtil;
 
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.struct.QueryGraph;
@@ -87,12 +89,16 @@ public class SPARQLConvert implements QueryModelVisitor<Exception> {
 	}
 	
 	private QueryGraphNode getMappedNode(Var target) {
-		QueryGraphNode qn;
-		String name = target.getName();
+		QueryGraphNode qn = null;
 		
-		if (target.isAnonymous()) {
-			qn = graph.addNode(idman.addGetID(name)); 
+		if (target.isAnonymous() && target.getValue() != null) {
+			Value v = target.getValue();
+			
+			String sv = NTriplesUtil.toNTriplesString(v);
+			qn = graph.addNode(idman.addGetID(sv));
 		} else {
+			String name = target.getName();
+			
 			if (nameNodeMap.containsKey(name))
 				qn = nameNodeMap.get(name);
 			else {
