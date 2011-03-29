@@ -94,11 +94,11 @@ public class Experiment {
 				count++;
 			}
 			scan.close();
-			
 			sys.close();
+			
 			ie.deri.urq.lidaq.benchmark.Benchmark bm = sys.webRepository().getBenchmark();
-			long relSrc = (Long)bm.get(new String(ie.deri.urq.lidaq.benchmark.WebRepositoryBenchmark.TOTAL_LOOKUPS)) - 
-				(Long)bm.get(new String(ie.deri.urq.lidaq.benchmark.WebRepositoryBenchmark.TOTAL_3XX_LOOKUPS));
+			long relSrc = (Long)bm.get(ie.deri.urq.lidaq.benchmark.WebRepositoryBenchmark.TOTAL_LOOKUPS) - 
+				(Integer)bm.get(ie.deri.urq.lidaq.benchmark.WebRepositoryBenchmark.TOTAL_3XX_LOOKUPS);
 			
 			wr.append((System.currentTimeMillis() - time) + "\t " + count + "\t" + srcs.size() + "\t" + relSrc + "\n");
 			
