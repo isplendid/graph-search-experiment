@@ -22,7 +22,7 @@ public class SPARQLQueryReader implements QueryReader {
 		SPARQLConvert convert = new SPARQLConvert(idman);
 		
 		try {
-			TupleExpr exp = parser.parseQuery(readStringFromFile(filename), "http://deri.ie").getTupleExpr();
+			TupleExpr exp = parser.parseQuery(readStringFromFile(filename), "http://www.apexlab.org/").getTupleExpr();
 			
 			exp.visit(convert);
 		} catch (Exception e) {
