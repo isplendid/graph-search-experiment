@@ -377,7 +377,7 @@ public class SPARQLConvert implements QueryModelVisitor<Exception> {
 		Var p = sp.getPredicateVar();
 		Var o = sp.getObjectVar();
 		
-		graph.addEdge(getMappedNode(s), getMappedNode(o), idman.addGetID(p.getName()));
+		graph.addEdge(getMappedNode(s), getMappedNode(o), idman.addGetID(NTriplesUtil.toNTriplesString(p.getValue())));
 	}
 
 	@Override
