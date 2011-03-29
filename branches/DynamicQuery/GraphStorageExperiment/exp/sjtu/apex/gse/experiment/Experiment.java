@@ -52,7 +52,6 @@ public class Experiment {
 		
 		BufferedWriter wr;
 		IDManager idman = null;
-		int startId = -1;
 		
 		wr = new BufferedWriter(new FileWriter(resultFilename));
 		
@@ -60,11 +59,6 @@ public class Experiment {
 		
 		int cnt = 0;
 		QuerySchema qs;
-		
-		while (cnt < startId) {
-			rd.read();
-			cnt ++;
-		}
 		
 		while ((qs = rd.read()) != null) {
 			System.out.println(++cnt);
@@ -100,16 +94,17 @@ public class Experiment {
 			long relSrc = (Long)bm.get(ie.deri.urq.lidaq.benchmark.WebRepositoryBenchmark.TOTAL_LOOKUPS) - 
 				(Integer)bm.get(ie.deri.urq.lidaq.benchmark.WebRepositoryBenchmark.TOTAL_3XX_LOOKUPS);
 			
+			
 			wr.append((System.currentTimeMillis() - time) + "\t " + count + "\t" + srcs.size() + "\t" + relSrc + "\n");
 			
 			File log = new File("plan.log");
 			log.delete();
 			
 			wr.close();	
-			
-			System.exit(0);
 		}
 		
+		//This is a workaround of some threads not being stopped
+		System.exit(0);
 	}
 	
 	

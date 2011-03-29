@@ -23,6 +23,7 @@ public class BatchExperiment {
 				pa[0] = configFn;
 				pa[1] = q.getAbsolutePath();
 				pa[2] = resultFldr + "/" + q.getName();
+				System.out.println("Start to process query " + pa[1]);
 				Experiment.main(pa);
 			}
 	}
