@@ -87,11 +87,11 @@ public class AtomicPatternIndexService {
 		QueryGraphNode sub;
 		QueryGraphNode obj;
 		
-		int subInt = idman.addGetID(stmt[0].toString());
-		int objInt = idman.addGetID(stmt[2].toString());
-		int predInt = idman.addGetID(stmt[1].toString());
+		int subInt = idman.addGetID(stmt[0].toN3());
+		int objInt = idman.addGetID(stmt[2].toN3());
+		int predInt = idman.addGetID(stmt[1].toN3());
 		
-		src.add(srcman.addGetID(stmt[3].toString()));
+		src.add(srcman.addGetID(stmt[3].toN3()));
 		
 		//Add graph of size 2
 		graph = new QueryGraph();
