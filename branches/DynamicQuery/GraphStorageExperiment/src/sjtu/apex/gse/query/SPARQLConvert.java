@@ -75,12 +75,14 @@ public class SPARQLConvert implements QueryModelVisitor<Exception> {
 	private List<QueryGraphNode> selectedVars;
 	private IDManager idman;
 	private QueryGraph graph;
-	Map<String, QueryGraphNode> nameNodeMap;
+	Map<String, QueryGraphNode> varNodeMap;
+	Map<String, QueryGraphNode> litNodeMap;
 	
 	public SPARQLConvert(IDManager idman) {
 		selectedVars = new ArrayList<QueryGraphNode>();
 		graph = new QueryGraph();
-		nameNodeMap = new HashMap<String, QueryGraphNode>();
+		varNodeMap = new HashMap<String, QueryGraphNode>();
+		litNodeMap = new HashMap<String, QueryGraphNode>();
 		this.idman = idman;
 	}
 	
@@ -95,15 +97,21 @@ public class SPARQLConvert implements QueryModelVisitor<Exception> {
 			Value v = target.getValue();
 			
 			String sv = NTriplesUtil.toNTriplesString(v);
-			qn = graph.addNode(idman.addGetID(sv));
+			
+			if (litNodeMap.containsKey(sv))
+				qn = litNodeMap.get(sv);
+			else {
+				qn = graph.addNode(idman.addGetID(sv));
+				litNodeMap.put(sv, qn);
+			}
 		} else {
 			String name = target.getName();
 			
-			if (nameNodeMap.containsKey(name))
-				qn = nameNodeMap.get(name);
+			if (varNodeMap.containsKey(name))
+				qn = varNodeMap.get(name);
 			else {
 				qn = graph.addNode();
-				nameNodeMap.put(name, qn);
+				varNodeMap.put(name, qn);
 			}
 		}
 		
@@ -332,7 +340,7 @@ public class SPARQLConvert implements QueryModelVisitor<Exception> {
 
 	@Override
 	public void meet(ProjectionElem pe) throws Exception {
-		selectedVars.add(nameNodeMap.get(pe.getSourceName()));
+		selectedVars.add(varNodeMap.get(pe.getSourceName()));
 	}
 
 	@Override
