@@ -12,6 +12,7 @@ public class FileIndexEntry implements Comparable<FileIndexEntry> {
 	public FileIndexEntry(String pattern, RecordRange range, SourceHeapRange shr) {
 		this.pattern = pattern;
 		this.range = range;
+		this.shr = shr;
 	}
 
 	public int compareTo(FileIndexEntry arg0) {
