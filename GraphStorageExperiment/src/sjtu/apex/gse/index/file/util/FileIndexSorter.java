@@ -67,7 +67,7 @@ public class FileIndexSorter {
 		HeapContainer hc;
 
 		while ((hc = (HeapContainer) h.remove()) != null) {
-			wr.writeEntry(hc.tfe.pattern, hc.tfe.range);
+			wr.writeEntry(hc.tfe.pattern, hc.tfe.range, hc.tfe.shr);
 			if (hc.rd.next()) {
 				tfe = hc.rd.readEntry();
 				hc.updateEntry(tfe);
@@ -86,7 +86,7 @@ public class FileIndexSorter {
 		FileIndexWriter wr = new FileIndexWriter(filename, size, strSize);
 
 		for (FileIndexEntry e : ent) {
-			wr.writeEntry(e.pattern, e.range);
+			wr.writeEntry(e.pattern, e.range, e.shr);
 		}
 
 		wr.close();

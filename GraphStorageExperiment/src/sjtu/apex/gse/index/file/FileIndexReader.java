@@ -6,11 +6,13 @@ import java.io.RandomAccessFile;
 
 import sjtu.apex.gse.storage.file.RID;
 import sjtu.apex.gse.storage.file.RecordRange;
+import sjtu.apex.gse.storage.file.SourceHeapRange;
 
 
 public class FileIndexReader {
 	
 	static final int lenSize = 2, intSize = 4;
+	static final int bitShift = 12;
 	
 	RandomAccessFile file;
 	int recLen;
@@ -21,8 +23,8 @@ public class FileIndexReader {
 	public FileIndexReader(String filename, int size, int strSize) {
 		try {
 			file = new RandomAccessFile(filename, "r");
-			recLen = strSize + lenSize + intSize * 4;
-			entLen = intSize * size + intSize * 4;
+			recLen = strSize + lenSize + intSize * 8;
+			entLen = intSize * size + intSize * 8;
 			pointer = -recLen;
 			this.strSize = strSize;
 		} catch (FileNotFoundException e) {
@@ -78,9 +80,25 @@ public class FileIndexReader {
 		return null;
 	}
 	
+	public SourceHeapRange getSourceHeapRange() {
+		try {
+			file.seek(pointer + strSize + lenSize + 16);
+			int sp = file.readInt();
+			int so = file.readInt();
+			int ep = file.readInt();
+			int eo = file.readInt();
+			
+			return new SourceHeapRange(new RID(sp, so), new RID(ep, eo));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	public FileIndexEntry readEntry() {
 		if (next())
-			return new FileIndexEntry(getPatternString(), getRange());
+			return new FileIndexEntry(getPatternString(), getRange(), getSourceHeapRange());
 		else
 			return null;
 	}
@@ -88,8 +106,8 @@ public class FileIndexReader {
 	public int getInstanceCount() {
 		RecordRange rr = getRange();
 		
-		long startpos = (long)(rr.getStartRID().getPageID()) * 4096 + (long)(rr.getStartRID().getOffset());
-		long endpos = (long)(rr.getEndRID().getPageID()) * 4096 + (long)(rr.getEndRID().getOffset());
+		long startpos = (long)(rr.getStartRID().getPageID()) << bitShift + (long)(rr.getStartRID().getOffset());
+		long endpos = (long)(rr.getEndRID().getPageID()) << bitShift + (long)(rr.getEndRID().getOffset());
 		
 		return (int) ((endpos - startpos) / entLen + 1);
 	}

@@ -11,39 +11,47 @@ public class SourceHeapReader {
 	final static byte bitShift = 12;
 	
 	private byte buf[] = new byte[pageSize];
-	private int offset;
+	private long pageStart;
 	private RandomAccessFile file;
 	
 	public SourceHeapReader(String filename) {
 		try {
 			file = new RandomAccessFile(filename, "r");
+			pageStart = -1;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private int readInt(int pos) {
+	private int readInt(long pos) {
 		int value = 0;
+		int offset;
 		
-		if (!(pos >= offset && pos < offset + pageSize)) {
-			offset = pos >> bitShift;
-
+		if (!(pos >= pageStart && pos < pageStart + pageSize)) {
+			pageStart = pos & 0xfffff000;
 			try {
-				file.seek(offset);
-				file.read(buf, offset, pageSize);
+				file.seek(pageStart);
+				file.read(buf, 0, pageSize);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+		offset = (int)(pos - pageStart);
 		
-		value = ((0x00FF & buf[pos]) << 24) | ((0x00FF & buf[pos + 1]) << 16) + ((0x00FF & buf[pos + 2]) << 8) + (0x00FF & buf[pos + 3]);
+		value = ((0x00FF & buf[offset]) << 24) | ((0x00FF & buf[offset + 1]) << 16) + ((0x00FF & buf[offset + 2]) << 8) + (0x00FF & buf[offset + 3]);
 		
 		return value;
 	}
-
-	public Set<Integer> getSourceSet(int startIdx, int endIdx) {
+	
+	public Set<Integer> getSourceSet(SourceHeapRange range) {
+		return getSourceSet(range.getStartIndex().getPageID(), range.getStartIndex().getOffset(), range.getEndIndex().getPageID(), range.getEndIndex().getOffset());
+	}
+	
+	public Set<Integer> getSourceSet(int startPage, int startOffset, int endPage, int endOffset) {
 		Set<Integer> ret = new HashSet<Integer>();
-		int pointer = startIdx;
+		long startIdx = (startPage << bitShift | startOffset);
+		long endIdx = (endPage << bitShift | endOffset);
+		long pointer = startIdx;
 		
 		while (pointer < endIdx) {
 			readInt(pointer);
