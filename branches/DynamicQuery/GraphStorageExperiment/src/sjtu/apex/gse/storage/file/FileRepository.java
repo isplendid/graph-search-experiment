@@ -103,15 +103,20 @@ public class FileRepository implements Scan {
 
 	@Override
 	public Set<Integer> getSourceSet() {
-		int startPos, endPos;
-		int startIdx, endIdx;
+		int pointer = 0;
+		int startPage, startOffset, endPage, endOffset;
 		
-		startPos = offset + recLen - 8;
-		endPos = offset + recLen - 4;
-		startIdx = ((0x00FF & buf[startPos]) << 24) | ((0x00FF & buf[startPos + 1]) << 16) + ((0x00FF & buf[startPos + 2]) << 8) + (0x00FF & buf[startPos + 3]);
-		endIdx = ((0x00FF & buf[endPos]) << 24) | ((0x00FF & buf[endPos + 1]) << 16) + ((0x00FF & buf[endPos + 2]) << 8) + (0x00FF & buf[endPos + 3]);
+		pointer = offset + recLen - 16;
+		startPage = ((0x00FF & buf[pointer]) << 24) | ((0x00FF & buf[pointer + 1]) << 16) + ((0x00FF & buf[pointer + 2]) << 8) + (0x00FF & buf[pointer + 3]);
+		pointer += 4;
+		startOffset = ((0x00FF & buf[pointer]) << 24) | ((0x00FF & buf[pointer + 1]) << 16) + ((0x00FF & buf[pointer + 2]) << 8) + (0x00FF & buf[pointer + 3]);
 		
-		return heapFile.getSourceSet(startIdx, endIdx);
+		pointer += 4;
+		endPage = ((0x00FF & buf[pointer]) << 24) | ((0x00FF & buf[pointer + 1]) << 16) + ((0x00FF & buf[pointer + 2]) << 8) + (0x00FF & buf[pointer + 3]);
+		pointer += 4;
+		endOffset = ((0x00FF & buf[pointer]) << 24) | ((0x00FF & buf[pointer + 1]) << 16) + ((0x00FF & buf[pointer + 2]) << 8) + (0x00FF & buf[pointer + 3]);
+		
+		return heapFile.getSourceSet(startPage, startOffset, endPage, endOffset);
 	}
 
 }
