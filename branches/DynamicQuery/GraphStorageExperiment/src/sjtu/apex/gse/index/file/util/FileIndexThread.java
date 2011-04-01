@@ -81,6 +81,7 @@ public class FileIndexThread {
 		
 		tw.close();
 		FilesystemUtility.deleteFile(trfn);
+		FilesystemUtility.deleteFile(tshfn);
 		
 		mergeIndex();
 
