@@ -95,13 +95,16 @@ public class FileIndexMerger {
 			hc.fie = hc.reader.readEntry();
 			if (hc.fie != null)
 				h.insert(hc);
-			else
+			else {
 				hc.reader.close();
+				hc.shr.close();
+			}
 		}
 		
 		if (end != null)
 			fiw.writeEntry(currentPattern, new RecordRange(start, end), shw.writeSet(tmpSrc));
 			
+		shw.close();
 		fiw.close();
 		frw.close();
 	}

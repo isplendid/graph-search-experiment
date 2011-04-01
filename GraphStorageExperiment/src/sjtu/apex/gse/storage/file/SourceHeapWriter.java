@@ -36,6 +36,7 @@ public class SourceHeapWriter {
 				file.setLength(pointer);
 				file.seek(pageStart);
 				file.write(buf, 0 , (int)pointer & pageSize);
+				file.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -72,7 +73,7 @@ public class SourceHeapWriter {
 		for (int i : value) writeInt(i);
 		endIdx = pointer;
 		
-		return new SourceHeapRange(new RID((int)(startIdx >> bitShift), (int)(startIdx & pageSize)), new RID((int)(endIdx >> bitShift), (int)(endIdx & pageSize)));
+		return new SourceHeapRange(new RID((int)(startIdx >> bitShift), (int)(startIdx & (pageSize - 1))), new RID((int)(endIdx >> bitShift), (int)(endIdx & (pageSize - 1))));
 	}
 	 
 }

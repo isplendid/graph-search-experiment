@@ -17,7 +17,7 @@ public class SourceHeapReader {
 	public SourceHeapReader(String filename) {
 		try {
 			file = new RandomAccessFile(filename, "r");
-			pageStart = -1;
+			pageStart = -Integer.MAX_VALUE;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -54,7 +54,7 @@ public class SourceHeapReader {
 		long pointer = startIdx;
 		
 		while (pointer < endIdx) {
-			readInt(pointer);
+			ret.add(readInt(pointer));
 			pointer += 4;
 		}
 		
