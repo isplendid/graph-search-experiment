@@ -10,7 +10,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import sjtu.apex.gse.index.file.util.FileIndexThreads;
+import sjtu.apex.gse.index.file.util.FileIndexThread;
 import sjtu.apex.gse.metadata.IndexManager;
 import sjtu.apex.gse.storage.file.FileRepositoryEntry;
 import sjtu.apex.gse.storage.file.FileRepositoryReader;
@@ -20,13 +20,13 @@ import sun.security.util.Debug;
 
 public class FileIndexThreadsTest {
 	
-	private FileIndexThreads fit;
-	private final static int maxIns = 10000;
+	private FileIndexThread fit;
+	private final static int maxIns = 100000000;
 	private List<List<Set<Integer>>> lls;
 	
 	@Before
 	public void setUp() {
-		fit = new FileIndexThreads(2, 128, 100, 2, "dbg/dat", "dbg/tmp");
+		fit = new FileIndexThread(2, 128, 100, 2, "dbg/dat", "dbg/tmp");
 		lls = new ArrayList(4);
 		
 		for (int i = 0; i < 4; i++) {
@@ -45,7 +45,12 @@ public class FileIndexThreadsTest {
 			lls.get(i % 4).get(0).add(base);
 			lls.get(i % 4).get(1).add(base + 1);
 			
-			fit.addEntry(Integer.toString(i % 4), r, new HashSet<Integer>());
+			Set<Integer> srclist = new HashSet<Integer>();
+			
+			for (int j = 0; j <= i % 4; j++)
+				srclist.add(j);
+			
+			fit.addEntry(Integer.toString(i % 4), r, srclist);
 		}
 		fit.close();
 	}
