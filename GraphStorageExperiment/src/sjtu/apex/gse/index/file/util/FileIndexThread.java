@@ -76,9 +76,9 @@ public class FileIndexThread {
 	}
 
 	public void close() {
-		tsw.close();
 		buildIndex();
 		
+		tsw.close();
 		tw.close();
 		FilesystemUtility.deleteFile(trfn);
 		FilesystemUtility.deleteFile(tshfn);
