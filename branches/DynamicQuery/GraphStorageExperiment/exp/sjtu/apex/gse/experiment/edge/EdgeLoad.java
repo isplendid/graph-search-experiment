@@ -107,12 +107,12 @@ public class EdgeLoad {
 			if ((++cnt) % 5000 == 0)
 				System.out.println(cnt);
 			
-			int sid = idman.addGetID(stmt[0].toString());
-			int oid = idman.addGetID(stmt[2].toString());
+			int sid = idman.addGetID(stmt[0].toN3());
+			int oid = idman.addGetID(stmt[2].toN3());
 			
 			if (sid == -1 || oid == -1) continue;
 			
-			int pred = idman.addGetID(stmt[1].toString());
+			int pred = idman.addGetID(stmt[1].toN3());
 			
 			wr.append(sid, new Edge(pred, true));
 			wr.append(oid, new Edge(pred, false));
