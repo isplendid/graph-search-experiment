@@ -24,7 +24,7 @@ public class FileIndexReader {
 		try {
 			file = new RandomAccessFile(filename, "r");
 			recLen = strSize + lenSize + intSize * 8;
-			entLen = intSize * size + intSize * 8;
+			entLen = intSize * size + intSize * 4;
 			pointer = -recLen;
 			this.strSize = strSize;
 		} catch (FileNotFoundException e) {
@@ -106,8 +106,8 @@ public class FileIndexReader {
 	public int getInstanceCount() {
 		RecordRange rr = getRange();
 		
-		long startpos = (long)(rr.getStartRID().getPageID()) << bitShift + (long)(rr.getStartRID().getOffset());
-		long endpos = (long)(rr.getEndRID().getPageID()) << bitShift + (long)(rr.getEndRID().getOffset());
+		long startpos = ((long)(rr.getStartRID().getPageID()) << bitShift) + (long)(rr.getStartRID().getOffset());
+		long endpos = ((long)(rr.getEndRID().getPageID()) << bitShift) + (long)(rr.getEndRID().getOffset());
 		
 		return (int) ((endpos - startpos) / entLen + 1);
 	}
