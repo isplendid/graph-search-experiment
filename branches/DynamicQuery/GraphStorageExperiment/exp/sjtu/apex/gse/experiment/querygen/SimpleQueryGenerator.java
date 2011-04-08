@@ -92,6 +92,7 @@ public class SimpleQueryGenerator {
 					filecount++;
 				}
 			}
+			fr.close();
 			fldrcnt ++;
 		}			
 		
