@@ -71,8 +71,8 @@ public class QuerySystem {
 			String port = config.getStringSetting("LDProxyPort", null);
 			
 			webReposMan =  new ie.deri.urq.lidaq.repos.WebRepositoryManager(host, port);
+			webRepos = webReposMan.getRepository();
 		}
-		webRepos = webReposMan.getRepository();
 	}
 	
 	private void paramsInit() {
