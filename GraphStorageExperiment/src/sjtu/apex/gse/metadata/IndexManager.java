@@ -25,7 +25,7 @@ public class IndexManager {
 		this.folder = folder;
 		this.strSize = strSize;
 		file = new RandomAccessFile[size];
-		recLen = lenSize + strSize + intSize * 4;
+		recLen = lenSize + strSize + intSize * 8;
 		for (int i = 0; i < size; i++)
 			try {
 				file[i] = new RandomAccessFile(folder + "/index" + i, "r");
