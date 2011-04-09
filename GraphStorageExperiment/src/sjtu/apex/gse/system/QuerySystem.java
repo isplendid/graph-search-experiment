@@ -3,6 +3,7 @@ package sjtu.apex.gse.system;
 import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.hash.HashFunction;
 import sjtu.apex.gse.hash.ModHash;
+import sjtu.apex.gse.index.file.FileIndexManager;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.SourceManager;
 import sjtu.apex.gse.indexer.file.SleepyCatIDManager;
@@ -52,7 +53,7 @@ public class QuerySystem {
 		
 		paramsInit();
 		
-		indexMan = new IndexManager(folder, pl, psl);
+		indexMan = new FileIndexManager(folder, pl, psl);
 		
 		
 		patternManagerInit();
