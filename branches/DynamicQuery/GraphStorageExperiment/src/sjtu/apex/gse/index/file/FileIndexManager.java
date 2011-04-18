@@ -106,7 +106,15 @@ public class FileIndexManager implements IndexManager {
 	
 	@Override
 	public RecordRange seek(String pattern, int size) {
-		return seekIndexEntry(pattern, size).range;
+		FileIndexEntry fie;
+		RecordRange ret;
+		
+		if ((fie = seekIndexEntry(pattern, size)) != null)
+			ret = fie.range;
+		else
+			ret = null;
+		
+		return ret;
 	}
 	
 	@Override
