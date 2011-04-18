@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import sjtu.apex.gse.metadata.IndexManager;
+import sjtu.apex.gse.index.file.FileIndexManager;
 import sjtu.apex.gse.storage.file.FileRepositoryEntry;
 import sjtu.apex.gse.storage.file.FileRepositoryReader;
 
@@ -14,7 +14,7 @@ public class FileRepositoryReaderPatternTest {
 
 	@Before
 	public void setUp() throws Exception {
-		rd = new FileRepositoryReader("tmp/dat/storage1", 2, new IndexManager("tmp/dat", 3, 128).seek("*[-16555::16552]", 2));
+		rd = new FileRepositoryReader("tmp/dat/storage1", 2, new FileIndexManager("tmp/dat", 3, 128).seek("*[-16555::16552]", 2));
 	}
 	
 	@Test

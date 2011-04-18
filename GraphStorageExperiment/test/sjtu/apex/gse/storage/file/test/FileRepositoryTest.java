@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import sjtu.apex.gse.index.file.FileIndexManager;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.file.SleepyCatIDManager;
 import sjtu.apex.gse.metadata.IndexManager;
@@ -18,7 +19,7 @@ public class FileRepositoryTest {
 		
 	@Before
 	public void setUp() throws Exception {
-		pm = new IndexManager("tmp/dat", 3, 128);
+		pm = new FileIndexManager("tmp/dat", 3, 128);
 		idman = new SleepyCatIDManager("tmp/id");
 	}
 
