@@ -10,6 +10,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import sjtu.apex.gse.index.file.FileIndexManager;
 import sjtu.apex.gse.index.file.util.FileIndexThread;
 import sjtu.apex.gse.metadata.IndexManager;
 import sjtu.apex.gse.storage.file.FileRepositoryEntry;
@@ -57,7 +58,7 @@ public class FileIndexThreadsTest {
 	
 	@Test
 	public void test() {
-		IndexManager im = new IndexManager("dbg/dat", 2, 128);
+		IndexManager im = new FileIndexManager("dbg/dat", 2, 128);
 		
 		for (int i = 0; i < 4; i++) {
 			RecordRange rr = im.seek(Integer.toString(i), 2);
