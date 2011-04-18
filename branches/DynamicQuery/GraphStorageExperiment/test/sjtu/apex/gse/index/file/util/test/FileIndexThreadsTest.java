@@ -22,7 +22,7 @@ import sun.security.util.Debug;
 public class FileIndexThreadsTest {
 	
 	private FileIndexThread fit;
-	private final static int maxIns = 100000000;
+	private final static int maxIns = 0;
 	private List<List<Set<Integer>>> lls;
 	
 	@Before
