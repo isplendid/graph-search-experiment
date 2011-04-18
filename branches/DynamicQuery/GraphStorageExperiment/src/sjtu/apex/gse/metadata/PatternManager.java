@@ -19,7 +19,6 @@ import sjtu.apex.gse.struct.QueryGraphNode;
  */
 public class PatternManager {
 
-	//	static Connection conn = ConnectionFactory.createConnection();
 	PatternCodec codec;
 	IndexManager indexMan;
 
@@ -42,7 +41,7 @@ public class PatternManager {
 
 	/**
 	 * Get the number of instances according with the given pattern (by encoded string)
-	 * @param graph The structural 
+	 * @param graph - The structural 
 	 * @return The number of instances
 	 */
 	public Integer getPatternInstanceCount(String ps, int size) {
@@ -51,14 +50,6 @@ public class PatternManager {
 			return null;
 		else
 			return res;
-		//		try {
-		//			Statement stm = conn.createStatement();
-		//			ResultSet rs = stm.executeQuery("SELECT CNT FROM PATTERN WHERE P = '" + ps + "'");
-
-		//			return rs.getInt(1); 
-		//		} catch (SQLException e) {
-		//			return null;
-		//		}
 	}
 
 	/**
