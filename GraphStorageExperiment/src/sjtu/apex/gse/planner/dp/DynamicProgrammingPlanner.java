@@ -7,7 +7,6 @@ import java.util.Set;
 
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.factory.OperatorFactory;
-import sjtu.apex.gse.operator.web.WebPatternPlan;
 import sjtu.apex.gse.pattern.PatternInfo;
 import sjtu.apex.gse.planner.Planner;
 import sjtu.apex.gse.struct.Connectivity;
