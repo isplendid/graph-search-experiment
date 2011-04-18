@@ -31,15 +31,15 @@ public class SourceHeapWriter {
 	}
 	
 	public void close() {
-		if (pointer > fileSize) {
-			try {
+		try {
+			if (pointer > fileSize) {
 				file.setLength(pointer);
 				file.seek(pageStart);
 				file.write(buf, 0 , (int)pointer & pageSize);
-				file.close();
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
+			file.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
