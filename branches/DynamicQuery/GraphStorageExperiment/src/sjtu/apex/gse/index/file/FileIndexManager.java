@@ -19,12 +19,16 @@ public class FileIndexManager implements IndexManager {
 	private String folder;
 	private int recLen;
 	private int strSize;
-	private SourceHeapReader reader;
+	private SourceHeapReader[] reader;
 	
-	public FileIndexManager(String folder, int size, int strSize, SourceHeapReader shr) {
+	public FileIndexManager(String folder, int size, int strSize) {
 		this.folder = folder;
 		this.strSize = strSize;
-		this.reader = shr;
+		
+		reader = new SourceHeapReader[size];
+		for (int i = 0; i < size; i++)
+			reader[i] = new SourceHeapReader(folder + "/srcheap" + i);
+		
 		file = new RandomAccessFile[size];
 		recLen = lenSize + strSize + intSize * 8;
 		for (int i = 0; i < size; i++)
@@ -121,10 +125,16 @@ public class FileIndexManager implements IndexManager {
 	public void close() {
 		try {
 			for (int i = 0; i < file.length; i++) 
-			if (file[i] != null){
-				file[i].close();
-				file[i] = null;
-			}
+				if (file[i] != null){
+					file[i].close();
+					file[i] = null;
+				}
+			
+			for (int i = 0; i < reader.length; i++)
+				if (reader[i] != null) {
+					reader[i].close();
+					reader[i] = null;
+				}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -134,6 +144,6 @@ public class FileIndexManager implements IndexManager {
 	public Set<Integer> getSourceList(String pattern, int size) {
 		FileIndexEntry fie = seekIndexEntry(pattern, size);
 		
-		return reader.getSourceSet(fie.shr);
+		return reader[size - 1].getSourceSet(fie.shr);
 	}
 }
