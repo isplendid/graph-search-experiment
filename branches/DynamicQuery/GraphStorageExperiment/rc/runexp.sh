@@ -34,6 +34,6 @@ do
     fi
 
     echo Running $query to $output_file
-    timeout -s 9 180s java -Xmx4096m -cp bin:lib/nxparser.jar:lib/je-3.3.69.jar:lib/lidaq_web_repos.jar sjtu.apex.gse.experiment.Experiment cfg-web $query $output_file
+    timeout -s 9 180s java -Xmx4096m -cp bin:lib/nxparser.jar:lib/je-3.3.69.jar:lib/lidaq_web_repos.jar:lib/openrdf-sesame-2.3.2-onejar.jar sjtu.apex.gse.experiment.Experiment cfg-web $query $output_file
   done
 done
