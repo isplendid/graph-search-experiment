@@ -21,6 +21,8 @@ public class PatternInfo {
 	private Set<QueryGraphNode> constrainedNode;
 	private Set<QueryGraphNode> satisfiedNode;
 	private int insCnt;
+	private Set<Integer> sources;
+	private PatternInfo parent;
 	
 	/**
 	 * Create a new PatternInfo
@@ -28,13 +30,16 @@ public class PatternInfo {
 	 * @param patternStr - The string representation of the query graph
 	 * @param insCnt - The number of bindings will possibly be returned
 	 */
-	public PatternInfo(QueryGraph graph, String patternStr, Integer insCnt) {
+	public PatternInfo(QueryGraph graph, String patternStr, Integer insCnt, Set<Integer> sources, PatternInfo parent) {
 		this.satisfiedNode = graph.getSatisfiedNodeSet();
 		this.graph = graph;
 		this.patternStr = patternStr;
 		this.usedEdge = graph.getEdgeSet();
 		this.usedNode = graph.getNodeSet();
 		this.constrainedNode = graph.getConstrainedNodeSet();
+		this.sources = sources;
+		this.parent = parent;
+		
 		if (insCnt == null)
 			this.insCnt = -1;
 		else
@@ -91,7 +96,19 @@ public class PatternInfo {
 		return insCnt;
 	}
 	
+	/**
+	 * Get the list of sources
+	 * @return The list of relevant sources.
+	 */
+	public Set<Integer> getSources() {
+		return sources;
+	}
+	
+	public PatternInfo getParent() {
+		return parent;
+	}
+	
 	public String toString() {
-		return patternStr;
+		return "(" + patternStr + "," + sources.toString() + ")";
 	}
 }
