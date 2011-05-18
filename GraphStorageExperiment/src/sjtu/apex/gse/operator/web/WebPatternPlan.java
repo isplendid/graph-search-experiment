@@ -1,6 +1,7 @@
 package sjtu.apex.gse.operator.web;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
@@ -13,15 +14,17 @@ public class WebPatternPlan implements Plan {
 	private String ps;
 	private Integer webAccCnt = null;
 	private Integer resCnt = null;
+	private Set<Integer> sources;
 	
-	public WebPatternPlan(QuerySchema sch, QuerySystem qs) {
-		this(sch, qs, qs.patternManager().getCodec().encodePattern(sch.getQueryGraph()));	
+	public WebPatternPlan(QuerySchema sch, QuerySystem qs, Set<Integer> sources) {
+		this(sch, qs, qs.patternManager().getCodec().encodePattern(sch.getQueryGraph()), sources);	
 	}
 	
-	public WebPatternPlan(QuerySchema sch, QuerySystem qs, String ps) {
+	public WebPatternPlan(QuerySchema sch, QuerySystem qs, String ps, Set<Integer> sources) {
 		this.sch = sch;
 		this.qs = qs;
 		this.ps = ps;
+		this.sources = sources;
 	}
 
 	@Override
@@ -81,7 +84,7 @@ public class WebPatternPlan implements Plan {
 	
 	@Override
 	public String toString() {
-		return "WebPattern(" + ps + ")";
+		return "WebPattern(" + ps + "," + sources.toString() + ")";
 	}
 
 

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import sjtu.apex.gse.pattern.PatternCodec;
 import sjtu.apex.gse.pattern.PatternInfo;
+import sjtu.apex.gse.struct.Connectivity;
 import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphEdge;
 import sjtu.apex.gse.struct.QueryGraphNode;
@@ -33,10 +34,7 @@ public class PatternManager {
 	 * @return The number of instances
 	 */
 	public Integer getPatternInstanceCount(QueryGraph graph) {
-		String pattern = codec.encodePattern(graph);
-
-		return indexMan.getPatternCount(pattern, graph.nodeCount());
-		//		return getPatternInstanceCount(pattern);
+		return getPatternInstanceCount(codec.encodePattern(graph), graph.nodeCount());
 	}
 
 	/**
@@ -51,6 +49,109 @@ public class PatternManager {
 		else
 			return res;
 	}
+	
+	/**
+	 * Get the list of relevant sources for a pattern
+	 * @param ps - The encoded pattern string
+	 * @param size - The number of nodes in the pattern
+	 * @return The list of sources.
+	 */
+	public Set<Integer> getPatternRelevantSources(String ps, int size) {
+		return indexMan.getSourceList(ps, size);
+	}
+	
+	private void addTriplePatterns(SubpatternSet generated, List<PatternInfo> elems, QueryGraph graph) {
+		for (int i = 0; i < graph.edgeCount(); i++) {
+			QueryGraphEdge e = graph.getEdge(i);
+			Set<QueryGraphEdge> es = new HashSet<QueryGraphEdge>();
+			
+			es.add(e);
+			
+			for (int j = 0; j < 4; j++) {
+				Set<QueryGraphNode> ns = new HashSet<QueryGraphNode>();
+				if ((j & 1) == 1) ns.add(e.getNodeFrom());
+				if ((j & 2) == 2) ns.add(e.getNodeTo());
+				
+				QueryGraph g = graph.getInducedSubgraph(ns, es);
+				String ps = codec.encodePattern(g);
+				
+				Integer insCnt = getPatternInstanceCount(ps, g.nodeCount());
+				
+				if (insCnt != null || j == 3) {
+					if (generated.get(ps, g.getEdgeSet(), g.getNodeSet()) == null) {
+						PatternInfo pi = new PatternInfo(g, ps, insCnt, getPatternRelevantSources(ps, g.nodeCount()), null);
+						elems.add(pi);
+						generated.add(pi);
+					}
+				}
+			}
+			
+		}
+	}
+	
+	private void contrainSources(PatternInfo subject, Set<Integer> sources) {
+		subject.getSources().retainAll(sources);		
+	}
+	
+	private void updateGraphs(QueryGraph ng, SubpatternSet generated, List<PatternInfo> elems, PatternInfo parent) {
+		String ps = codec.encodePattern(ng);
+		Integer insCnt;
+		
+		if ((insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
+			Set<Integer> tmpSrc = new HashSet<Integer>(parent.getSources());
+			tmpSrc.retainAll(getPatternRelevantSources(ps, ng.nodeCount()));
+			
+			PatternInfo pi;
+			if ((pi = generated.get(ps, ng.getEdgeSet(), ng.getNodeSet())) == null) {
+				pi = new PatternInfo(ng, ps, insCnt, tmpSrc, parent);
+				elems.add(pi);
+				generated.add(pi);
+			} else {
+				PatternInfo itr = parent;
+				do {
+					contrainSources(itr, tmpSrc);
+					itr = itr.getParent();
+				} while (itr != null);
+			}
+		}
+	}
+	
+	private void addComplexPatterns(SubpatternSet generated, List<PatternInfo> elems, QueryGraph graph) {
+		PatternInfo toExt;
+		int pointer = 0;
+		
+		while (pointer < elems.size()) {
+			toExt = elems.get(pointer);
+			Set<QueryGraphNode> nodeCovered = toExt.getCoveredNodes();
+			Set<QueryGraphEdge> edgeCovered = toExt.getCoveredEdges();
+			Set<QueryGraphNode> nodeConstrained = toExt.getConstrainedNodes();
+			
+			for (QueryGraphNode n : nodeCovered) {
+				//Extend the pattern by adding edges
+				for (Connectivity c : n.getAncestor().getConnectivities()) 
+					if (!edgeCovered.contains(c.getEdge())){
+						edgeCovered.add(c.getEdge());
+						
+						QueryGraph ng = graph.getInducedSubgraph(nodeConstrained, edgeCovered);
+						updateGraphs(ng, generated, elems, toExt);
+						
+						edgeCovered.remove(c.getEdge());
+					}
+				
+				//Extend the pattern by adding constraints
+				if (n.isGeneral() && n.isGeneralized()) {
+					nodeConstrained.add(n);
+					
+					QueryGraph ng = graph.getInducedSubgraph(nodeConstrained, edgeCovered);
+					updateGraphs(ng, generated, elems, toExt);
+					
+					nodeConstrained.remove(n);
+				}
+			}
+			
+			pointer++;
+		}
+	}
 
 	/**
 	 * Get all legal sub-patterns of a given pattern. BFS search algorithm is applied here
@@ -60,85 +161,13 @@ public class PatternManager {
 	public List<PatternInfo> getSubPatterns(QueryGraph graph) {
 		List<PatternInfo> elems = new ArrayList<PatternInfo>();
 		SubpatternSet generated = new SubpatternSet();
-//		int pointer = 0;
-//		PatternInfo toExt;
-
-//		for (int i = 0; i < graph.nodeCount(); i++) 
-//			if (!graph.getNode(i).isGeneral()) {
-//				QueryGraphNode n = graph.getNode(i);
-//				Set<QueryGraphNode> ns = new HashSet<QueryGraphNode>();
-//
-//				ns.add(n);
-//				QueryGraph g = graph.getInducedSubgraph(ns, null, null, null);
-//				String ps = codec.encodePattern(g);
-//				Integer ti = getPatternInstanceCount(ps, g.nodeCount());
-//				if (ti != null) {
-//					PatternInfo pi = new PatternInfo(g, ps, ti); 
-//					elems.add(pi);
-//					generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
-//				}
-//			}
 		
-		for (int i = 0; i < graph.edgeCount(); i++) {
-			QueryGraphEdge e = graph.getEdge(i);
-			Set<QueryGraphEdge> es = new HashSet<QueryGraphEdge>();
-			Set<QueryGraphNode> ns = new HashSet<QueryGraphNode>();
-			
-			es.add(e);
-			ns.add(e.getNodeFrom());
-			ns.add(e.getNodeTo());
-			
-			QueryGraph g = graph.getInducedSubgraph(ns, es, null, null);
-			String ps = codec.encodePattern(g);
-			PatternInfo pi = new PatternInfo(g, ps, getPatternInstanceCount(ps, g.nodeCount()));
-			elems.add(pi);
-			generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
-		}
+		//Triple patterns are definitely added as candidates
+		addTriplePatterns(generated, elems, graph);
 
-//		while (pointer < elems.size()) {
-//			toExt = elems.get(pointer);
-//			Set<QueryGraphNode> nodeCovered = toExt.getCoveredNodes();
-//			Set<QueryGraphEdge> edgeCovered = toExt.getCoveredEdges();
-//			Set<QueryGraphNode> nodeConstrained = toExt.getConstrainedNodes();
-//			
-//			for (QueryGraphNode n : nodeCovered) {
-//				for (Connectivity c : n.getAncestor().getConnectivities()) 
-//					if (!edgeCovered.contains(c.getEdge())){
-//						edgeCovered.add(c.getEdge());
-//						
-//						QueryGraph ng = graph.getInducedSubgraph(nodeConstrained, edgeCovered, nodeConstrained, hf);
-//						String ps = codec.encodePattern(ng);
-//						Integer insCnt;
-//						
-//						if (!generated.contains(ps, ng.getEdgeSet(), ng.getNodeSet()) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
-//							PatternInfo pi = new PatternInfo(ng, ps, insCnt);
-//							elems.add(pi);
-//							generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
-//						}
-//						
-//						edgeCovered.remove(c.getEdge());
-//					}
-//				
-//				if (n.isGeneral() && n.isGeneralized()) {
-//					nodeConstrained.add(n);
-//					
-//					QueryGraph ng = graph.getInducedSubgraph(nodeConstrained, edgeCovered, nodeConstrained, hf);
-//					String ps = codec.encodePattern(ng);
-//					Integer insCnt;
-//					
-//					if (!generated.contains(ps, ng.getEdgeSet(), ng.getNodeSet()) && (insCnt = getPatternInstanceCount(ps, ng.nodeCount())) != null) {
-//						PatternInfo pi = new PatternInfo(ng, ps, insCnt);
-//						elems.add(pi);
-//						generated.add(ps, pi.getCoveredEdges(), pi.getCoveredNodes());
-//					}
-//					
-//					nodeConstrained.remove(n);
-//				}
-//			}
-//
-//			pointer++;
-//		}
-
+		//Complex patterns are added if exist in index
+		addComplexPatterns(generated, elems, graph);
+		
 		return elems;
 	}
 

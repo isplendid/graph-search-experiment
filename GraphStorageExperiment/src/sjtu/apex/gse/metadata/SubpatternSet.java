@@ -6,54 +6,48 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import sjtu.apex.gse.pattern.PatternInfo;
 import sjtu.apex.gse.struct.QueryGraphEdge;
 import sjtu.apex.gse.struct.QueryGraphNode;
 
 class SubpatternSet {
-	Map<String, List<Elem>> map;
+	Map<String, List<PatternInfo>> map;
 	
 	public SubpatternSet() {
-		map = new HashMap<String, List<Elem>>();
+		map = new HashMap<String, List<PatternInfo>>();
 	}
 	
-	public void add(String ps, Set<QueryGraphEdge> ce, Set<QueryGraphNode> cn) {
-		List<Elem> el;
+	public void add(PatternInfo pi) {
+		List<PatternInfo> el;
+		String ps = pi.getPatternString();
 		
 		if (map.containsKey(ps))
 			el = map.get(ps);
 		else {
-			el = new ArrayList<Elem>();
+			el = new ArrayList<PatternInfo>();
 			map.put(ps, el);
 		}
-		el.add(new Elem(ps, ce, cn));
+		el.add(pi);
 	}
 	
 	public boolean contains(String ps, Set<QueryGraphEdge> ce, Set<QueryGraphNode> cn) {
-		if (map.containsKey(ps)) {
-			List<Elem> el = map.get(ps);
-			
-			for (Elem e : el) {
-				
-				if (e.ce.containsAll(ce) && 
-						e.cn.containsAll(cn))
-					return true;
-			}
-			
-			return false;
-		}
-		else
-			return false;
+		return get(ps, ce, cn) != null;
 	}
 	
-	private class Elem {
-		String ps;
-		Set<QueryGraphEdge> ce; //Edge covered
-		Set<QueryGraphNode> cn; //Node covered
-		
-		Elem(String ps, Set<QueryGraphEdge> ce, Set<QueryGraphNode> cn) {
-			this.ps = ps;
-			this.ce = ce;
-			this.cn = cn;
+	public PatternInfo get(String ps, Set<QueryGraphEdge> ce, Set<QueryGraphNode> cn) {
+		if (map.containsKey(ps)) {
+			List<PatternInfo> el = map.get(ps);
+			
+			for (PatternInfo e : el) {
+				Set<QueryGraphEdge> coveredEdge = e.getCoveredEdges();
+				Set<QueryGraphNode> coveredNode = e.getCoveredNodes();
+				if ((e.getPatternString().equals(ps)) && coveredEdge.containsAll(ce) && coveredNode.containsAll(cn))
+					return e;
+			}
+			
+			return null;
 		}
+		else
+			return null;
 	}
 }

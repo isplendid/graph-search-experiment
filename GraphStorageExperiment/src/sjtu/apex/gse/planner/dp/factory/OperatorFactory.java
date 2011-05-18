@@ -1,6 +1,7 @@
-package sjtu.apex.gse.operator.factory;
+package sjtu.apex.gse.planner.dp.factory;
 
 import java.util.List;
+import java.util.Set;
 
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.struct.QueryGraphNode;
@@ -15,8 +16,8 @@ public abstract class OperatorFactory {
 	 * @param sys
 	 * @return
 	 */
-	public Plan getAtomicPlan(QuerySchema sch, QuerySystem sys) {
-		return getAtomicPlan(sch, sys, sys.patternCodec().encodePattern(sch.getQueryGraph()));
+	public Plan getAtomicPlan(QuerySchema sch, QuerySystem sys, Set<Integer> sources) {
+		return getAtomicPlan(sch, sys, sys.patternCodec().encodePattern(sch.getQueryGraph()), sources);
 	}
 	
 	/**
@@ -26,7 +27,7 @@ public abstract class OperatorFactory {
 	 * @param ptrStr
 	 * @return
 	 */
-	public abstract Plan getAtomicPlan(QuerySchema sch, QuerySystem sys, String ptrStr);
+	public abstract Plan getAtomicPlan(QuerySchema sch, QuerySystem sys, String ptrStr, Set<Integer> sources);
 	
 	/**
 	 * 

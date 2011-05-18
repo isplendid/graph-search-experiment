@@ -26,6 +26,16 @@ public class QueryGraph {
 	}
 	
 	/**
+	 * 
+	 * @param ns
+	 * @param es
+	 * @return
+	 */
+	public QueryGraph getInducedSubgraph(Set<QueryGraphNode> ns, Set<QueryGraphEdge> es) {
+		return getInducedSubgraph(ns, es, null, null);
+	}
+	
+	/**
 	 * Create an induced subgraph according to node constraints set and edge constraints set
 	 * @param ns - Node set
 	 * @param es - Edge set

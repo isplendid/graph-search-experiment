@@ -1,6 +1,7 @@
-package sjtu.apex.gse.operator.factory;
+package sjtu.apex.gse.planner.dp.factory;
 
 import java.util.List;
+import java.util.Set;
 
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.join.HashJoinPlan;
@@ -13,8 +14,8 @@ import sjtu.apex.gse.system.QuerySystem;
 public class WebOperatorFactory extends OperatorFactory {
 
 	@Override
-	public Plan getAtomicPlan(QuerySchema sch, QuerySystem sys, String ptrStr) {
-		return new WebPatternPlan(sch, sys);
+	public Plan getAtomicPlan(QuerySchema sch, QuerySystem sys, String ptrStr, Set<Integer> sources) {
+		return new WebPatternPlan(sch, sys, sources);
 	}
 
 	@Override
