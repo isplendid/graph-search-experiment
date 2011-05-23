@@ -185,20 +185,20 @@ public class NestedLoopJoinScan implements Scan {
 	}
 	
 	private class JoinThread extends Thread {
-		WebPatternScan src;
-		ResultMerger merger;
-		List<Integer> joinColumn;
-		int rowWidth;
-		QueryGraphNode[] nodeList;
-		ThreadCounter counter;
+		private WebPatternScan src;
+		private ResultMerger merger;
+		private List<Integer> joinColumn;
+		private int rowWidth;
+		private QueryGraphNode[] nodeList;
+		private ThreadCounter threadCnt;
 	
-		public JoinThread(WebPatternScan src, List<Integer> joinColumn, ResultMerger merger, QueryGraphNode[] nodeList, ThreadCounter counter) {
+		public JoinThread(WebPatternScan src, List<Integer> joinColumn, ResultMerger merger, QueryGraphNode[] nodeList, ThreadCounter threadCnt) {
 			this.src = src;
 			this.merger = merger;
 			this.joinColumn = joinColumn;
 			this.rowWidth = nodeList.length;
 			this.nodeList = nodeList;
-			this.counter = counter;
+			this.threadCnt = threadCnt;
 		}
 		
 		public void run() {
@@ -211,7 +211,7 @@ public class NestedLoopJoinScan implements Scan {
 				
 				merger.addTuple(joinValue, new Tuple(row, src.getSourceSet()));
 			}
-			counter.threadEnded();
+			threadCnt.threadEnded();
 			merger.addPoisonToken();
 		}
 	}

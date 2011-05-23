@@ -120,6 +120,7 @@ public class HashJoinScan implements Scan {
 			this.src = src;
 			this.nodeList = nodeList;
 			this.rowWidth = nodeList.length;
+			this.threadCnt = threadCnt;
 		}
 		
 		public void run() {
