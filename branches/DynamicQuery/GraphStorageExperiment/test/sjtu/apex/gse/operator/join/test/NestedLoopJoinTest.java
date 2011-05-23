@@ -102,7 +102,7 @@ public class NestedLoopJoinTest {
 			QueryGraph gc = g.getInducedSubgraph(new HashSet<QueryGraphNode>(nl), es, null, null);
 			QuerySchema qs = new QuerySchema(gc, nl);
 			
-			Plan pp = new WebPatternPlan(qs, sys);
+			Plan pp = new WebPatternPlan(qs, sys, null);
 			left.add(pp);
 		}
 		
@@ -118,7 +118,7 @@ public class NestedLoopJoinTest {
 			QueryGraph gc = g.getInducedSubgraph(new HashSet<QueryGraphNode>(nl), es, null, null);
 			QuerySchema qs = new QuerySchema(gc, nl);
 			
-			Plan pp = new WebPatternPlan(qs, sys);
+			Plan pp = new WebPatternPlan(qs, sys, null);
 			right.add(pp);
 		}
 		
