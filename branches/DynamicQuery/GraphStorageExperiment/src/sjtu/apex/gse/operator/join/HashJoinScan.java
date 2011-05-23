@@ -130,6 +130,7 @@ public class HashJoinScan implements Scan {
 		private int totalThread;
 		
 		public ProducerThread(ResultMerger merger, Scan src, QueryGraphNode[] nodeList, List<Integer> joinColumn, ThreadCounter threadCnt, int totalThread) {
+			this.joinColumn = joinColumn;
 			this.merger = merger;
 			this.src = src;
 			this.nodeList = nodeList;
