@@ -1,9 +1,11 @@
 package sjtu.apex.gse.operator.join;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -17,6 +19,7 @@ public class HashJoinScan implements Scan {
 	private static final int totalThread = 2;
 	
 	private BlockingQueue<Tuple> outputQueue;
+	private Queue<Tuple> buffer;
 	private Tuple currentEntry;
 	private QuerySchema sch;
 	private ThreadCounter threadCnt = new ThreadCounter();
@@ -24,6 +27,8 @@ public class HashJoinScan implements Scan {
 	public HashJoinScan(Scan l, Scan r, List<Integer> lo, List<Integer> ro, QuerySchema sch) {
 		
 		this.sch = sch;
+		this.buffer = new LinkedList<Tuple>();
+		
 		Map<QueryGraphNode, Integer> leftMapping = new HashMap<QueryGraphNode, Integer>();
 		Map<QueryGraphNode, Integer> rightMapping = new HashMap<QueryGraphNode, Integer>();
 		
@@ -56,8 +61,8 @@ public class HashJoinScan implements Scan {
 		leftMerger.setJoiningMerger(rightMerger);
 		rightMerger.setJoiningMerger(leftMerger);
 		
-		new ProducerThread(leftMerger, l, leftNodes, lo, threadCnt).start();
-		new ProducerThread(rightMerger, r, rightNodes, ro, threadCnt).start();
+		new ProducerThread(leftMerger, l, leftNodes, lo, threadCnt, totalThread).start();
+		new ProducerThread(rightMerger, r, rightNodes, ro, threadCnt, totalThread).start();
 	}
 
 	@Override
@@ -69,13 +74,21 @@ public class HashJoinScan implements Scan {
 	@Override
 	public boolean next() {
 		if (threadCnt.getEndedThreadCount() < totalThread) {
-			try {
-				currentEntry = outputQueue.take();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			if (buffer.size() <= 0) {
+				try {
+					buffer.add(outputQueue.take());
+					outputQueue.drainTo(buffer);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 			
-			return true;
+			currentEntry = buffer.remove();
+			
+			if (currentEntry.isDummy())
+				return false;
+			else
+				return true;
 		}
 		else
 			return false;
@@ -114,13 +127,15 @@ public class HashJoinScan implements Scan {
 		private QueryGraphNode[] nodeList;
 		private List<Integer> joinColumn;
 		private ThreadCounter threadCnt;
+		private int totalThread;
 		
-		public ProducerThread(ResultMerger merger, Scan src, QueryGraphNode[] nodeList, List<Integer> joinColumn, ThreadCounter threadCnt) {
+		public ProducerThread(ResultMerger merger, Scan src, QueryGraphNode[] nodeList, List<Integer> joinColumn, ThreadCounter threadCnt, int totalThread) {
 			this.merger = merger;
 			this.src = src;
 			this.nodeList = nodeList;
 			this.rowWidth = nodeList.length;
 			this.threadCnt = threadCnt;
+			this.totalThread = totalThread;
 		}
 		
 		public void run() {
@@ -134,6 +149,8 @@ public class HashJoinScan implements Scan {
 				merger.addTuple(joinValue, new Tuple(row, src.getSourceSet()));
 			}
 			threadCnt.threadEnded();
+			if (threadCnt.getEndedThreadCount() >= totalThread)
+				merger.addPoisonToken();
 		}
 	}
 
