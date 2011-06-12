@@ -118,8 +118,10 @@ public class WebPatternScan implements Scan {
 	private Set<String> convertSrcSetToExternal(Set<Integer> sources) {
 		Set<String> ret = new HashSet<String>();
 		
-		for (Integer id : sources)
-			ret.add(srcman.getSource(id));
+		for (Integer id : sources) {
+			String tmp = srcman.getSource(id);
+			ret.add(tmp.substring(1, tmp.length() - 2));
+		}
 		
 		return ret;
 	}

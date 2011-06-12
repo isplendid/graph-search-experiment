@@ -152,6 +152,9 @@ public class FileIndexManager implements IndexManager {
 	public Set<Integer> getSourceList(String pattern, int size) {
 		FileIndexEntry fie = seekIndexEntry(pattern, size);
 		
-		return reader[size - 1].getSourceSet(fie.shr);
+		if (fie != null)
+			return reader[size - 1].getSourceSet(fie.shr);
+		else
+			return null; 
 	}
 }
