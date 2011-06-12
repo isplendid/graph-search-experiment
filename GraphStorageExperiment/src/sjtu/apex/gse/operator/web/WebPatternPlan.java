@@ -24,14 +24,17 @@ public class WebPatternPlan implements Plan {
 		this.sch = sch;
 		this.qs = qs;
 		this.ps = ps;
-		this.sources = sources;
+		if (sources == null)
+			this.sources = new HashSet<Integer>();
+		else
+			this.sources = sources;
 	}
 
 	@Override
 	public Scan open() {
 		WebPatternScan wps = new WebPatternScan(sch, qs.idManager(), qs.sourceManager(), qs.webRepository());
 		
-		wps.addKey(-1, -1, new HashSet<Integer>());
+		wps.addKey(-1, -1, sources);
 		wps.keyEnded();
 		
 		return wps;
@@ -84,7 +87,7 @@ public class WebPatternPlan implements Plan {
 	
 	@Override
 	public String toString() {
-		return "WebPattern(" + ps + "," + sources.toString() + ")";
+		return "WebPattern(" + ps + "," + (sources == null ? "[]" : sources.toString()) + ")";
 	}
 
 
