@@ -9,7 +9,6 @@ import java.util.Set;
 
 import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.config.FileConfig;
-import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.query.FileQueryReader;
@@ -28,7 +27,7 @@ import sjtu.apex.gse.system.QuerySystem;
 public class Experiment {
 	
 	final static boolean logPlan = false;
-	final static boolean outResult = false;
+	static boolean outResult = false;
 
 	/**
 	 * @param args
@@ -38,8 +37,12 @@ public class Experiment {
 		String configFilename = args[0];
 		String queryFilename = args[1];
 		String resultFilename = args[2];
+		String outputFilename = null;
+		if (args.length >= 4) outputFilename = args[3];
 		
 		Configuration config = new FileConfig(configFilename);
+		
+		outResult = config.getIntegerSetting("OutResult", 0) == 0 ? false : true;
 		
 		QuerySystem sys = new QuerySystem(config);
 		QueryReader rd;
@@ -51,11 +54,11 @@ public class Experiment {
 		}
 		
 		BufferedWriter wr;
-		IDManager idman = null;
+		BufferedWriter out = null;
 		
 		wr = new BufferedWriter(new FileWriter(resultFilename));
-		
-		if (outResult) idman = sys.idManager();
+		if (outputFilename != null)
+			out = new BufferedWriter(new FileWriter(outputFilename));
 		
 		int cnt = 0;
 		QuerySchema qs;
@@ -76,12 +79,26 @@ public class Experiment {
 			Scan scan = p.open();
 
 			int count = 0;
+			
 			QueryGraph qg = qs.getQueryGraph();
+			
+			System.out.println(p.toString());
+			
+			if (out != null) {
+				out.append(p.toString());
+				out.flush();
+			}
+			
 			while (scan.next()) {
 				if (outResult) {
 					for (int i = qg.nodeCount() - 1; i >= 0; i--)
-						System.out.print(idman.getURI(scan.getID(qg.getNode(i))) + " ");
+						System.out.print(sys.idManager().getURI(scan.getID(qg.getNode(i))) + " ");
 					System.out.println();
+				}
+				if (out != null) {
+					for (int i = qg.nodeCount() - 1; i >= 0; i--)
+						out.append(sys.idManager().getURI(scan.getID(qg.getNode(i))) + " ");
+					out.append("\n");
 				}
 				srcs.addAll(scan.getSourceSet());
 				/* DO SOMETHING */
@@ -89,6 +106,7 @@ public class Experiment {
 			}
 			scan.close();
 			sys.close();
+			out.close();
 			
 			ie.deri.urq.lidaq.benchmark.Benchmark bm = sys.webRepository().getBenchmark();
 			long relSrc = (Long)bm.get(ie.deri.urq.lidaq.benchmark.WebRepositoryBenchmark.TOTAL_LOOKUPS) - 
