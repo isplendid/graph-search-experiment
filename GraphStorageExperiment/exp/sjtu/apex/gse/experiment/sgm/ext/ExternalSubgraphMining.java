@@ -27,7 +27,7 @@ public class ExternalSubgraphMining {
 				traverseSubfolders(f.getAbsolutePath(), files);
 	}
 	
-	public static void mine(String srcPath, String dest, String exec, int freq) throws IOException, InterruptedException {
+	public static void mine(String srcPath, String dest, String exec, String freq) throws IOException, InterruptedException {
 		WordDictionary wd = new WordDictionary();
 		BufferedWriter wr = new BufferedWriter(new FileWriter(dest));
 		List<File> files = new ArrayList<File>();
@@ -130,7 +130,7 @@ public class ExternalSubgraphMining {
 			System.out.println("4. Executable for the gSpan");
 			System.out.println("5. Frequency threshold");
 		}
-		mine(args[1], args[2], args[3], Integer.parseInt(args[4]));
+		mine(args[1], args[2], args[3], args[4]);
 		
 	}
 
