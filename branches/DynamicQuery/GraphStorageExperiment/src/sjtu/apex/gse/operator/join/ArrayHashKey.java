@@ -3,6 +3,7 @@ package sjtu.apex.gse.operator.join;
 
 public class ArrayHashKey {
 	private int[] joinValue;
+	private Integer hashCode = null;
 	
 	public ArrayHashKey(int[] joinValue) {
 		this.joinValue = joinValue;
@@ -10,16 +11,20 @@ public class ArrayHashKey {
 	
 	@Override
 	public int hashCode() {
-		int h = 0;
-		
-		for (int ki : joinValue) {
-			int highorder = h & 0xf8000000;
-			h = h << 5;
-			h = h ^ (highorder >> 27);
-			h = h ^ ki;
+		if (hashCode == null) { 
+			int h = 0;
+			
+			for (int ki : joinValue) {
+				int highorder = h & 0xf8000000;
+				h = h << 5;
+				h = h ^ (highorder >> 27);
+				h = h ^ ki;
+			}
+			
+			hashCode = h;
 		}
 		
-		return h;
+		return hashCode;
 	}
 	
 	@Override

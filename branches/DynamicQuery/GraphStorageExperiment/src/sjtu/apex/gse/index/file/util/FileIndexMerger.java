@@ -1,11 +1,9 @@
 package sjtu.apex.gse.index.file.util;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import sjtu.apex.gse.index.file.FileIndexEntry;
 import sjtu.apex.gse.index.file.FileIndexReader;
 import sjtu.apex.gse.index.file.FileIndexWriter;
+import sjtu.apex.gse.operator.join.Tuple;
 import sjtu.apex.gse.storage.file.FileRepositoryEntry;
 import sjtu.apex.gse.storage.file.FileRepositoryReader;
 import sjtu.apex.gse.storage.file.FileRepositoryWriter;
@@ -68,30 +66,29 @@ public class FileIndexMerger {
 		}
 		
 		String currentPattern = null;
-		RID start = frw.getRID();
-		RID end = null;
 		HeapContainer hc;
-		Set<Integer> tmpSrc = new HashSet<Integer>();
+		BindingMerger currentBindings = new BindingMerger();
 		
 		while ((hc = (HeapContainer)h.remove()) != null) {
 			if (currentPattern == null) currentPattern = hc.fie.pattern;
-			if (!hc.fie.pattern.equals(currentPattern) && end != null) {
-				fiw.writeEntry(currentPattern, new RecordRange(start, end), shw.writeSet(tmpSrc));
-				tmpSrc = new HashSet<Integer>();
+			if (!hc.fie.pattern.equals(currentPattern)) {
+				if (!currentPattern.isEmpty()) {
+					writePattern(fiw, frw, shw, currentPattern, currentBindings);
+					currentBindings = new BindingMerger();
+				}
+
+				//Prepare values for the next pattern
 				currentPattern = hc.fie.pattern;
-				start = frw.getRID();
 			}
-			tmpSrc.addAll(hc.shr.getSourceSet(hc.fie.shr));
 			
+			//Read all bindings and add to the merger
 			FileRepositoryReader frr = new FileRepositoryReader(hc.repFilename, size, hc.fie.range);
 			FileRepositoryEntry tmp;
-			while ((tmp = frr.readEntry()) != null) {
-				end = frw.getRID();
-				tmp.sourceHeapRange = shw.writeSet(hc.shr.getSourceSet(tmp.sourceHeapRange));
-				frw.writeEntry(tmp);
-			}
+			while ((tmp = frr.readEntry()) != null)
+				currentBindings.AddEntry(tmp.bindings, hc.shr.getSourceSet(tmp.sourceHeapRange));
 			frr.close();
 			
+			//Read next index entry and add to the heap 
 			hc.fie = hc.reader.readEntry();
 			if (hc.fie != null)
 				h.insert(hc);
@@ -101,12 +98,27 @@ public class FileIndexMerger {
 			}
 		}
 		
-		if (end != null)
-			fiw.writeEntry(currentPattern, new RecordRange(start, end), shw.writeSet(tmpSrc));
+		if (!currentBindings.isEmpty())
+			writePattern(fiw, frw, shw, currentPattern, currentBindings);
 			
 		shw.close();
 		fiw.close();
 		frw.close();
+	}
+	
+	private static void writePattern(FileIndexWriter fiw, FileRepositoryWriter frw, SourceHeapWriter shw, String pattern, BindingMerger bm) {
+		RID start, end;
+		
+		//Writes binding entries
+		start = frw.getRID();
+		end = start;
+		
+		for (Tuple t : bm.getTuples()) {
+			end = frw.getRID();
+			frw.writeEntry(t.getBindings(), shw.writeSet(t.getSources()));
+		}
+		//Writes an index entry
+		fiw.writeEntry(pattern, new RecordRange(start, end), shw.writeSet(bm.getRelevantSources()));
 	}
 	
 	static class HeapContainer implements Comparable<HeapContainer> {
