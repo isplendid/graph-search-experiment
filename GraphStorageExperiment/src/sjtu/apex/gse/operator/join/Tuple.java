@@ -29,6 +29,10 @@ public class Tuple {
 		return values[id];
 	}
 	
+	public int[] getBindings() {
+		return values;
+	}
+	
 	public Set<Integer> getSources() {
 		return sources;
 	}
