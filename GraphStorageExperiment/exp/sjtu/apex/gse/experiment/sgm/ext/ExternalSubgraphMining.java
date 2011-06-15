@@ -21,9 +21,9 @@ public class ExternalSubgraphMining {
 	
 	public static void traverseSubfolders(String root, Collection<File> files) {
 		for (File f : new File(root).listFiles()) 
-			if (f.isDirectory())
+			if (f.isFile())
 				files.add(f);
-			else
+			else if (f.isDirectory())
 				traverseSubfolders(f.getAbsolutePath(), files);
 	}
 	
@@ -74,7 +74,7 @@ public class ExternalSubgraphMining {
 		String[] cmd = new String[3];
 		cmd[0] = "sh";
 		cmd[1] = "-c";
-		cmd[2] = exec + " " + dest + " -s" + freq + " -o";
+		cmd[2] = exec + " -f " + dest + " -s" + freq + " -o";
 		
 		Process p = Runtime.getRuntime().exec(cmd);
 		int exitCode = p.waitFor();
@@ -126,7 +126,7 @@ public class ExternalSubgraphMining {
 		if (args.length < 5) {
 			System.out.println("1. Configuration filename");
 			System.out.println("2. Search root");
-			System.out.println("3. Destination filename");
+			System.out.println("3. Output filename");
 			System.out.println("4. Executable for the gSpan");
 			System.out.println("5. Frequency threshold");
 		}
