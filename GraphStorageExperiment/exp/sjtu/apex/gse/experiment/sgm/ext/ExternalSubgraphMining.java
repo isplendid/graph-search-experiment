@@ -21,7 +21,7 @@ public class ExternalSubgraphMining {
 	
 	public static void traverseSubfolders(String root, Collection<File> files) {
 		for (File f : new File(root).listFiles()) 
-			if (f.isFile())
+			if (f.isFile() && !f.getName().endsWith(".sparql"))
 				files.add(f);
 			else if (f.isDirectory())
 				traverseSubfolders(f.getAbsolutePath(), files);
