@@ -27,9 +27,9 @@ public class ExternalSubgraphMining {
 				traverseSubfolders(f.getAbsolutePath(), files);
 	}
 	
-	public static void mine(Configuration conf, String srcPath, String dest, String exec, int freq) throws IOException, InterruptedException {
+	public static void mine(String srcPath, String dest, String exec, int freq) throws IOException, InterruptedException {
+		WordDictionary wd = new WordDictionary();
 		BufferedWriter wr = new BufferedWriter(new FileWriter(dest));
-		IDManager idman = new SleepyCatIDManager(conf);
 		List<File> files = new ArrayList<File>();
 		traverseSubfolders(srcPath, files);
 		String temp;
@@ -53,7 +53,7 @@ public class ExternalSubgraphMining {
 						if (temp.equals("*")) 
 							wr.append("v " + i + " 0\n");
 						else
-							wr.append("v " + i + " " + idman.getID(temp) + "\n");
+							wr.append("v " + i + " " + wd.getID(temp) + "\n");
 					}
 				}
 
@@ -62,7 +62,7 @@ public class ExternalSubgraphMining {
 
 					if (samp)
 						wr.append("e " + (Integer.parseInt(t[0]) - 1) + " " + (Integer.parseInt(t[1]) - 1) + " "
-								+ idman.getID(t[2]) + "\n");
+								+ wd.getID(t[2]) + "\n");
 				}
 
 			}
@@ -100,11 +100,11 @@ public class ExternalSubgraphMining {
 					if (hc == 0)
 						sb.append("*\n");
 					else
-						sb.append(idman.getURI(hc) + "\n");
+						sb.append(wd.getWord(hc) + "\n");
 				}
 				else {
 					ec ++;
-					sb.append((Integer.parseInt(ts[1]) + 1) + " " + (Integer.parseInt(ts[2]) + 1) + " " + idman.getURI(Integer.parseInt(ts[3])) + "\n");
+					sb.append((Integer.parseInt(ts[1]) + 1) + " " + (Integer.parseInt(ts[2]) + 1) + " " + wd.getWord(Integer.parseInt(ts[3])) + "\n");
 				}
 			}
 			wr.append(nc + " " + ec + "\n");
@@ -130,7 +130,7 @@ public class ExternalSubgraphMining {
 			System.out.println("4. Executable for the gSpan");
 			System.out.println("5. Frequency threshold");
 		}
-		mine(new FileConfig(args[0]), args[1], args[2], args[3], Integer.parseInt(args[4]));
+		mine(args[1], args[2], args[3], Integer.parseInt(args[4]));
 		
 	}
 
