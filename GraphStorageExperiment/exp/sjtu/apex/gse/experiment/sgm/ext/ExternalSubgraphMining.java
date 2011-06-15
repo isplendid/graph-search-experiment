@@ -10,15 +10,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import sjtu.apex.gse.config.Configuration;
-import sjtu.apex.gse.config.FileConfig;
-import sjtu.apex.gse.indexer.IDManager;
-import sjtu.apex.gse.indexer.file.SleepyCatIDManager;
-
 public class ExternalSubgraphMining {
-	
-	final static double prop = 0.2;
-	
+		
 	public static void traverseSubfolders(String root, Collection<File> files) {
 		for (File f : new File(root).listFiles()) 
 			if (f.isFile() && !f.getName().endsWith(".sparql"))
@@ -27,7 +20,7 @@ public class ExternalSubgraphMining {
 				traverseSubfolders(f.getAbsolutePath(), files);
 	}
 	
-	public static void mine(String srcPath, String dest, String exec, String freq) throws IOException, InterruptedException {
+	public static void mine(String srcPath, String dest, String exec, double freq, double prop) throws IOException, InterruptedException {
 		WordDictionary wd = new WordDictionary();
 		BufferedWriter wr = new BufferedWriter(new FileWriter(dest));
 		List<File> files = new ArrayList<File>();
@@ -123,14 +116,15 @@ public class ExternalSubgraphMining {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws NumberFormatException, IOException, InterruptedException {
-		if (args.length < 5) {
+		if (args.length < 6) {
 			System.out.println("1. Configuration filename");
 			System.out.println("2. Search root");
 			System.out.println("3. Output filename");
 			System.out.println("4. Executable for the gSpan");
 			System.out.println("5. Frequency threshold");
+			System.out.println("6. Probability of being selected");
 		}
-		mine(args[1], args[2], args[3], args[4]);
+		mine(args[1], args[2], args[3], Double.parseDouble(args[4]), Double.parseDouble(args[5]));
 		
 	}
 
