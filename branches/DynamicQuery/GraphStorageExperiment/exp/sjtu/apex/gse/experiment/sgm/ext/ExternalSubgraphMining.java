@@ -29,7 +29,7 @@ public class ExternalSubgraphMining {
 	
 	public static void mine(String srcPath, String dest, String exec, int freq) throws IOException, InterruptedException {
 		WordDictionary wd = new WordDictionary();
-		BufferedWriter wr = new BufferedWriter(new FileWriter(dest));
+		BufferedWriter wr = new BufferedWriter(new FileWriter(dest + ".gen"));
 		List<File> files = new ArrayList<File>();
 		traverseSubfolders(srcPath, files);
 		String temp;
@@ -74,7 +74,7 @@ public class ExternalSubgraphMining {
 		String[] cmd = new String[3];
 		cmd[0] = "sh";
 		cmd[1] = "-c";
-		cmd[2] = exec + " -f " + dest + " -s" + freq + " -o";
+		cmd[2] = exec + " -f " + dest + ".gen " + " -s" + freq + " -o";
 		
 		Process p = Runtime.getRuntime().exec(cmd);
 		int exitCode = p.waitFor();
