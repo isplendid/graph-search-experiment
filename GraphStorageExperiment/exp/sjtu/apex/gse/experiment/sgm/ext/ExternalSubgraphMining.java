@@ -20,7 +20,7 @@ public class ExternalSubgraphMining {
 				traverseSubfolders(f.getAbsolutePath(), files);
 	}
 	
-	public static void mine(String srcPath, String dest, String exec, double freq, double prop) throws IOException, InterruptedException {
+	public static void mine(String srcPath, String dest, String exec, double freq, double prop, int minEdge) throws IOException, InterruptedException {
 		WordDictionary wd = new WordDictionary();
 		BufferedWriter wr = new BufferedWriter(new FileWriter(dest));
 		List<File> files = new ArrayList<File>();
@@ -86,7 +86,6 @@ public class ExternalSubgraphMining {
 				
 				if (ts.length == 3) {
 					nc ++;
-//					sb.append(ts[1] + " ");
 					if (Integer.parseInt(ts[1]) != (nc - 1))
 						System.out.println("error");
 					int hc = Integer.parseInt(ts[2]);
@@ -100,8 +99,10 @@ public class ExternalSubgraphMining {
 					sb.append((Integer.parseInt(ts[1]) + 1) + " " + (Integer.parseInt(ts[2]) + 1) + " " + wd.getWord(Integer.parseInt(ts[3])) + "\n");
 				}
 			}
-			wr.append(nc + " " + ec + "\n");
-			wr.append(sb.toString());
+			if (ec >= minEdge) {
+				wr.append(nc + " " + ec + "\n");
+				wr.append(sb.toString());
+			}
 		}
 		
 		wr.close();
@@ -123,8 +124,13 @@ public class ExternalSubgraphMining {
 			System.out.println("4. Executable for the gSpan");
 			System.out.println("5. Frequency threshold");
 			System.out.println("6. Probability of being selected");
+			System.out.println("7. Mininum number of edges to be output (optional)");
 		}
-		mine(args[1], args[2], args[3], Double.parseDouble(args[4]), Double.parseDouble(args[5]));
+		
+		int minEdge = 2;
+		if (args.length >= 7) minEdge = Integer.parseInt(args[6]);
+		
+		mine(args[1], args[2], args[3], Double.parseDouble(args[4]), Double.parseDouble(args[5]), minEdge);
 		
 	}
 
