@@ -1,4 +1,4 @@
-package sjtu.apex.gse.experiment.sgm;
+package sjtu.apex.gse.exp.sgm;
 
 import java.util.ArrayList;
 import java.util.HashMap;

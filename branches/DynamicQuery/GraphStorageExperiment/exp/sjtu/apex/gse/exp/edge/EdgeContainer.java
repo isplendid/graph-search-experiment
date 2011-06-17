@@ -1,4 +1,4 @@
-package sjtu.apex.gse.experiment.edge;
+package sjtu.apex.gse.exp.edge;
 
 class EdgeContainer implements Comparable<Object> {
 	int id;

@@ -1,4 +1,4 @@
-package sjtu.apex.gse.experiment.edge;
+package sjtu.apex.gse.exp.edge;
 
 import java.io.FileInputStream;
 import java.io.IOException;
