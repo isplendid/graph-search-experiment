@@ -1,4 +1,4 @@
-package sjtu.apex.gse.experiment.edge;
+package sjtu.apex.gse.exp.edge;
 
 public class Edge {
 	private int label;

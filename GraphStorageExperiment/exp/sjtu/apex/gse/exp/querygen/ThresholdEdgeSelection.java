@@ -1,4 +1,4 @@
-package sjtu.apex.gse.experiment.querygen;
+package sjtu.apex.gse.exp.querygen;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

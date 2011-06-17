@@ -1,4 +1,4 @@
-package sjtu.apex.gse.experiment.querygen;
+package sjtu.apex.gse.exp.querygen;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,8 +7,8 @@ import java.util.Set;
 
 import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.config.FileConfig;
-import sjtu.apex.gse.experiment.edge.Edge;
-import sjtu.apex.gse.experiment.edge.EdgeInfo;
+import sjtu.apex.gse.exp.edge.Edge;
+import sjtu.apex.gse.exp.edge.EdgeInfo;
 import sjtu.apex.gse.filesystem.FilesystemUtility;
 import sjtu.apex.gse.indexer.IDManager;
 import sjtu.apex.gse.indexer.LabelManager;
