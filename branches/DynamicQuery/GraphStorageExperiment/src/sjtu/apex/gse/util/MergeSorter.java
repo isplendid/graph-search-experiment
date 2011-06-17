@@ -25,6 +25,7 @@ public class MergeSorter {
 //			System.out.println("#" + c);
 			dest.setID(i, c);
 		}
+		dest.setSourceSet(src.getSourceSet());
 		return src.next();
 	}
 	
@@ -104,11 +105,17 @@ public class MergeSorter {
 		while (crun > 1) {
 			UpdateScan[] runs = initRuns(sch);
 			
-			src.next();
-			crun = splitToRuns(src, runs, sch, comp);
-			src = new RAMArrayRepository(sch);
-			crun = mergeRuns(runs, (UpdateScan)src, sch, comp);
-			src.beforeFirst();
+			if (src.next()) {
+				crun = splitToRuns(src, runs, sch, comp);
+				src = new RAMArrayRepository(sch);
+				crun = mergeRuns(runs, (UpdateScan)src, sch, comp);
+				src.beforeFirst();
+			}
+			else {
+				src = new RAMArrayRepository(sch);
+				src.beforeFirst();
+				crun = 1;
+			}
 		}		
 		
 		return src;
