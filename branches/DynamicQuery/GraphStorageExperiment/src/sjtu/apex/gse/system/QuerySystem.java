@@ -53,7 +53,7 @@ public class QuerySystem {
 		
 		paramsInit();
 		
-		indexMan = new FileIndexManager(folder, pl, psl);
+		indexMan = new FileIndexManager(config);
 		
 		
 		patternManagerInit();
