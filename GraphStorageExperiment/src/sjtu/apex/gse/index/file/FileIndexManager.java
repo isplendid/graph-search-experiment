@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Set;
 
+import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.metadata.IndexManager;
 import sjtu.apex.gse.storage.file.RID;
 import sjtu.apex.gse.storage.file.RecordRange;
@@ -20,6 +21,10 @@ public class FileIndexManager implements IndexManager {
 	private int recLen;
 	private int strSize;
 	private SourceHeapReader[] reader;
+	
+	public FileIndexManager(Configuration config) {
+		this(config.getStringSetting("DataFolder", null), config.getIntegerSetting("PatternLength", 0), config.getIntegerSetting("PatternStrSize", 128));
+	}
 	
 	public FileIndexManager(String folder, int size, int strSize) {
 		this.folder = folder;
