@@ -47,7 +47,7 @@ public class PatternPlan implements Plan {
 
 	@Override
 	public int resultCount() {
-		if (rcCache != -1)
+		if (rcCache == -1)
 			rcCache = qs.patternManager().getPatternInstanceCount(ps, sch.getQueryGraph().nodeCount());
 		
 		return rcCache;

@@ -21,7 +21,7 @@ public class PatternManagerTest {
 		QuerySchema sch;
 		
 		while ((sch = rd.read()) != null) {
-			List<PatternInfo> list = qs.patternManager().getSubPatterns(sch.getQueryGraph());
+			List<PatternInfo> list = qs.patternManager().getSubPatterns(sch.getQueryGraph(), true);
 			
 			for (PatternInfo pi : list) {
 				System.out.println(pi.getPatternString());

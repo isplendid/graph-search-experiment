@@ -110,7 +110,7 @@ public class QuerySystem {
 				break;
 		}
 	
-		queryPlanner = new DynamicProgrammingPlanner(this, opFac);
+		queryPlanner = new DynamicProgrammingPlanner(this, opFac, sysMode == QuerySystemMode.FILE_ONLY);
 	}
 	
 	public ie.deri.urq.lidaq.repos.WebRepository webRepository() {

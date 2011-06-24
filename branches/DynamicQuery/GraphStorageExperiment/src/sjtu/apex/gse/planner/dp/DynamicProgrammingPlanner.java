@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.sun.net.ssl.internal.ssl.Debug;
+
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.pattern.PatternInfo;
 import sjtu.apex.gse.planner.Planner;
@@ -26,17 +28,19 @@ public class DynamicProgrammingPlanner implements Planner {
 	
 	private QuerySystem qs;
 	private OperatorFactory opFac;
+	private boolean strictPattern;
 	
-	public DynamicProgrammingPlanner(QuerySystem querySystem, OperatorFactory opFac) {
+	public DynamicProgrammingPlanner(QuerySystem querySystem, OperatorFactory opFac, boolean strictPattern) {
 		this.qs = querySystem;
 		this.opFac = opFac;
+		this.strictPattern = strictPattern;
 	}
 
 	@Override
 	public Plan plan(QuerySchema g) {
 		QueryGraph graph = g.getQueryGraph();
 		OptimalArray optArr = new OptimalArray(graph);	
-		List<PatternInfo> sbp = qs.patternManager().getSubPatterns(graph); 
+		List<PatternInfo> sbp = qs.patternManager().getSubPatterns(graph, !strictPattern); 
 
 		for (PatternInfo pi : sbp) {
 			Set<PatternInfo> pis = new HashSet<PatternInfo>();
