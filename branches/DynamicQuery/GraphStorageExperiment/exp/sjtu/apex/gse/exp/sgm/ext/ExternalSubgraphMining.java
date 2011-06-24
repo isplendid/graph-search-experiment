@@ -150,7 +150,7 @@ public class ExternalSubgraphMining {
 					
 					int edgeLabel = idman.getID(wd.getWord(Integer.parseInt(ts[3])));
 					
-					if (existsPattern(n1l, n2l, edgeLabel))
+					if (existsPattern(n1l, edgeLabel, n2l))
 						sb.append((Integer.parseInt(ts[1]) + 1) + " " + (Integer.parseInt(ts[2]) + 1) + " " + wd.getWord(Integer.parseInt(ts[3])) + "\n");
 					else
 						sb.append((Integer.parseInt(ts[2]) + 1) + " " + (Integer.parseInt(ts[1]) + 1) + " " + wd.getWord(Integer.parseInt(ts[3])) + "\n");					
