@@ -15,7 +15,7 @@ import sjtu.apex.gse.system.QuerySystem.QuerySystemMode;
 public class DynamicProgrammingPlannerTest {
 
 	private String configPath = "cfg-web-1";
-	private String queryFile = "dbg/q/104q.500";
+	private String queryFile = "dbg/q/104q.1";
 	
 	private QuerySystem qs;
 	private QueryReader qr;

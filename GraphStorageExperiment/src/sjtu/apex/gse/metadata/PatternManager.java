@@ -60,7 +60,7 @@ public class PatternManager {
 		return indexMan.getSourceList(ps, size);
 	}
 	
-	private void addTriplePatterns(SubpatternSet generated, List<PatternInfo> elems, QueryGraph graph) {
+	private void addTriplePatterns(SubpatternSet generated, List<PatternInfo> elems, QueryGraph graph, boolean returnTriple) {
 		for (int i = 0; i < graph.edgeCount(); i++) {
 			QueryGraphEdge e = graph.getEdge(i);
 			Set<QueryGraphEdge> es = new HashSet<QueryGraphEdge>();
@@ -77,7 +77,7 @@ public class PatternManager {
 				
 				Integer insCnt = getPatternInstanceCount(ps, g.nodeCount());
 				
-				if (insCnt != null || j == 3) {
+				if (insCnt != null || (returnTriple && j == 3)) {
 					if (generated.get(ps, g.getEdgeSet(), g.getNodeSet()) == null) {
 						PatternInfo pi = new PatternInfo(g, ps, insCnt, getPatternRelevantSources(ps, g.nodeCount()), null);
 						elems.add(pi);
@@ -156,14 +156,15 @@ public class PatternManager {
 	/**
 	 * Get all legal sub-patterns of a given pattern. BFS search algorithm is applied here
 	 * @param graph - The given pattern
+	 * @param returnTriple - Indicates whether return at least a triple pattern for each edge regardless of whether it is indexed  
 	 * @return A set of legal sub-patterns
 	 */
-	public List<PatternInfo> getSubPatterns(QueryGraph graph) {
+	public List<PatternInfo> getSubPatterns(QueryGraph graph, boolean returnTriple) {
 		List<PatternInfo> elems = new ArrayList<PatternInfo>();
 		SubpatternSet generated = new SubpatternSet();
 		
 		//Triple patterns are definitely added as candidates
-		addTriplePatterns(generated, elems, graph);
+		addTriplePatterns(generated, elems, graph, returnTriple);
 
 		//Complex patterns are added if exist in index
 		addComplexPatterns(generated, elems, graph);
