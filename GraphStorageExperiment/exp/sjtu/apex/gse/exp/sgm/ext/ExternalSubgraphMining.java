@@ -192,7 +192,7 @@ public class ExternalSubgraphMining {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws NumberFormatException, IOException, InterruptedException {
-		if (args.length < 7) {
+		if (args.length < 6) {
 			System.out.println("1. Configuration filename");
 			System.out.println("2. Search root");
 			System.out.println("3. Output filename");
@@ -200,12 +200,12 @@ public class ExternalSubgraphMining {
 			System.out.println("5. Frequency threshold");
 			System.out.println("6. Probability of being selected");
 			System.out.println("7. Mininum number of edges to be output (optional)");
+		} else {
+			int minEdge = 2;
+			if (args.length >= 7) minEdge = Integer.parseInt(args[6]);
+			
+			new ExternalSubgraphMining(args[0], Double.parseDouble(args[4]), Double.parseDouble(args[5]), minEdge).mine(args[1], args[2], args[3]);
 		}
-		
-		int minEdge = 2;
-		if (args.length >= 7) minEdge = Integer.parseInt(args[6]);
-		
-		new ExternalSubgraphMining(args[0], Double.parseDouble(args[4]), Double.parseDouble(args[5]), minEdge).mine(args[1], args[2], args[3]);
 	}
 
 }
