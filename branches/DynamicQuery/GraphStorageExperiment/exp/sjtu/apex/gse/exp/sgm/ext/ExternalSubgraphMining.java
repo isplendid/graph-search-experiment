@@ -54,8 +54,8 @@ public class ExternalSubgraphMining {
 	private boolean existsPattern(int sub, int pred, int obj) {
 		QueryGraph g = new QueryGraph();
 		
-		QueryGraphNode subn = g.addNode(sub);
-		QueryGraphNode objn = g.addNode(obj);
+		QueryGraphNode subn = sub < 0 ? g.addNode() : g.addNode(sub);
+		QueryGraphNode objn = obj < 0 ? g.addNode() : g.addNode(obj);
 		g.addEdge(subn, objn, pred);
 		
 		String pattern = codec.encodePattern(g);
