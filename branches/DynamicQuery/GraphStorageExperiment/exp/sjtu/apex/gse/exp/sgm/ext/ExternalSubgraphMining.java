@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.net.ssl.internal.ssl.Debug;
-
 import sjtu.apex.gse.config.Configuration;
 import sjtu.apex.gse.config.FileConfig;
 import sjtu.apex.gse.index.file.FileIndexManager;
@@ -62,7 +60,7 @@ public class ExternalSubgraphMining {
 		
 		String pattern = codec.encodePattern(g);
 		
-		Debug.println("DEBUG", pattern + " - " + (idxman.seek(pattern, 2) != null));
+		System.out.println("DEBUG : " + pattern + " - " + (idxman.seek(pattern, 2) != null));
 		
 		return (idxman.seek(pattern, 2) != null);
 	}
