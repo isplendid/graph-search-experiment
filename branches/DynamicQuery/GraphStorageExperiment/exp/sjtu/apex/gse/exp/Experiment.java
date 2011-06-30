@@ -106,7 +106,7 @@ public class Experiment {
 			}
 			scan.close();
 			sys.close();
-			out.close();
+			if (out != null) out.close();
 			
 			ie.deri.urq.lidaq.benchmark.Benchmark bm = sys.webRepository().getBenchmark();
 			long relSrc = (Long)bm.get(ie.deri.urq.lidaq.benchmark.WebRepositoryBenchmark.TOTAL_LOOKUPS) - 
