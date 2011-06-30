@@ -31,6 +31,9 @@ import sjtu.apex.gse.system.QuerySystem.QuerySystemMode;
 import com.sun.net.ssl.internal.ssl.Debug;
 
 public class ComplexPatternIndexService {
+	
+	public static int threshold = 32767;
+	
 	private int maxSize;
 	private FileIndexer fidx;
 	private IDManager idman;
@@ -69,6 +72,7 @@ public class ComplexPatternIndexService {
 			System.out.println("Indexing pattern " + patternStr);
 			
 			while (s.next()) {
+				if (maps.size() > threshold) break;
 				Map<QueryGraphNode, Integer> nodeId = cnm.getMap(q.getQueryGraph());
 				int[] bindings = new int[q.getQueryGraph().nodeCount()];
 				
@@ -87,9 +91,12 @@ public class ComplexPatternIndexService {
 				
 				t.getSources().addAll(s.getSourceSet());
 			}
+			s.close();
 			
-			for (Tuple t : maps.values())
-				fidx.addEntry(patternStr, q.getQueryGraph().nodeCount(), t.getBindings(), t.getSources());
+			if (maps.size() <= threshold) {
+				for (Tuple t : maps.values())
+					fidx.addEntry(patternStr, q.getQueryGraph().nodeCount(), t.getBindings(), t.getSources());
+			}
 		}
 	}
 	
