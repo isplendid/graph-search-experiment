@@ -4,6 +4,7 @@
 query_folder=$1
 result_folder=$2
 out_folder=$3
+index_no=$4
 
 if [ ! -d $result_folder ]
 then
@@ -47,6 +48,6 @@ do
     fi
 
     echo Running $query to $result_file
-    timeout -s 9 180s java -Xmx4096m -cp bin:lib/nxparser.jar:lib/je-3.3.69.jar:lib/lidaq_web_repos.jar:lib/openrdf-sesame-2.3.2-onejar.jar sjtu.apex.gse.exp.Experiment cfg-web-cmplx $query $result_file $output_file > /dev/null 2>&1
+    timeout -s 9 180s java -Xmx4096m -cp bin:lib/nxparser.jar:lib/je-3.3.69.jar:lib/lidaq_web_repos.jar:lib/openrdf-sesame-2.3.2-onejar.jar sjtu.apex.gse.exp.Experiment cfg-web-cmplx$index_no $query $result_file $output_file > /dev/null 2>&1
   done
 done
