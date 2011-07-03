@@ -12,7 +12,6 @@ import sjtu.apex.gse.struct.QueryGraph;
 import sjtu.apex.gse.struct.QueryGraphEdge;
 import sjtu.apex.gse.struct.QueryGraphNode;
 
-
 /**
  * 
  * @author Tian Yuan
@@ -93,7 +92,8 @@ public class PatternManager {
 		subject.getSources().retainAll(sources);		
 	}
 	
-	private void updateGraphs(QueryGraph ng, SubpatternSet generated, List<PatternInfo> elems, PatternInfo parent) {
+	private boolean updateGraphs(QueryGraph ng, SubpatternSet generated, List<PatternInfo> elems, PatternInfo parent) {
+		boolean ret = false;
 		String ps = codec.encodePattern(ng);
 		Integer insCnt;
 		
@@ -113,7 +113,10 @@ public class PatternManager {
 					itr = itr.getParent();
 				} while (itr != null);
 			}
+			ret = true;
 		}
+		
+		return ret;
 	}
 	
 	private void addComplexPatterns(SubpatternSet generated, List<PatternInfo> elems, QueryGraph graph) {
@@ -131,10 +134,17 @@ public class PatternManager {
 				for (Connectivity c : n.getAncestor().getConnectivities()) 
 					if (!edgeCovered.contains(c.getEdge())){
 						edgeCovered.add(c.getEdge());
+						nodeConstrained.add(n.getAncestor());
 						
 						QueryGraph ng = graph.getInducedSubgraph(nodeConstrained, edgeCovered);
-						updateGraphs(ng, generated, elems, toExt);
+						boolean updated = updateGraphs(ng, generated, elems, toExt);
 						
+						nodeConstrained.remove(n.getAncestor());
+						
+						if (!updated) {
+							ng = graph.getInducedSubgraph(nodeConstrained, edgeCovered);
+							updateGraphs(ng, generated, elems, toExt);
+						}
 						edgeCovered.remove(c.getEdge());
 					}
 				
