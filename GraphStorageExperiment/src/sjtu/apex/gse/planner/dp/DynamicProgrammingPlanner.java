@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.sun.net.ssl.internal.ssl.Debug;
-
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.pattern.PatternInfo;
 import sjtu.apex.gse.planner.Planner;
@@ -17,7 +15,6 @@ import sjtu.apex.gse.struct.QueryGraphEdge;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
 import sjtu.apex.gse.system.QuerySystem;
-
 
 /**
  * A planner that applies dynamic programming algorithm

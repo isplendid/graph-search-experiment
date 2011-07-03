@@ -1,6 +1,7 @@
 package sjtu.apex.gse.pattern;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -63,10 +64,32 @@ public class DirectPatternCodec implements PatternCodec {
 			QueryGraphNode currentNode = graph.getNode(i);
 			if ((cmpRes = currentNode.getLabel() - minNode.getLabel()) < 0)
 				minNode = currentNode;
-			else if (cmpRes == 0 && (cmpRes = (currentNode.getOutDegree() - minNode.getOutDegree())) > 0)
-				minNode = currentNode;
-			else if (cmpRes == 0 && (cmpRes = (currentNode.getInDegree() - minNode.getInDegree())) > 0)
-				minNode = currentNode;
+			else if (cmpRes == 0) {
+				if ((cmpRes = (currentNode.getOutDegree() - minNode.getOutDegree())) > 0)
+					minNode = currentNode;
+				else if (cmpRes == 0) {
+					if ((cmpRes = (currentNode.getInDegree() - minNode.getInDegree())) > 0)
+						minNode = currentNode;
+					else if (cmpRes == 0) {
+						List<Integer> currentEdges = new ArrayList<Integer>();
+						List<Integer> minNodeEdges = new ArrayList<Integer>();
+						
+						for (Connectivity c : currentNode.getConnectivities())
+							currentEdges.add(c.getEdge().getLabel());
+						
+						for (Connectivity c : minNode.getConnectivities())
+							minNodeEdges.add(c.getEdge().getLabel());
+						
+						Collections.sort(currentEdges);
+						Collections.sort(minNodeEdges);
+						
+						for (int j = 0; j < currentEdges.size(); j ++) 
+							if (currentEdges.get(j) - minNodeEdges.get(j) < 0) {
+								minNode = currentNode;
+							}
+					}
+				}
+			}
 		}
 
 		return iterativeEncode(graph, minNode, new HashSet<QueryGraphNode>());
