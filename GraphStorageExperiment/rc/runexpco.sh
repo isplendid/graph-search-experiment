@@ -1,6 +1,14 @@
 #!/bin/bash
 #
 
+EXPECTED_ARGS=4
+
+if [ $# -ne $EXPECTED_ARGS ]
+then
+  echo "Usage : `basename $0` <query folder> <result folder> <out folder> <index number>"
+  exit $E_BADARGS
+fi
+
 query_folder=$1
 result_folder=$2
 out_folder=$3
