@@ -101,18 +101,21 @@ public class PatternManager {
 			Set<Integer> tmpSrc = new HashSet<Integer>(parent.getSources());
 			tmpSrc.retainAll(getPatternRelevantSources(ps, ng.nodeCount()));
 			
+			//Add the pattern to element set if it does not exist
 			PatternInfo pi;
 			if ((pi = generated.get(ps, ng.getEdgeSet(), ng.getNodeSet())) == null) {
 				pi = new PatternInfo(ng, ps, insCnt, tmpSrc, parent);
 				elems.add(pi);
 				generated.add(pi);
-			} else {
-				PatternInfo itr = parent;
-				do {
-					contrainSources(itr, tmpSrc);
-					itr = itr.getParent();
-				} while (itr != null);
 			}
+			
+			//Update parents by constraining its sources
+			PatternInfo itr = parent;
+			do {
+				contrainSources(itr, tmpSrc);
+				itr = itr.getParent();
+			} while (itr != null);
+	
 			ret = true;
 		}
 		
@@ -134,12 +137,12 @@ public class PatternManager {
 				for (Connectivity c : n.getAncestor().getConnectivities()) 
 					if (!edgeCovered.contains(c.getEdge())){
 						edgeCovered.add(c.getEdge());
-						nodeConstrained.add(n.getAncestor());
+						nodeConstrained.add(c.getNode().getAncestor());
 						
 						QueryGraph ng = graph.getInducedSubgraph(nodeConstrained, edgeCovered);
 						boolean updated = updateGraphs(ng, generated, elems, toExt);
 						
-						nodeConstrained.remove(n.getAncestor());
+						nodeConstrained.remove(c.getNode().getAncestor());
 						
 						if (!updated) {
 							ng = graph.getInducedSubgraph(nodeConstrained, edgeCovered);
