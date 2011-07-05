@@ -15,7 +15,10 @@ public class WebOperatorFactory extends OperatorFactory {
 
 	@Override
 	public Plan getAtomicPlan(QuerySchema sch, QuerySystem sys, String ptrStr, Set<Integer> sources) {
-		return new WebPatternPlan(sch, sys, sources);
+		if (sch.getQueryGraph().edgeCount() != 1)
+			return null;
+		else
+			return new WebPatternPlan(sch, sys, sources);
 	}
 
 	@Override

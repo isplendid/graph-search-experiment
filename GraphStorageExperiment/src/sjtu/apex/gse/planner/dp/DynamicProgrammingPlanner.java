@@ -43,9 +43,11 @@ public class DynamicProgrammingPlanner implements Planner {
 			Set<PatternInfo> pis = new HashSet<PatternInfo>();
 			
 			Plan p = opFac.getAtomicPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()), qs, pi.getSources());
-
-			pis.add(pi);
-			optArr.setInitValue(new OptimalArrayElem(p, pis, null, pi));
+			
+			if (p != null) {
+				pis.add(pi);
+				optArr.setInitValue(new OptimalArrayElem(p, pis, null, pi));
+			}
 		}
 
 		Set<OptimalArrayElem> ext;
