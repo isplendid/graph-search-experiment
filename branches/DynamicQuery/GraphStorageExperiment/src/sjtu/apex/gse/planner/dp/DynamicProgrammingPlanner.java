@@ -25,29 +25,28 @@ public class DynamicProgrammingPlanner implements Planner {
 	
 	private QuerySystem qs;
 	private OperatorFactory opFac;
-	private boolean strictPattern;
+	private boolean isFromFile;
 	
-	public DynamicProgrammingPlanner(QuerySystem querySystem, OperatorFactory opFac, boolean strictPattern) {
+	public DynamicProgrammingPlanner(QuerySystem querySystem, OperatorFactory opFac, boolean isFromFile) {
 		this.qs = querySystem;
 		this.opFac = opFac;
-		this.strictPattern = strictPattern;
+		this.isFromFile = isFromFile;
 	}
 
 	@Override
 	public Plan plan(QuerySchema g) {
 		QueryGraph graph = g.getQueryGraph();
 		OptimalArray optArr = new OptimalArray(graph);	
-		List<PatternInfo> sbp = qs.patternManager().getSubPatterns(graph, !strictPattern); 
+		List<PatternInfo> sbp = qs.patternManager().getSubPatterns(graph, !isFromFile); 
 
-		for (PatternInfo pi : sbp) {
+		for (PatternInfo pi : sbp) 
+		if (!isFromFile || pi.getPattern().edgeCount() == 1) {
 			Set<PatternInfo> pis = new HashSet<PatternInfo>();
 			
 			Plan p = opFac.getAtomicPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()), qs, pi.getSources());
 			
-			if (p != null) {
-				pis.add(pi);
-				optArr.setInitValue(new OptimalArrayElem(p, pis, null, pi));
-			}
+			pis.add(pi);
+			optArr.setInitValue(new OptimalArrayElem(p, pis, null, pi));
 		}
 
 		Set<OptimalArrayElem> ext;
@@ -56,12 +55,14 @@ public class DynamicProgrammingPlanner implements Planner {
 				Set<PatternInfo> containedPattern = elem.getContainedPatterns();
 				
 				for (PatternInfo p : sbp)
-					if (!containedPattern.contains(p) && isExtendAndConnected(p, elem)){
-						Set<PatternInfo> con = getContainedPattern(elem.getContainedPatterns(), p);
-						Plan pln = getJoinSelectPlan(elem, p, g);
-						OptimalArrayElem oae = new OptimalArrayElem(pln, con, elem.getSatisfiedNodes(), p);
-
-						optArr.update(oae);
+					if (!isFromFile || p.getPattern().edgeCount() == 1) {
+						if (!containedPattern.contains(p) && isExtendAndConnected(p, elem)){
+							Set<PatternInfo> con = getContainedPattern(elem.getContainedPatterns(), p);
+							Plan pln = getJoinSelectPlan(elem, p, g);
+							OptimalArrayElem oae = new OptimalArrayElem(pln, con, elem.getSatisfiedNodes(), p);
+	
+							optArr.update(oae);
+						}
 					}
 			}
 		}

@@ -1,6 +1,5 @@
 package sjtu.apex.gse.planner.dp.test;
 
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,8 +13,8 @@ import sjtu.apex.gse.system.QuerySystem.QuerySystemMode;
 
 public class DynamicProgrammingPlannerTest {
 
-	private String configPath = "cfg-web-1";
-	private String queryFile = "dbg/q/104q.1";
+	private String configPath = "cfg-web-cmplx8";
+	private String queryFile = "dbg/q/144q.86";
 	
 	private QuerySystem qs;
 	private QueryReader qr;
