@@ -40,14 +40,14 @@ public class DynamicProgrammingPlanner implements Planner {
 		List<PatternInfo> sbp = qs.patternManager().getSubPatterns(graph, !isFromFile); 
 
 		for (PatternInfo pi : sbp) 
-		if (!isFromFile || pi.getPattern().edgeCount() == 1) {
-			Set<PatternInfo> pis = new HashSet<PatternInfo>();
-			
-			Plan p = opFac.getAtomicPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()), qs, pi.getSources());
-			
-			pis.add(pi);
-			optArr.setInitValue(new OptimalArrayElem(p, pis, null, pi));
-		}
+			if (isFromFile || pi.getPattern().edgeCount() == 1) {
+				Set<PatternInfo> pis = new HashSet<PatternInfo>();
+				
+				Plan p = opFac.getAtomicPlan(new QuerySchema(pi.getPattern(), pi.getCoveredNodes()), qs, pi.getSources());
+				
+				pis.add(pi);
+				optArr.setInitValue(new OptimalArrayElem(p, pis, null, pi));
+			}
 
 		Set<OptimalArrayElem> ext;
 		while ((ext = optArr.nextStage()) != null) {
@@ -55,7 +55,7 @@ public class DynamicProgrammingPlanner implements Planner {
 				Set<PatternInfo> containedPattern = elem.getContainedPatterns();
 				
 				for (PatternInfo p : sbp)
-					if (!isFromFile || p.getPattern().edgeCount() == 1) {
+					if (isFromFile || p.getPattern().edgeCount() == 1) {
 						if (!containedPattern.contains(p) && isExtendAndConnected(p, elem)){
 							Set<PatternInfo> con = getContainedPattern(elem.getContainedPatterns(), p);
 							Plan pln = getJoinSelectPlan(elem, p, g);

@@ -35,7 +35,7 @@ public class SourceHeapWriter {
 			if (pointer > fileSize) {
 				file.setLength(pointer);
 				file.seek(pageStart);
-				file.write(buf, 0 , (int)pointer % pageSize);
+				file.write(buf, 0 , (int)(pointer  & (pageSize - 1)));
 			}
 			file.close();
 		} catch (IOException e) {

@@ -19,6 +19,10 @@ public class BindingMerger {
 		this(defaultMaxSrc);
 	}
 	
+	/**
+	 * 
+	 * @param maxSrc
+	 */
 	public BindingMerger(int maxSrc) {
 		this.maxSrc = maxSrc;
 		this.keyEntryMap = new HashMap<ArrayHashKey, Tuple>();
@@ -37,7 +41,7 @@ public class BindingMerger {
 			tmpEntry = keyEntryMap.get(key);
 
 		for (Integer i : sources) {
-			if (tmpEntry.getSources().size() >= maxSrc)
+			if (maxSrc > 0 && tmpEntry.getSources().size() >= maxSrc)
 				break;
 			tmpEntry.getSources().add(i);
 			relevantSrc.add(i);
