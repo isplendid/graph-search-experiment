@@ -5,6 +5,7 @@ import java.util.List;
 
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
+import sjtu.apex.gse.operator.visitor.PlanVisitor;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
 
@@ -30,6 +31,14 @@ public class HashJoinPlan implements Plan {
 		this.l = l;
 		this.r = r;
 		this.sch = sch;
+	}
+	
+	public Plan leftPlan() {
+		return l;
+	}
+	
+	public Plan rightPlan() {
+		return r;
 	}
 
 	@Override
@@ -71,6 +80,11 @@ public class HashJoinPlan implements Plan {
 	@Override
 	public int webAccess() {
 		return l.webAccess() + r.webAccess();
+	}
+
+	@Override
+	public void accept(PlanVisitor visitor) {
+		visitor.visit(this);
 	}
 
 }

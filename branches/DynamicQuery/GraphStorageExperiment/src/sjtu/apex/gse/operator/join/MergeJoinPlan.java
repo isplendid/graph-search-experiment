@@ -7,6 +7,7 @@ import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.RestorableScan;
 import sjtu.apex.gse.operator.Scan;
 import sjtu.apex.gse.operator.SortPlan;
+import sjtu.apex.gse.operator.visitor.PlanVisitor;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
 
@@ -44,6 +45,14 @@ public class MergeJoinPlan implements Plan {
 		return new MergeJoinScan((RestorableScan)l.open(), (RestorableScan)r.open(), li, ri, sch);
 	}
 	
+	public Plan leftPlan() {
+		return l;
+	}
+	
+	public Plan rightPlan() {
+		return r;
+	}
+	
 	public void close() {
 		// TODO Auto-generated method stub
 
@@ -79,6 +88,11 @@ public class MergeJoinPlan implements Plan {
 	@Override
 	public int webAccess() {
 		return l.webAccess() + r.webAccess();
+	}
+
+	@Override
+	public void accept(PlanVisitor visitor) {
+		visitor.visit(this);
 	}
 
 }

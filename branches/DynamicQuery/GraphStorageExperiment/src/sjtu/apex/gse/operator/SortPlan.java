@@ -3,6 +3,7 @@ package sjtu.apex.gse.operator;
 import java.util.ArrayList;
 import java.util.List;
 
+import sjtu.apex.gse.operator.visitor.PlanVisitor;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
 import sjtu.apex.gse.util.EntryComparator;
@@ -31,6 +32,10 @@ public class SortPlan implements Plan {
 			order.add(sch.getNodeID(q.get(i)));
 		
 		comp = new IDComparator(order);
+	}
+	
+	public Plan sourcePlan() {
+		return src;
 	}
 	
 	public Scan open() {
@@ -71,5 +76,10 @@ public class SortPlan implements Plan {
 	@Override
 	public int webAccess() {
 		return 0;
+	}
+
+	@Override
+	public void accept(PlanVisitor visitor) {
+		visitor.visit(this);		
 	}
 }

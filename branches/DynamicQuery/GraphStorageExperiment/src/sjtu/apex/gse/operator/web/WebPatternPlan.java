@@ -5,6 +5,7 @@ import java.util.Set;
 
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
+import sjtu.apex.gse.operator.visitor.PlanVisitor;
 import sjtu.apex.gse.struct.QuerySchema;
 import sjtu.apex.gse.system.QuerySystem;
 
@@ -90,6 +91,14 @@ public class WebPatternPlan implements Plan {
 		return "WebPattern(" + ps + "," + (sources == null ? "[]" : sources.toString()) + ")";
 	}
 
+	@Override
+	public void accept(PlanVisitor visitor) {
+		visitor.visit(this);
+	}
 
+
+	public Set<Integer> getPlanSource() {
+		return sources;
+	}
 }
 

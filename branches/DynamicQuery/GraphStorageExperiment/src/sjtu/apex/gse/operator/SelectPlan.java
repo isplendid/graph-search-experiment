@@ -1,5 +1,6 @@
 package sjtu.apex.gse.operator;
 
+import sjtu.apex.gse.operator.visitor.PlanVisitor;
 import sjtu.apex.gse.struct.QuerySchema;
 
 /**
@@ -53,6 +54,11 @@ public class SelectPlan implements Plan {
 	public int webAccess() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public void accept(PlanVisitor visitor) {
+		visitor.visit(this);
 	}
 
 
