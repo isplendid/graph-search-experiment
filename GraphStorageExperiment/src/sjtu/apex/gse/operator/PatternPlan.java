@@ -2,6 +2,7 @@ package sjtu.apex.gse.operator;
 
 import java.util.Map;
 
+import sjtu.apex.gse.operator.visitor.PlanVisitor;
 import sjtu.apex.gse.struct.QueryGraphNode;
 import sjtu.apex.gse.struct.QuerySchema;
 import sjtu.apex.gse.system.QuerySystem;
@@ -66,6 +67,11 @@ public class PatternPlan implements Plan {
 	@Override
 	public int webAccess() {
 		return 0;
+	}
+
+	@Override
+	public void accept(PlanVisitor visitor) {
+		visitor.visit(this);
 	}
 
 }

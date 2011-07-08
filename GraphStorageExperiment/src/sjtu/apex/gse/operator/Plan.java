@@ -1,5 +1,6 @@
 package sjtu.apex.gse.operator;
 
+import sjtu.apex.gse.operator.visitor.PlanClient;
 import sjtu.apex.gse.struct.QuerySchema;
 
 
@@ -8,7 +9,7 @@ import sjtu.apex.gse.struct.QuerySchema;
  * @author Tian Yuan
  *
  */
-public interface Plan {
+public interface Plan extends PlanClient {
 	
 	/**
 	 * Open the result set of the node in the plan tree and 

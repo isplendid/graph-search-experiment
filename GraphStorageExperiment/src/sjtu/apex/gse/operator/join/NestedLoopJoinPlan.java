@@ -5,6 +5,7 @@ import java.util.List;
 
 import sjtu.apex.gse.operator.Plan;
 import sjtu.apex.gse.operator.Scan;
+import sjtu.apex.gse.operator.visitor.PlanVisitor;
 import sjtu.apex.gse.operator.web.WebPatternPlan;
 import sjtu.apex.gse.operator.web.WebPatternScan;
 import sjtu.apex.gse.struct.QueryGraph;
@@ -56,6 +57,14 @@ public class NestedLoopJoinPlan implements Plan {
 		
 		this.sys = sys;
 	}
+	
+	public Plan leftPlan() {
+		return l;
+	}
+	
+	public Plan rightPlan() {
+		return r;
+	}
 
 	@Override
 	public Scan open() {
@@ -96,6 +105,11 @@ public class NestedLoopJoinPlan implements Plan {
 	@Override
 	public int webAccess() {
 		return l.webAccess() + resultCount() * 3;
+	}
+
+	@Override
+	public void accept(PlanVisitor visitor) {
+		visitor.visit(this);		
 	}
 
 }
