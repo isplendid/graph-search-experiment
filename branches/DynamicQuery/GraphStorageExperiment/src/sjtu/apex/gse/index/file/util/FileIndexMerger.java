@@ -67,14 +67,14 @@ public class FileIndexMerger {
 		
 		String currentPattern = null;
 		HeapContainer hc;
-		BindingMerger currentBindings = new BindingMerger(-1);
+		BindingMerger currentBindings = new BindingMerger();
 		
 		while ((hc = (HeapContainer)h.remove()) != null) {
 			if (currentPattern == null) currentPattern = hc.fie.pattern;
 			if (!hc.fie.pattern.equals(currentPattern)) {
 				if (!currentPattern.isEmpty()) {
 					writePattern(fiw, frw, shw, currentPattern, currentBindings);
-					currentBindings = new BindingMerger(-1);
+					currentBindings = new BindingMerger();
 				}
 
 				//Prepare values for the next pattern

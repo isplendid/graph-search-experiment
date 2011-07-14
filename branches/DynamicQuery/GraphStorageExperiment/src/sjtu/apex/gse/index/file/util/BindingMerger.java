@@ -9,22 +9,13 @@ import sjtu.apex.gse.operator.join.ArrayHashKey;
 import sjtu.apex.gse.operator.join.Tuple;
 
 public class BindingMerger {
-	private static final int defaultMaxSrc = 2;
-	
 	private HashMap<ArrayHashKey, Tuple> keyEntryMap;
 	private HashSet<Integer> relevantSrc;
-	private int maxSrc;
-	
-	public BindingMerger() {
-		this(defaultMaxSrc);
-	}
 	
 	/**
 	 * 
-	 * @param maxSrc
 	 */
-	public BindingMerger(int maxSrc) {
-		this.maxSrc = maxSrc;
+	public BindingMerger() {
 		this.keyEntryMap = new HashMap<ArrayHashKey, Tuple>();
 		this.relevantSrc = new HashSet<Integer>();
 	}
@@ -41,8 +32,6 @@ public class BindingMerger {
 			tmpEntry = keyEntryMap.get(key);
 
 		for (Integer i : sources) {
-			if (maxSrc > 0 && tmpEntry.getSources().size() >= maxSrc)
-				break;
 			tmpEntry.getSources().add(i);
 			relevantSrc.add(i);
 		}
